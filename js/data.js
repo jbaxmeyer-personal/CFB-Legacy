@@ -1682,7 +1682,7 @@ const DILEMMA_EVENTS = [
     title: "A Player Opens Up",
     text: () => `A player confides that he's struggling badly outside of football.`,
     choices: [
-      { label: "Connect him with resources, ease his load", effects: { culture: 3, teamTalentDelta: -1 }, outcome: "He gets real help. The team takes a small on-field hit without him at full speed." },
+      { label: "Connect him with resources, ease his load", effects: { culture: 3, teamTalentDelta: -1, development: -1 }, outcome: "He gets real help. The team takes a small on-field hit, and your own attention is stretched thin for a while." },
       { label: "Push him to play through it", effects: { teamTalentDelta: 1, culture: -3 }, outcome: "Short-term production, but word gets around about how it was handled." },
     ],
   },
@@ -1994,7 +1994,7 @@ const DILEMMA_EVENTS = [
     title: "Pregame Prayer",
     text: () => `Most of the team wants a pregame prayer circle; a few players say it makes them uncomfortable.`,
     choices: [
-      { label: "Keep it voluntary and off to the side", effects: { culture: 2 }, outcome: "Everyone gets what they need without anyone feeling pressured." },
+      { label: "Keep it voluntary and off to the side", effects: { culture: 1 }, outcome: "Everyone gets what they need without anyone feeling pressured." },
       { label: "Make it a full-team tradition", effects: { culture: 2, teamTalentDelta: -1 }, outcome: "A powerful bonding moment for most — a quietly uncomfortable one for a few." },
     ],
   },
@@ -2084,8 +2084,8 @@ const DILEMMA_EVENTS = [
     title: "A Star's Foundation",
     text: () => `Your best player asks the program to publicly back a charity foundation he just started.`,
     choices: [
-      { label: "Back it publicly", effects: { mediaSavvy: 2, culture: 1 }, outcome: "Great optics for both of you, and a little more of his energy goes outward." },
-      { label: "Support him privately, keep the program neutral", effects: { culture: 1, mediaSavvy: -1 }, outcome: "Quieter, and it avoids any appearance of favoritism toward one player's cause." },
+      { label: "Back it publicly", effects: { mediaSavvy: 2, culture: -1 }, outcome: "Great optics for both of you — and a couple of teammates quietly note the favoritism." },
+      { label: "Support him privately, keep the program neutral", effects: { culture: 1 }, outcome: "Quieter, and it avoids any appearance of favoritism toward one player's cause." },
     ],
   },
   {
@@ -2186,7 +2186,7 @@ const DILEMMA_EVENTS = [
     title: "All-Star Game Snub",
     text: () => `One of your incoming signees gets left off a national all-star game roster — he's furious.`,
     choices: [
-      { label: "Publicly back him", effects: { mediaSavvy: 1, recruiting: 1 }, outcome: "He feels seen. It's a small, low-risk gesture that pays off in trust." },
+      { label: "Publicly back him", effects: { mediaSavvy: 1, recruiting: 1, culture: -1 }, outcome: "He feels seen — and a couple of teammates wonder why he needed the extra attention." },
       { label: "Stay out of it", effects: { recruiting: -1 }, outcome: "Not your fight — and he notices you didn't step in." },
     ],
   },
@@ -2196,7 +2196,7 @@ const DILEMMA_EVENTS = [
     title: "Camp Evaluation",
     text: () => `A prospect who dominated your summer camp isn't rated highly by recruiting services. Your gut says otherwise.`,
     choices: [
-      { label: "Offer him anyway, trust your eyes", effects: { recruiting: 1, development: 1 }, outcome: "A potential steal — or a swing that doesn't pan out. Either way, the staff trusts its own evaluation." },
+      { label: "Offer him anyway, trust your eyes", effects: { recruiting: 1, development: 1, jobSecurity: -1 }, outcome: "A potential steal — or a swing that doesn't pan out, and it's your name on the evaluation." },
       { label: "Defer to the industry rankings", effects: { recruiting: -1 }, outcome: "Safe and conventional. You may have just let a diamond walk out the door." },
     ],
   },
@@ -2237,7 +2237,7 @@ const DILEMMA_EVENTS = [
     text: () => `You're tight on scholarship numbers and considering a grayshirt offer to a mid-tier recruit — enroll later, save a spot now.`,
     choices: [
       { label: "Make the offer, be upfront about it", effects: { recruiting: 1, culture: 1 }, outcome: "Honest and workable. Not every family loves the arrangement, but this one respects it." },
-      { label: "Pass, find a cleaner scholarship fit", effects: { recruiting: -1 }, outcome: "Simpler roster math, one fewer body in a thin position group." },
+      { label: "Pass, find a cleaner scholarship fit", effects: { recruiting: -1, teamTalentDelta: 1 }, outcome: "Simpler roster math — and a recruit who can actually help you sooner." },
     ],
   },
   {
@@ -2246,7 +2246,7 @@ const DILEMMA_EVENTS = [
     title: "A Family in Need",
     text: () => `A recruit's family is quietly struggling financially — nothing you can legally offer beyond the scholarship, but you can be present.`,
     choices: [
-      { label: "Connect them with legitimate support resources", effects: { culture: 2, recruiting: 1 }, outcome: "Done entirely by the book, and it means everything to that family." },
+      { label: "Connect them with legitimate support resources", effects: { culture: 2, recruiting: 1, jobSecurity: -1 }, outcome: "It means everything to that family — and even done by the book, it's the kind of gesture compliance wants documented." },
       { label: "Keep the relationship strictly recruiting-focused", effects: { recruiting: -1 }, outcome: "Clean and cautious. It reads as a little cold to a family going through a hard time." },
     ],
   },
@@ -2356,8 +2356,8 @@ const DILEMMA_EVENTS = [
     title: "Show Me the Snap Counts",
     text: () => `A recruit's father wants hard data on freshman snap counts at your position group before committing.`,
     choices: [
-      { label: "Give him the honest numbers", effects: { recruiting: 1, culture: 1 }, outcome: "Full transparency. It scares off some recruits and reassures others." },
-      { label: "Speak in generalities instead", effects: { recruiting: 1, culture: -1 }, outcome: "Vaguer, and easier to sell in the moment." },
+      { label: "Give him the honest numbers", effects: { recruiting: -1, culture: 1 }, outcome: "Full transparency. It scares this one off, and it's the reputation that lands the next one." },
+      { label: "Speak in generalities instead", effects: { recruiting: 1, culture: -1 }, outcome: "Vaguer, and easier to sell in the moment — the current room notices the soft-pedaling." },
     ],
   },
   {
@@ -2366,7 +2366,7 @@ const DILEMMA_EVENTS = [
     title: "Underwhelming Testing Numbers",
     text: () => `A recruit you love puts up mediocre numbers at a national combine, tanking his rating overnight.`,
     choices: [
-      { label: "Stick with your tape evaluation", effects: { recruiting: 1, development: 1 }, outcome: "Trusting your own scouting over a stopwatch — a real program value." },
+      { label: "Stick with your tape evaluation", effects: { recruiting: 1, development: 1, jobSecurity: -1 }, outcome: "Trusting your own scouting over a stopwatch — and it's your credibility on the line if the tape was wrong." },
       { label: "Cool off on him like everyone else", effects: { recruiting: -1 }, outcome: "Following the market. You may be following it right off a good player." },
     ],
   },
@@ -2396,8 +2396,8 @@ const DILEMMA_EVENTS = [
     title: "Class Ranking Day",
     text: () => `National recruiting class rankings drop, and yours lands lower than the fan base expected.`,
     choices: [
-      { label: "Get ahead of it publicly, contextualize the class", effects: { mediaSavvy: 2 }, outcome: "A confident, proactive response calms most of the noise." },
-      { label: "Say nothing, let the results speak later", effects: { jobSecurity: -1 }, outcome: "The silence gets filled with fan speculation instead." },
+      { label: "Get ahead of it publicly, contextualize the class", effects: { mediaSavvy: 2, jobSecurity: -1 }, outcome: "A confident, proactive response calms most of the noise — and now you own the narrative if the class underperforms." },
+      { label: "Say nothing, let the results speak later", effects: { culture: 1 }, outcome: "The silence gets filled with fan speculation — and the team stays focused inward instead." },
     ],
   },
 
@@ -2538,7 +2538,7 @@ const DILEMMA_EVENTS = [
     title: "Media Days Grilling",
     text: () => `At conference media days, reporters pepper you with questions about last year's disappointing finish.`,
     choices: [
-      { label: "Own it fully, no excuses", effects: { mediaSavvy: 2, reputation: 1 }, outcome: "Accountability plays well. It's also now the headline everywhere." },
+      { label: "Own it fully, no excuses", effects: { mediaSavvy: 2, reputation: 1, jobSecurity: -1 }, outcome: "Accountability plays well externally — and it's now the headline the administration has to answer for too." },
       { label: "Pivot hard to this year's optimism", effects: { mediaSavvy: 1, reputation: -1 }, outcome: "Upbeat and forward-looking, if a little tone-deaf to the questions asked." },
     ],
   },
@@ -2558,7 +2558,7 @@ const DILEMMA_EVENTS = [
     title: "A Legend Returns",
     text: () => `A Hall of Fame alumnus wants a prominent role around the program — mostly ceremonial, but he has strong opinions.`,
     choices: [
-      { label: "Welcome him in, let him speak to the team", effects: { culture: 2, mediaSavvy: 1 }, outcome: "A powerful link to the program's history, occasional unsolicited advice included." },
+      { label: "Welcome him in, let him speak to the team", effects: { culture: 2, mediaSavvy: 1, teamTalentDelta: -1 }, outcome: "A powerful link to the program's history — and his unsolicited scheme advice muddies a practice or two." },
       { label: "Keep his role purely ceremonial", effects: { mediaSavvy: 1, culture: -1 }, outcome: "Polite distance maintained. He feels kept at arm's length." },
     ],
   },
@@ -2922,7 +2922,7 @@ const DILEMMA_EVENTS = [
     title: "Grieving in Silence",
     text: () => `You learn secondhand that a player lost a close family member weeks ago and never told the staff.`,
     choices: [
-      { label: "Check in personally, offer real support", effects: { culture: 3 }, outcome: "He opens up, and the relationship is stronger for it." },
+      { label: "Check in personally, offer real support", effects: { culture: 3, development: -1 }, outcome: "He opens up, and the relationship is stronger for it — the personal time comes out of your coaching hours." },
       { label: "Respect his privacy, don't bring it up", effects: { culture: -1 }, outcome: "You don't intrude — and he's left carrying it alone." },
     ],
   },
@@ -3042,7 +3042,7 @@ const DILEMMA_EVENTS = [
     title: "Breaking the Stigma",
     text: () => `You want to normalize players seeing the team's sports psychologist, but there's a real stigma around it in the room.`,
     choices: [
-      { label: "Talk about it openly with the whole team", effects: { culture: 3 }, outcome: "The stigma cracks. A few more players quietly start using the resource." },
+      { label: "Talk about it openly with the whole team", effects: { culture: 3, teamTalentDelta: -1 }, outcome: "The stigma cracks and a few more players quietly start using the resource — the meeting eats into practice time." },
       { label: "Let players seek it out privately", effects: { culture: 1 }, outcome: "No pressure applied, and the stigma lingers a little longer." },
     ],
   },
@@ -3304,8 +3304,8 @@ const DILEMMA_EVENTS = [
     title: "Riding a Streak",
     text: () => `A long winning streak has brought outsized national attention and pressure to keep it going.`,
     choices: [
-      { label: "Address the streak head-on with the team", effects: { culture: 1, weekPowerDelta: 1 }, outcome: "Naming the pressure takes some of its power away." },
-      { label: "Pretend the streak doesn't exist", effects: { weekPowerDelta: -1 }, outcome: "A studied nonchalance that doesn't fully hide the tension in the building." },
+      { label: "Address the streak head-on with the team", effects: { culture: 1, weekPowerDelta: -1 }, outcome: "Naming the pressure takes some of its power away — and makes it very real in the room for a moment." },
+      { label: "Pretend the streak doesn't exist", effects: { weekPowerDelta: 2 }, outcome: "A studied nonchalance that keeps everyone loose and playing free." },
     ],
   },
   {
@@ -3346,8 +3346,8 @@ const DILEMMA_EVENTS = [
     title: "The Quiet Leader",
     text: () => `A quiet, unassuming player in your room turns out to be the emotional glue holding it together.`,
     choices: [
-      { label: "Publicly recognize his leadership", effects: { culture: 2, mediaSavvy: 1 }, outcome: "He's a little embarrassed by the spotlight, and the room respects the callout." },
-      { label: "Let him keep leading quietly", effects: { culture: 1 }, outcome: "You respect his style, and the wider team never quite sees what you see." },
+      { label: "Publicly recognize his leadership", effects: { mediaSavvy: 1, culture: -1 }, outcome: "He's genuinely embarrassed by the spotlight, even as the room respects the callout." },
+      { label: "Let him keep leading quietly", effects: { culture: 2 }, outcome: "You respect his style, and it pays off in a quieter, more authentic way." },
     ],
   },
   {
@@ -3396,7 +3396,7 @@ const DILEMMA_EVENTS = [
     title: "Showing Off Your Room",
     text: () => `A recruiting visit puts a five-star prospect in your position room for an hour — a chance to sell your development track record.`,
     choices: [
-      { label: "Give him the full, honest pitch", effects: { recruiting: 1, culture: 1 }, outcome: "Genuine and specific, the kind of pitch that sticks with a recruit." },
+      { label: "Give him the full, honest pitch", effects: { recruiting: 1, culture: 1, development: -1 }, outcome: "Genuine and specific, the kind of pitch that sticks with a recruit — at the cost of an hour you'd planned to spend with your current room." },
       { label: "Let the head coach's pitch do the heavy lifting", effects: { recruiting: -1 }, outcome: "Less effort from you, and a slightly less personal impression left behind." },
     ],
   },
@@ -3406,8 +3406,8 @@ const DILEMMA_EVENTS = [
     title: "Skipping the Voluntary Lift",
     text: () => `A proven veteran in your room has been skipping voluntary weight room sessions all offseason.`,
     choices: [
-      { label: "Call him out directly, one-on-one", effects: { culture: 1, teamTalentDelta: 1 }, outcome: "A direct conversation that gets him back in the building." },
-      { label: "Let his production speak for itself", effects: { culture: -1 }, outcome: "No confrontation — and a standard the rest of the room notices isn't enforced evenly." },
+      { label: "Call him out directly, one-on-one", effects: { teamTalentDelta: 1, culture: -1 }, outcome: "A direct conversation that gets him back in the building — and creates a little friction between you." },
+      { label: "Let his production speak for itself", effects: { culture: 1 }, outcome: "No confrontation, relationship intact — and a standard the rest of the room notices isn't enforced evenly." },
     ],
   },
   {
