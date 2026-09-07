@@ -1,0 +1,593 @@
+/* ==========================================================================
+   CFB Legacy — theme
+   Matches the dark, sharp visual language of the Dynasty Tracker and
+   CFB Scoreboard apps: near-black base, elevated panels, subtle borders,
+   a single blue accent, system fonts only.
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  --bg-base: #0a0d12;
+  --bg-panel: #12171f;
+  --bg-panel-raised: #1a2029;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  --text-primary: #f4f6f9;
+  --text-secondary: #98a2b3;
+  --text-tertiary: #667085;
+
+  --accent: #4da6ff;
+  --accent-dim: #1e3a52;
+  --win: #34c759;
+  --danger: #ff3b30;
+  --danger-dim: #4a1f1c;
+  --gold: #ffd60a;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  --shadow-panel: 0 8px 30px rgba(0, 0, 0, 0.45);
+
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  background: radial-gradient(ellipse 120% 80% at 50% -10%, #171d27 0%, var(--bg-base) 55%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  max-width: 720px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3 {
+  margin: 0 0 0.6rem;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0 0 0.6rem;
+  line-height: 1.5;
+}
+
+.muted {
+  color: var(--text-secondary);
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.btn {
+  appearance: none;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-panel-raised);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #04101c;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.btn-block {
+  width: 100%;
+  display: block;
+  margin-top: 1rem;
+}
+
+.btn-choice {
+  text-align: left;
+  width: 100%;
+}
+
+.choice-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+/* ==========================================================================
+   Layout helpers
+   ========================================================================== */
+
+.screen {
+  padding: 1rem 1rem 2.5rem;
+  flex: 1;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen-title {
+  font-size: 1.35rem;
+  margin: 0.4rem 0 1rem;
+}
+
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.1rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-panel);
+}
+
+.panel h2 {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   Header / coach card
+   ========================================================================== */
+
+.app-header {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.school-banner {
+  padding: 1.25rem 1rem;
+  position: relative;
+}
+
+.school-banner__overlay {
+  background: rgba(10, 13, 18, 0.45);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.9rem;
+  backdrop-filter: blur(2px);
+}
+
+.school-banner__title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.school-banner__sub {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.school-banner__meta {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 0.15rem;
+}
+
+.header-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem 0;
+}
+
+.pill {
+  background: var(--bg-panel-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.pill--rep {
+  color: var(--gold);
+  border-color: rgba(255, 214, 10, 0.3);
+}
+
+.pill--danger {
+  color: var(--danger);
+  border-color: rgba(255, 59, 48, 0.4);
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem 1rem;
+  padding: 0.9rem 1rem 1.1rem;
+}
+
+.stat-bar__label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.2rem;
+}
+
+.stat-bar__track {
+  background: var(--bg-panel-raised);
+  border-radius: 999px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.stat-bar__fill {
+  background: var(--accent);
+  height: 100%;
+  border-radius: 999px;
+}
+
+/* ==========================================================================
+   Start screen
+   ========================================================================== */
+
+.start-screen {
+  padding: 2rem 1.2rem 2.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.wordmark {
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  background: linear-gradient(180deg, #fff, #c7ccd4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.3rem;
+}
+
+.tagline {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.field {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.field span {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.3rem;
+}
+
+.field input[type="text"] {
+  width: 100%;
+  background: var(--bg-panel-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.8rem;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.field input[type="text"]:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ==========================================================================
+   Choice cards (radio-styled)
+   ========================================================================== */
+
+.choice-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+}
+
+@media (min-width: 480px) {
+  .choice-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.choice-card {
+  display: block;
+  position: relative;
+  background: var(--bg-panel-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.8rem 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.choice-card input {
+  position: absolute;
+  opacity: 0;
+}
+
+.choice-card--selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+  background: var(--accent-dim);
+}
+
+.choice-card__title {
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.choice-card__desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   Dilemma / event screen
+   ========================================================================== */
+
+.event-panel h2 {
+  color: var(--text-primary);
+  text-transform: none;
+  font-size: 1.15rem;
+  letter-spacing: normal;
+  margin-top: 0.3rem;
+}
+
+/* ==========================================================================
+   Recap
+   ========================================================================== */
+
+.recap-panel {
+  text-align: center;
+}
+
+.recap-record {
+  font-size: 2.6rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.recap-postseason {
+  color: var(--gold);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.achievement-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.8rem;
+}
+
+.achievement-badge {
+  background: var(--bg-panel-raised);
+  border: 1px solid rgba(255, 214, 10, 0.35);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.storyline-list {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.storyline-list li {
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   Offseason / job market
+   ========================================================================== */
+
+.banner {
+  text-align: center;
+  font-weight: 600;
+}
+
+.banner--danger {
+  border-color: rgba(255, 59, 48, 0.4);
+  color: var(--danger);
+}
+
+.offer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.8rem;
+}
+
+@media (min-width: 480px) {
+  .offer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.offer-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-panel);
+}
+
+.offer-card__banner {
+  height: 46px;
+}
+
+.offer-card__body {
+  padding: 0.9rem;
+}
+
+.offer-card__kind {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  margin-bottom: 0.2rem;
+}
+
+.offer-card__kind--promotion {
+  color: var(--win);
+}
+
+.offer-card__kind--stay {
+  color: var(--accent);
+}
+
+.offer-card__title {
+  font-weight: 700;
+  font-size: 1.02rem;
+}
+
+.offer-card__school {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.offer-card__meta {
+  font-size: 0.78rem;
+  margin-bottom: 0.6rem;
+}
+
+/* ==========================================================================
+   History panel
+   ========================================================================== */
+
+.history-panel {
+  border-top: 1px solid var(--border-subtle);
+  padding: 0.9rem 1rem 1.4rem;
+}
+
+.history-panel summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.history-panel__scroll {
+  overflow-x: auto;
+  margin-top: 0.7rem;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.history-table th, .history-table td {
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+.history-table th {
+  color: var(--text-tertiary);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+}
+
+/* ==========================================================================
+   Retirement screen
+   ========================================================================== */
+
+.achievement-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+}
+
+.achievement-grid .achievement-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  padding: 0.6rem 0.7rem;
+}
+
+.achievement-badge--locked {
+  opacity: 0.4;
+  border-color: var(--border-subtle);
+}
+
+.achievement-badge__icon {
+  font-size: 1.1rem;
+}
+
+.achievement-badge__label {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.achievement-badge__desc {
+  font-size: 0.78rem;
+}
