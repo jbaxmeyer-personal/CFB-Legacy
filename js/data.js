@@ -1300,6 +1300,32 @@ const RECRUITING_FOCUS_OPTIONS = [
   },
 ];
 
+const OFFENSE_SCHEMES = [
+  { id: "Spread", label: "Spread", description: "Four verticals, tempo, space. Rewards a sharp Offense IQ and a deep skill-position room.", fitStats: ["offenseIQ", "recruiting"] },
+  { id: "Air Raid", label: "Air Raid", description: "Pass-heavy, high-volume attack. Explosive with a strong-armed QB, exposed if the line can't hold up.", fitStats: ["offenseIQ", "development"] },
+  { id: "Power Spread", label: "Power Spread", description: "Run-first out of spread sets. Physical, ball-control, forgiving of a shaky passing game.", fitStats: ["development", "culture"] },
+  { id: "Pro Style", label: "Pro Style", description: "Balanced, multiple, pro-readable. No glaring weakness, no defining strength either.", fitStats: ["offenseIQ", "culture"] },
+  { id: "Multiple Offense", label: "Multiple Offense", description: "Formation soup — a lot to install, a lot of answers once it's in.", fitStats: ["offenseIQ", "development"] },
+  { id: "Option", label: "Option", description: "Ball-control, clock-killing, low-turnover. Old-school, but it wins low-talent matchups.", fitStats: ["culture", "development"] },
+];
+
+const DEFENSE_SCHEMES = [
+  { id: "4-2-5", label: "4-2-5", description: "Speed over size, built for spread offenses. Exposed against a physical run game.", fitStats: ["defenseIQ", "recruiting"] },
+  { id: "Base 4-3", label: "Base 4-3", description: "Textbook, sound against the run, asks less of your secondary.", fitStats: ["defenseIQ", "culture"] },
+  { id: "Base 3-4", label: "Base 3-4", description: "Disguise and pressure from multiple angles. Needs smart linebackers to execute.", fitStats: ["defenseIQ", "development"] },
+  { id: "3-3-5", label: "3-3-5", description: "Extra DB, bend-don't-break against the pass. Vulnerable up front on early downs.", fitStats: ["defenseIQ", "recruiting"] },
+  { id: "Multiple Defense", label: "Multiple Defense", description: "Disguises everything, installs slowly. Confuses opponents once it's mastered.", fitStats: ["defenseIQ", "development"] },
+  { id: "3-4 Multiple", label: "3-4 Multiple", description: "Hybrid fronts, versatile personnel. Rewards depth and coaching continuity.", fitStats: ["development", "culture"] },
+];
+
+function schemesForSide(side) {
+  return side === "offense" ? OFFENSE_SCHEMES : DEFENSE_SCHEMES;
+}
+
+function findScheme(side, id) {
+  return schemesForSide(side).find((s) => s.id === id);
+}
+
 const PHILOSOPHY_OPTIONS = [
   {
     id: "conservative",
@@ -1351,9 +1377,9 @@ const DILEMMA_EVENTS = [
     title: "Curfew Breaker",
     text: (ctx) => `Your best player was caught out past curfew the night before a road trip. The locker room is watching how ${ctx.pronoun} you handle it.`,
     choices: [
-      { label: "Bench him for the first quarter", effects: { culture: 4, teamTalentDelta: -1 }, outcome: "The message lands. The team respects the line you drew." },
+      { label: "Bench him for the first quarter", effects: { culture: 4, teamTalentDelta: -1, weekPowerDelta: -2 }, outcome: "The message lands. The team respects the line you drew." },
       { label: "Private word, no punishment", effects: { culture: -2, mediaSavvy: 1 }, outcome: "He appreciates the discretion, but a few veterans notice the double standard." },
-      { label: "Suspend him for the game", effects: { culture: 6, teamTalentDelta: -3, reputation: 1 }, outcome: "A costly stand, but the program's discipline reputation grows." },
+      { label: "Suspend him for the game", effects: { culture: 6, teamTalentDelta: -3, reputation: 1, weekPowerDelta: -5 }, outcome: "A costly stand, but the program's discipline reputation grows." },
     ],
   },
   {
@@ -1363,7 +1389,7 @@ const DILEMMA_EVENTS = [
     text: () => `A major booster corners you at a fundraiser, pushing hard for more playing time for his nephew — a backup.`,
     choices: [
       { label: "Politely refuse", effects: { culture: 2, mediaSavvy: -1 }, outcome: "Word gets around that you can't be pushed. The roster respects it." },
-      { label: "Give the kid a few token snaps", effects: { mediaSavvy: 2, culture: -1 }, outcome: "The booster is satisfied. A couple of players grumble about favoritism." },
+      { label: "Give the kid a few token snaps", effects: { mediaSavvy: 2, culture: -1, teamTalentDelta: -1 }, outcome: "The booster is satisfied. A couple of players grumble about favoritism." },
       { label: "Report it to the AD", effects: { reputation: 2, jobSecurity: -3 }, outcome: "The AD backs you publicly, but you've made an enemy with deep pockets." },
     ],
   },
@@ -1373,8 +1399,8 @@ const DILEMMA_EVENTS = [
     title: "Transfer Portal Storm",
     text: (ctx) => `A rival staffer is quietly recruiting one of ${ctx.possessive} best players in the portal chat rooms.`,
     choices: [
-      { label: "Call an emergency meeting to re-recruit him", effects: { recruiting: 2, teamTalentDelta: 1 }, outcome: "The extra attention works — he commits to staying." },
-      { label: "Let him decide on his own", effects: { culture: 1 }, outcome: "He stays, appreciating that you didn't pressure him." },
+      { label: "Call an emergency meeting to re-recruit him", effects: { recruiting: 2, teamTalentDelta: 1, development: -1 }, outcome: "The extra attention works — he commits to staying." },
+      { label: "Let him decide on his own", effects: { culture: 1, recruiting: -1 }, outcome: "He stays, appreciating that you didn't pressure him." },
       { label: "Move on and open a scholarship", effects: { teamTalentDelta: -2, development: 1 }, outcome: "He transfers. It stings, but you already have his replacement targeted." },
     ],
   },
@@ -1384,7 +1410,7 @@ const DILEMMA_EVENTS = [
     title: "Media Firestorm",
     text: () => `A local reporter asks a loaded question about the team's struggles in your postgame press conference.`,
     choices: [
-      { label: "Deflect with coach-speak", effects: { mediaSavvy: 1 }, outcome: "Bland but safe. Nobody remembers it by Monday." },
+      { label: "Deflect with coach-speak", effects: { mediaSavvy: 1, reputation: -1 }, outcome: "Bland but safe. Nobody remembers it by Monday." },
       { label: "Fire back at the reporter", effects: { mediaSavvy: -3, reputation: 1 }, outcome: "Clips go viral. Fans love the fire, the administration winces." },
       { label: "Give an unusually honest answer", effects: { mediaSavvy: 3, jobSecurity: -1 }, outcome: "Refreshing candor earns respect, but it also hands ammunition to critics." },
     ],
@@ -1395,8 +1421,8 @@ const DILEMMA_EVENTS = [
     title: "Injury Scare",
     text: () => `Your best player at your position group goes down awkwardly in practice. The training staff wants to be cautious.`,
     choices: [
-      { label: "Shut him down for the week", effects: { culture: 2, teamTalentDelta: -1 }, outcome: "He's fresh for the following week's game. Depth gets valuable reps." },
-      { label: "Push to get him back for Saturday", effects: { teamTalentDelta: 1, culture: -2 }, outcome: "He plays, but the training staff isn't thrilled with the call." },
+      { label: "Shut him down for the week", effects: { culture: 2, teamTalentDelta: -1, weekPowerDelta: -3 }, outcome: "He's fresh for the following week's game. Depth gets valuable reps." },
+      { label: "Push to get him back for Saturday", effects: { teamTalentDelta: 1, culture: -2, weekPowerDelta: 3 }, outcome: "He plays, but the training staff isn't thrilled with the call." },
     ],
   },
   {
@@ -1405,7 +1431,7 @@ const DILEMMA_EVENTS = [
     title: "The Home Visit",
     text: () => `A five-star prospect's family wants brutal honesty about playing time before they'll commit.`,
     choices: [
-      { label: "Promise a real shot to compete", effects: { recruiting: 2, culture: 1 }, outcome: "The honesty resonates. He commits, expectations set correctly." },
+      { label: "Promise a real shot to compete", effects: { recruiting: 2, culture: 1, teamTalentDelta: -1 }, outcome: "The honesty resonates. He commits, expectations set correctly." },
       { label: "Oversell the depth chart", effects: { recruiting: 3, culture: -2 }, outcome: "He commits, but the current starters overhear about the promise." },
       { label: "Walk away from the recruitment", effects: { culture: 1, recruiting: -1 }, outcome: "You keep your word cheap elsewhere, but a blue-chip talent goes to a rival." },
     ],
@@ -1417,7 +1443,7 @@ const DILEMMA_EVENTS = [
     text: () => `A Power conference program is trying to poach your top assistant with a big raise.`,
     choices: [
       { label: "Match the offer to keep him", effects: { jobSecurity: -2, development: 2 }, outcome: "Budget strain, but staff continuity holds." },
-      { label: "Let him go and promote from within", effects: { development: -1, mediaSavvy: 1 }, outcome: "A rocky transition, but you find a rising star underneath him." },
+      { label: "Let him go and promote from within", effects: { development: -1, mediaSavvy: 1, jobSecurity: 1 }, outcome: "A rocky transition, but you find a rising star underneath him." },
     ],
   },
   {
@@ -1426,8 +1452,8 @@ const DILEMMA_EVENTS = [
     title: "Rivalry Week",
     text: () => `The whole state has been counting down to this game for a year. The team is buzzing — or maybe too tight.`,
     choices: [
-      { label: "Keep the week business as usual", effects: { culture: 1 }, outcome: "The calm approach keeps nerves in check." },
-      { label: "Lean into the hype all week", effects: { teamTalentDelta: 1, culture: -1 }, outcome: "The energy is electric, though a couple of guys look keyed-up." },
+      { label: "Keep the week business as usual", effects: { culture: 1, reputation: -1, weekPowerDelta: 0 }, outcome: "The calm approach keeps nerves in check, if a little flat." },
+      { label: "Lean into the hype all week", effects: { teamTalentDelta: 1, culture: -1, weekPowerDelta: 3 }, outcome: "The energy is electric, though a couple of guys look keyed-up." },
     ],
   },
   {
@@ -1436,8 +1462,8 @@ const DILEMMA_EVENTS = [
     title: "Eligibility Trouble",
     text: () => `Academic services flags a starter as at-risk for eligibility this term.`,
     choices: [
-      { label: "Mandate study hall hours", effects: { culture: 2, development: 1 }, outcome: "He buckles down and stays eligible." },
-      { label: "Leave it to the player", effects: { culture: -1 }, outcome: "He squeaks by, but it was closer than anyone liked." },
+      { label: "Mandate study hall hours", effects: { culture: 2, development: 1, teamTalentDelta: -1 }, outcome: "He buckles down and stays eligible, but loses practice reps to tutoring." },
+      { label: "Leave it to the player", effects: { culture: -1, mediaSavvy: 1 }, outcome: "He squeaks by. Players notice you treated him like an adult." },
     ],
   },
   {
@@ -1456,8 +1482,8 @@ const DILEMMA_EVENTS = [
     title: "Game Plan Leak",
     text: () => `You suspect a portion of next week's game plan leaked to the opponent's staff.`,
     choices: [
-      { label: "Scrap the plan and rebuild", effects: { development: -1, teamTalentDelta: 1 }, outcome: "Extra work pays off with a fresher wrinkle nobody saw." },
-      { label: "Trust the plan and move forward", effects: { culture: -1 }, outcome: "It works out, but the uncertainty nags at the staff all week." },
+      { label: "Scrap the plan and rebuild", effects: { development: -1, teamTalentDelta: 1, weekPowerDelta: 3 }, outcome: "Extra work pays off with a fresher wrinkle nobody saw." },
+      { label: "Trust the plan and move forward", effects: { culture: -1, development: 1 }, outcome: "It works out, and the staff banks the saved prep time elsewhere." },
     ],
   },
   {
@@ -1466,8 +1492,8 @@ const DILEMMA_EVENTS = [
     title: "Weather Disruption",
     text: () => `A storm wipes out two days of outdoor practice right before a big game.`,
     choices: [
-      { label: "Move everything to walkthroughs", effects: { development: 1 }, outcome: "Mental reps keep the install on track." },
-      { label: "Push through in the indoor facility", effects: { teamTalentDelta: 1, culture: -1 }, outcome: "The extra work pays off physically, but the team is gassed." },
+      { label: "Move everything to walkthroughs", effects: { development: 1, teamTalentDelta: -1 }, outcome: "Mental reps keep the install on track, but the legs feel it Saturday." },
+      { label: "Push through in the indoor facility", effects: { teamTalentDelta: 1, culture: -1, weekPowerDelta: 2 }, outcome: "The extra work pays off physically, but the team is gassed." },
     ],
   },
   {
@@ -1486,7 +1512,7 @@ const DILEMMA_EVENTS = [
     title: "The Head Coach Wants Your Read",
     text: () => `The head coach asks you point-blank in the staff meeting whether your group is ready to install a riskier wrinkle for Saturday.`,
     choices: [
-      { label: "Vouch for it — they're ready", effects: { reputation: 2, teamTalentDelta: 1 }, outcome: "It works. Your stock with the head coach rises." },
+      { label: "Vouch for it — they're ready", effects: { reputation: 2, teamTalentDelta: 1, weekPowerDelta: 3 }, outcome: "It works. Your stock with the head coach rises." },
       { label: "Advise caution", effects: { reputation: 1, culture: 1 }, outcome: "The safe call is respected, if unremarkable." },
     ],
   },
@@ -1516,8 +1542,8 @@ const DILEMMA_EVENTS = [
     title: "Walk-On Story",
     text: () => `A walk-on in your program has quietly outplayed a scholarship starter in practice all month.`,
     choices: [
-      { label: "Reward it with real reps", effects: { culture: 3, development: 1 }, outcome: "A feel-good story that galvanizes the whole roster." },
-      { label: "Stick with the scholarship depth chart", effects: { culture: -2 }, outcome: "Politically safe, but the locker room notices." },
+      { label: "Reward it with real reps", effects: { culture: 3, development: 1, weekPowerDelta: -1 }, outcome: "A feel-good story that galvanizes the whole roster." },
+      { label: "Stick with the scholarship depth chart", effects: { culture: -2, teamTalentDelta: 1 }, outcome: "Politically safe and proven — but the locker room notices." },
     ],
   },
   {
@@ -1526,7 +1552,7 @@ const DILEMMA_EVENTS = [
     title: "Award Season Buzz",
     text: () => `Your name is coming up in Coach of the Year conversations. A reporter wants an exclusive sit-down.`,
     choices: [
-      { label: "Do the interview", effects: { mediaSavvy: 2, reputation: 2 }, outcome: "Good exposure, though a couple of assistants feel overlooked." },
+      { label: "Do the interview", effects: { mediaSavvy: 2, reputation: 2, culture: -1 }, outcome: "Good exposure, though a couple of assistants feel overlooked." },
       { label: "Deflect credit to the staff and players", effects: { culture: 3, mediaSavvy: 1 }, outcome: "The humility plays extremely well inside the building." },
     ],
   },
@@ -1536,8 +1562,8 @@ const DILEMMA_EVENTS = [
     title: "Quarterback Controversy",
     text: () => `Your starting QB has been shaky, and the backup is lighting it up in practice. Fans are loud on social media.`,
     choices: [
-      { label: "Make the switch", effects: { teamTalentDelta: 1, culture: -2 }, outcome: "Bold move. It could pay off big or blow up the room." },
-      { label: "Stick with the starter", effects: { culture: 2 }, outcome: "Loyalty is noted, even if the offense doesn't improve much." },
+      { label: "Make the switch", effects: { teamTalentDelta: 1, culture: -2, weekPowerDelta: 2 }, outcome: "Bold move. It could pay off big or blow up the room." },
+      { label: "Stick with the starter", effects: { culture: 2, weekPowerDelta: -1 }, outcome: "Loyalty is noted, even if the offense doesn't improve much." },
     ],
   },
   {
@@ -1546,7 +1572,7 @@ const DILEMMA_EVENTS = [
     title: "In-State Snub",
     text: () => `The state's top recruit publicly says he's looking at programs outside the region.`,
     choices: [
-      { label: "Make a personal, public pitch", effects: { mediaSavvy: 2, recruiting: 1 }, outcome: "It's a swing for the fences. He notices the effort." },
+      { label: "Make a personal, public pitch", effects: { mediaSavvy: 2, recruiting: 1, jobSecurity: -1 }, outcome: "It's a swing for the fences. He notices the effort." },
       { label: "Focus recruiting resources elsewhere", effects: { recruiting: 1 }, outcome: "Pragmatic. You land depth instead of a headline name." },
     ],
   },
@@ -1556,7 +1582,7 @@ const DILEMMA_EVENTS = [
     title: "Practice Scuffle",
     text: () => `Two players come to blows at practice over a trash-talking incident.`,
     choices: [
-      { label: "Discipline both equally", effects: { culture: 4 }, outcome: "Fair and firm. The room respects the standard." },
+      { label: "Discipline both equally", effects: { culture: 4, teamTalentDelta: -1 }, outcome: "Fair and firm. The room respects the standard, even the star who got benched with everyone else." },
       { label: "Let it go — competitive fire is good", effects: { culture: -3, teamTalentDelta: 1 }, outcome: "The edge stays, but so does the tension." },
     ],
   },
@@ -1566,8 +1592,8 @@ const DILEMMA_EVENTS = [
     title: "Alumni Dinner",
     text: () => `You're invited to a big-money alumni dinner the night before a short practice week.`,
     choices: [
-      { label: "Attend and work the room", effects: { mediaSavvy: 2, reputation: 1 }, outcome: "Fundraising relationships strengthen for the program's future." },
-      { label: "Skip it to focus on the game plan", effects: { teamTalentDelta: 1, mediaSavvy: -1 }, outcome: "The team appreciates the focus; the boosters notice the absence." },
+      { label: "Attend and work the room", effects: { mediaSavvy: 2, reputation: 1, weekPowerDelta: -2 }, outcome: "Fundraising relationships strengthen for the program's future." },
+      { label: "Skip it to focus on the game plan", effects: { teamTalentDelta: 1, mediaSavvy: -1, weekPowerDelta: 2 }, outcome: "The team appreciates the focus; the boosters notice the absence." },
     ],
   },
   {
@@ -1576,8 +1602,258 @@ const DILEMMA_EVENTS = [
     title: "Trap Game",
     text: () => `A ranked opponent looms next week, and this Saturday's overmatched opponent is being overlooked in the building.`,
     choices: [
-      { label: "Sound the alarm in meetings", effects: { culture: 2 }, outcome: "The focus holds. No trap sprung." },
-      { label: "Let the staff coast a bit", effects: { culture: -2, teamTalentDelta: -1 }, outcome: "A scare on the scoreboard reminds everyone why you don't look ahead." },
+      { label: "Sound the alarm in meetings", effects: { culture: 2, weekPowerDelta: 3 }, outcome: "The focus holds. No trap sprung." },
+      { label: "Let the staff coast a bit", effects: { culture: -2, teamTalentDelta: -1, development: 1, weekPowerDelta: -5 }, outcome: "A scare on the scoreboard reminds everyone why you don't look ahead — though the lighter week gets your backups real reps." },
+    ],
+  },
+  {
+    id: "hazing_allegation",
+    stages: ["coordinator", "headcoach"],
+    title: "Hazing Allegation",
+    text: () => `A freshman's parents call about upperclassmen hazing in the position rooms.`,
+    choices: [
+      { label: "Investigate and discipline those responsible", effects: { culture: 4, teamTalentDelta: -2 }, outcome: "Painful in the short term — you suspend a key veteran — but the culture shift is real." },
+      { label: "Handle it quietly, one-on-one", effects: { mediaSavvy: 1, culture: -3 }, outcome: "No headlines, but the underlying problem doesn't really go away." },
+    ],
+  },
+  {
+    id: "ncaa_compliance_flag",
+    stages: ["headcoach"],
+    title: "Compliance Flag",
+    text: () => `Your compliance office flags a minor recruiting-contact violation risk from an overeager assistant.`,
+    choices: [
+      { label: "Self-report immediately", effects: { reputation: 1, jobSecurity: -3 }, outcome: "Short-term pain with the administration, but your integrity is on record." },
+      { label: "Quietly correct the process internally", effects: { jobSecurity: 1, reputation: -1 }, outcome: "It blows over — for now — but the risk doesn't disappear, just goes underground." },
+    ],
+  },
+  {
+    id: "satellite_camp_tour",
+    stages: ["coordinator", "headcoach"],
+    title: "Satellite Camp Tour",
+    text: () => `You're invited to work camps in a talent-rich region outside your normal footprint.`,
+    choices: [
+      { label: "Go on the tour", effects: { recruiting: 2, teamTalentDelta: -1 }, outcome: "New pipeline relationships open up, at the cost of a week away from install." },
+      { label: "Stay home, focus on the roster you have", effects: { development: 1, recruiting: -1 }, outcome: "The current roster gets your full attention instead." },
+    ],
+  },
+  {
+    id: "redshirt_decision",
+    stages: ["position", "coordinator", "headcoach"],
+    title: "Redshirt Decision",
+    text: () => `A talented true freshman could help right now, or you could redshirt him for a stronger long-term payoff.`,
+    choices: [
+      { label: "Play him now", effects: { teamTalentDelta: 1, development: -1 }, outcome: "He helps immediately, though the long view takes a hit." },
+      { label: "Redshirt him", effects: { development: 2, teamTalentDelta: -1 }, outcome: "A weaker roster this year buys a much stronger one down the road." },
+    ],
+  },
+  {
+    id: "oversigning_numbers",
+    stages: ["headcoach"],
+    title: "Roster Numbers",
+    text: () => `You're over the scholarship limit and have to make cuts before the deadline.`,
+    choices: [
+      { label: "Cut to the number, no exceptions", effects: { culture: -2, recruiting: 1 }, outcome: "Efficient and clean, but brutal — and the locker room knows it." },
+      { label: "Find grayshirt and walk-on workarounds", effects: { culture: 2, recruiting: -1 }, outcome: "Kinder to the players affected, slower to fix your numbers problem." },
+    ],
+  },
+  {
+    id: "viral_moment",
+    stages: ["coordinator", "headcoach"],
+    title: "Viral Moment",
+    text: () => `A sideline clip of you goes viral overnight for all the wrong — or right — reasons.`,
+    choices: [
+      { label: "Lean into it, embrace the moment", effects: { mediaSavvy: 3, culture: -1 }, outcome: "Great for the brand. A few players think you're more focused on the cameras." },
+      { label: "Downplay it, stay businesslike", effects: { culture: 1, mediaSavvy: -1 }, outcome: "Low-key and professional, if a little unmemorable." },
+    ],
+  },
+  {
+    id: "rival_dirty_tactic",
+    stages: ["coordinator", "headcoach"],
+    title: "Dirty Recruiting Tactics",
+    text: () => `You catch wind that a rival staff is bending recruiting rules to flip one of your commits.`,
+    choices: [
+      { label: "Report it to the conference office", effects: { reputation: 2, jobSecurity: -2 }, outcome: "The right thing to do — and it costs you political capital with that program's allies." },
+      { label: "Beat them on the field instead", effects: { teamTalentDelta: 1, recruiting: -1, weekPowerDelta: 4 }, outcome: "You let the scoreboard do the talking. The staff plays with an edge this week." },
+    ],
+  },
+  {
+    id: "mental_health_disclosure",
+    stages: ["position", "coordinator", "headcoach"],
+    title: "A Player Opens Up",
+    text: () => `A player confides that he's struggling badly outside of football.`,
+    choices: [
+      { label: "Connect him with resources, ease his load", effects: { culture: 3, teamTalentDelta: -1 }, outcome: "He gets real help. The team takes a small on-field hit without him at full speed." },
+      { label: "Push him to play through it", effects: { teamTalentDelta: 1, culture: -3 }, outcome: "Short-term production, but word gets around about how it was handled." },
+    ],
+  },
+  {
+    id: "community_service_request",
+    stages: ["headcoach"],
+    title: "Community Request",
+    text: () => `A high-profile charity asks for the whole team during your one open week of the season.`,
+    choices: [
+      { label: "Do it", effects: { mediaSavvy: 2, reputation: 1, teamTalentDelta: -1 }, outcome: "Great publicity, but the players don't get the rest that bye week was for." },
+      { label: "Decline, protect the bye week", effects: { teamTalentDelta: 1, mediaSavvy: -1 }, outcome: "The team is fresher. The charity finds another program." },
+    ],
+  },
+  {
+    id: "booster_facility_pitch",
+    stages: ["headcoach"],
+    title: "Booster's Offer",
+    text: () => `A booster offers to fund a facility upgrade — if you publicly endorse his business.`,
+    choices: [
+      { label: "Take the deal", effects: { recruiting: 2, mediaSavvy: -1 }, outcome: "The new facility becomes a real recruiting tool, though some see the endorsement as tacky." },
+      { label: "Turn it down, keep it clean", effects: { mediaSavvy: 1, recruiting: -1 }, outcome: "No strings attached, no new facility either." },
+    ],
+  },
+  {
+    id: "coordinator_conflict",
+    stages: ["headcoach"],
+    title: "Staff Conflict",
+    text: () => `Your offensive and defensive staffs are clashing hard over how to split practice reps.`,
+    choices: [
+      { label: "Split time evenly, mediate personally", effects: { culture: 2, teamTalentDelta: -1 }, outcome: "Fair, but it takes real time out of your week to referee it." },
+      { label: "Let them hash it out themselves", effects: { teamTalentDelta: 1, culture: -2 }, outcome: "One side wins out for now. The other side remembers it." },
+    ],
+  },
+  {
+    id: "depth_chart_favor",
+    stages: ["position"],
+    title: "A Favor Requested",
+    text: () => `Another position coach asks you to work a fringe player into your group's reps to help him get on the field.`,
+    choices: [
+      { label: "Do him the favor", effects: { culture: 1, teamTalentDelta: -1 }, outcome: "Staff goodwill banked, at a small cost to your room's focus." },
+      { label: "Protect your room's reps", effects: { teamTalentDelta: 1, culture: -1 }, outcome: "Your group stays sharp. The other coach isn't thrilled." },
+    ],
+  },
+  {
+    id: "hometown_discount_pitch",
+    stages: ["coordinator", "headcoach"],
+    title: "Hometown Discount",
+    text: () => `A local four-star will commit cheaply — if you promise him a specific role in writing.`,
+    choices: [
+      { label: "Promise the role", effects: { recruiting: 3, culture: -1 }, outcome: "He commits fast, but the current starter at that spot has questions." },
+      { label: "Recruit him straight, no promises", effects: { recruiting: 1, culture: 1 }, outcome: "Slower to close, but nobody's roster spot was ever in question." },
+    ],
+  },
+  {
+    id: "early_enrollee_culture_shock",
+    stages: ["position", "coordinator", "headcoach"],
+    title: "Early Enrollee Adjustment",
+    text: () => `A January enrollee is visibly struggling to adjust to college life and the playbook at the same time.`,
+    choices: [
+      { label: "Assign a mentor, slow-play his reps", effects: { culture: 2, development: 1, teamTalentDelta: -1 }, outcome: "He stabilizes. It takes longer to get him on the field." },
+      { label: "Throw him in with the vets immediately", effects: { teamTalentDelta: 1, culture: -1 }, outcome: "Sink or swim. This time he swims — barely." },
+    ],
+  },
+  {
+    id: "contract_extension_offer",
+    stages: ["headcoach"],
+    title: "Extension Offer",
+    text: () => `After a hot start, the athletic director offers you a contract extension.`,
+    choices: [
+      { label: "Sign now, lock in security", effects: { jobSecurity: 18, reputation: -1 }, outcome: "Peace of mind — though you may have left money and leverage on the table." },
+      { label: "Bet on yourself, wait for a bigger deal", effects: { jobSecurity: -4, reputation: 2 }, outcome: "Riskier, but if the season holds up, a much bigger deal is coming." },
+    ],
+  },
+  {
+    id: "schedule_a_ranked_team",
+    stages: ["headcoach"],
+    title: "Marquee Scheduling",
+    text: () => `You have a chance to schedule a marquee non-conference opponent for future national exposure.`,
+    choices: [
+      { label: "Schedule the game", effects: { mediaSavvy: 2, recruiting: 1, jobSecurity: -1 }, outcome: "A tougher future slate, but the exposure is real." },
+      { label: "Play it safe, schedule a cupcake", effects: { jobSecurity: 1, mediaSavvy: -1 }, outcome: "An easier future win, and a quieter national profile." },
+    ],
+  },
+  {
+    id: "december_practice_intensity",
+    stages: ["headcoach"],
+    title: "Bowl Prep Tone",
+    text: () => `Bowl practices are optional in intensity — some staffs grind, some reward the season with a lighter week.`,
+    choices: [
+      { label: "Push hard in practice", effects: { teamTalentDelta: 1, culture: -1 }, outcome: "Sharper on gameday. A few veterans grumble about the workload." },
+      { label: "Ease up, reward the season", effects: { culture: 2, teamTalentDelta: -1 }, outcome: "Good for morale, a little rusty on the field." },
+    ],
+  },
+  {
+    id: "transfer_portal_addition",
+    stages: ["coordinator", "headcoach"],
+    title: "Portal Addition",
+    text: () => `A proven transfer portal player wants a guaranteed starting job in writing before he'll commit mid-cycle.`,
+    choices: [
+      { label: "Guarantee him the starting job", effects: { teamTalentDelta: 2, culture: -2 }, outcome: "An immediate talent boost, and a current starter who now has to be told." },
+      { label: "Make him earn it like everyone else", effects: { culture: 1, teamTalentDelta: -1, recruiting: -1 }, outcome: "Fair to the roster — and he may commit elsewhere instead." },
+    ],
+  },
+  {
+    id: "exhibition_sandbagging",
+    stages: ["headcoach"],
+    title: "Scouting Report",
+    text: () => `Word gets around that this week's opponent has been hiding wrinkles on film ahead of your matchup.`,
+    choices: [
+      { label: "Scout extra, adjust the game plan", effects: { development: -1, teamTalentDelta: 2, weekPowerDelta: 4 }, outcome: "The extra film study pays off — your staff isn't caught off guard." },
+      { label: "Trust your prep, don't overreact", effects: { culture: 1, teamTalentDelta: -1 }, outcome: "Confidence in the plan holds, for better or worse." },
+    ],
+  },
+  {
+    id: "tv_exposure_request",
+    stages: ["headcoach"],
+    title: "Primetime Request",
+    text: () => `The network wants to flex your game to national primetime, disrupting your normal week.`,
+    choices: [
+      { label: "Accept the exposure", effects: { mediaSavvy: 3, teamTalentDelta: -1, weekPowerDelta: -2 }, outcome: "Great for the program's profile — the disrupted routine costs you a little sharpness." },
+      { label: "Ask to keep the normal time slot", effects: { teamTalentDelta: 1, mediaSavvy: -1 }, outcome: "Routine protected, less eyeballs on the program." },
+    ],
+  },
+  {
+    id: "senior_day_tribute",
+    stages: ["position", "coordinator", "headcoach"],
+    title: "Senior Day",
+    text: () => `Your seniors want an elaborate pregame tribute that eats into your normal pregame routine.`,
+    choices: [
+      { label: "Give them the full tribute", effects: { culture: 3, weekPowerDelta: -2 }, outcome: "An emotional, well-earned moment — the team is a step slow out of the gate." },
+      { label: "Keep it brief, focus on the game plan", effects: { teamTalentDelta: 1, culture: -1 }, outcome: "Business as usual. A couple of seniors are quietly disappointed." },
+    ],
+  },
+  {
+    id: "coaching_clinic_invite",
+    stages: ["position", "coordinator"],
+    title: "Coaching Clinic",
+    text: () => `You're invited to speak at a major coaching clinic — good exposure and networking for your career.`,
+    choices: [
+      { label: "Go, build your network", effects: { reputation: 2, mediaSavvy: 1, development: -1 }, outcome: "Good for your résumé; your room lost a week of your full attention." },
+      { label: "Stay, focus on your room", effects: { development: 1, reputation: -1 }, outcome: "Your players benefit. Your name stays out of the wider conversation." },
+    ],
+  },
+  {
+    id: "two_platoon_experiment",
+    stages: ["coordinator", "headcoach"],
+    title: "Rotation Question",
+    text: () => `You're tempted to rotate two players by situation rather than naming a clear starter.`,
+    choices: [
+      { label: "Run the rotation", effects: { teamTalentDelta: 1, culture: -2, weekPowerDelta: 2 }, outcome: "Matchup flexibility pays off on the field. Neither player loves splitting time." },
+      { label: "Name one starter and stick with him", effects: { culture: 2, teamTalentDelta: -1 }, outcome: "Clear roles, clean locker room, a little less tactical upside." },
+    ],
+  },
+  {
+    id: "recruiting_dead_period",
+    stages: ["coordinator", "headcoach"],
+    title: "Dead Period Timing",
+    text: () => `An NCAA recruiting dead period hits right as momentum was building with your top targets.`,
+    choices: [
+      { label: "Blitz phone and video calls within the rules", effects: { recruiting: 2, mediaSavvy: -1 }, outcome: "You keep the relationship warm, though a couple of families find it pushy." },
+      { label: "Go quiet and let the film speak", effects: { recruiting: -1, culture: 1 }, outcome: "Low-pressure and professional, but momentum cools." },
+    ],
+  },
+  {
+    id: "injury_to_star_recruit",
+    stages: ["coordinator", "headcoach"],
+    title: "Recruit's Injury",
+    text: () => `Your top incoming commit tears his ACL in his high school playoff game.`,
+    choices: [
+      { label: "Honor the scholarship no matter what", effects: { culture: 3, recruiting: -1 }, outcome: "The class sees it and takes note of your loyalty. The roster spot is a gamble." },
+      { label: "Pull back and offer elsewhere", effects: { recruiting: 1, culture: -2 }, outcome: "Pragmatic roster management — and the recruiting world notices the cold approach." },
     ],
   },
 ];

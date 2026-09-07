@@ -55,6 +55,8 @@ function handleClick(e) {
         trainingFocusId: draft.trainingFocusId,
         philosophy: draft.philosophy,
         recruitingFocusId: draft.recruitingFocusId,
+        offenseSchemeId: draft.offenseSchemeId,
+        defenseSchemeId: draft.defenseSchemeId,
       });
       App.awaitingContinue = false;
       renderApp();
