@@ -424,6 +424,33 @@ img {
   background: rgba(255, 59, 48, 0.08);
 }
 
+.risk-pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border: 1px solid;
+}
+
+.risk-pill--safe {
+  color: var(--win);
+  border-color: rgba(52, 199, 89, 0.35);
+  background: rgba(52, 199, 89, 0.08);
+}
+
+.risk-pill--balanced {
+  color: var(--gold);
+  border-color: rgba(255, 214, 10, 0.35);
+  background: rgba(255, 214, 10, 0.08);
+}
+
+.risk-pill--aggressive {
+  color: var(--danger);
+  border-color: rgba(255, 59, 48, 0.35);
+  background: rgba(255, 59, 48, 0.08);
+}
+
 .game-result {
   margin: 0.9rem 0;
   padding: 0.75rem 0.9rem;

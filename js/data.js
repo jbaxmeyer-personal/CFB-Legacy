@@ -1301,22 +1301,39 @@ const RECRUITING_FOCUS_OPTIONS = [
 ];
 
 const OFFENSE_SCHEMES = [
-  { id: "Spread", label: "Spread", description: "Four verticals, tempo, space. Rewards a sharp Offense IQ and a deep skill-position room.", fitStats: ["offenseIQ", "recruiting"] },
-  { id: "Air Raid", label: "Air Raid", description: "Pass-heavy, high-volume attack. Explosive with a strong-armed QB, exposed if the line can't hold up.", fitStats: ["offenseIQ", "development"] },
-  { id: "Power Spread", label: "Power Spread", description: "Run-first out of spread sets. Physical, ball-control, forgiving of a shaky passing game.", fitStats: ["development", "culture"] },
-  { id: "Pro Style", label: "Pro Style", description: "Balanced, multiple, pro-readable. No glaring weakness, no defining strength either.", fitStats: ["offenseIQ", "culture"] },
-  { id: "Multiple Offense", label: "Multiple Offense", description: "Formation soup — a lot to install, a lot of answers once it's in.", fitStats: ["offenseIQ", "development"] },
-  { id: "Option", label: "Option", description: "Ball-control, clock-killing, low-turnover. Old-school, but it wins low-talent matchups.", fitStats: ["culture", "development"] },
+  { id: "Spread", label: "Spread", description: "Four verticals, tempo, space. Rewards a sharp Offense IQ and a deep skill-position room.", fitStats: ["offenseIQ", "recruiting"], passBoost: 2, runBoost: -1 },
+  { id: "Air Raid", label: "Air Raid", description: "Pass-heavy, high-volume attack. Explosive with a strong-armed QB, exposed if the line can't hold up.", fitStats: ["offenseIQ", "development"], passBoost: 4, runBoost: -3 },
+  { id: "Power Spread", label: "Power Spread", description: "Run-first out of spread sets. Physical, ball-control, forgiving of a shaky passing game.", fitStats: ["development", "culture"], passBoost: -2, runBoost: 3 },
+  { id: "Pro Style", label: "Pro Style", description: "Balanced, multiple, pro-readable. No glaring weakness, no defining strength either.", fitStats: ["offenseIQ", "culture"], passBoost: 1, runBoost: 1 },
+  { id: "Multiple Offense", label: "Multiple Offense", description: "Formation soup — a lot to install, a lot of answers once it's in.", fitStats: ["offenseIQ", "development"], passBoost: 0, runBoost: 1 },
+  { id: "Option", label: "Option", description: "Ball-control, clock-killing, low-turnover. Old-school, but it wins low-talent matchups.", fitStats: ["culture", "development"], passBoost: -4, runBoost: 4 },
 ];
 
 const DEFENSE_SCHEMES = [
-  { id: "4-2-5", label: "4-2-5", description: "Speed over size, built for spread offenses. Exposed against a physical run game.", fitStats: ["defenseIQ", "recruiting"] },
-  { id: "Base 4-3", label: "Base 4-3", description: "Textbook, sound against the run, asks less of your secondary.", fitStats: ["defenseIQ", "culture"] },
-  { id: "Base 3-4", label: "Base 3-4", description: "Disguise and pressure from multiple angles. Needs smart linebackers to execute.", fitStats: ["defenseIQ", "development"] },
-  { id: "3-3-5", label: "3-3-5", description: "Extra DB, bend-don't-break against the pass. Vulnerable up front on early downs.", fitStats: ["defenseIQ", "recruiting"] },
-  { id: "Multiple Defense", label: "Multiple Defense", description: "Disguises everything, installs slowly. Confuses opponents once it's mastered.", fitStats: ["defenseIQ", "development"] },
-  { id: "3-4 Multiple", label: "3-4 Multiple", description: "Hybrid fronts, versatile personnel. Rewards depth and coaching continuity.", fitStats: ["development", "culture"] },
+  { id: "4-2-5", label: "4-2-5", description: "Speed over size, built for spread offenses. Exposed against a physical run game.", fitStats: ["defenseIQ", "recruiting"], passBoost: 3, runBoost: -3 },
+  { id: "Base 4-3", label: "Base 4-3", description: "Textbook, sound against the run, asks less of your secondary.", fitStats: ["defenseIQ", "culture"], passBoost: -1, runBoost: 3 },
+  { id: "Base 3-4", label: "Base 3-4", description: "Disguise and pressure from multiple angles. Needs smart linebackers to execute.", fitStats: ["defenseIQ", "development"], passBoost: 1, runBoost: 1 },
+  { id: "3-3-5", label: "3-3-5", description: "Extra DB, bend-don't-break against the pass. Vulnerable up front on early downs.", fitStats: ["defenseIQ", "recruiting"], passBoost: 3, runBoost: -3 },
+  { id: "Multiple Defense", label: "Multiple Defense", description: "Disguises everything, installs slowly. Confuses opponents once it's mastered.", fitStats: ["defenseIQ", "development"], passBoost: 1, runBoost: 1 },
+  { id: "3-4 Multiple", label: "3-4 Multiple", description: "Hybrid fronts, versatile personnel. Rewards depth and coaching continuity.", fitStats: ["development", "culture"], passBoost: 1, runBoost: 1 },
 ];
+
+/* Schemes that appear on opponent schools (from the Dynasty Tracker school
+   list) but aren't in the player-facing curated picker above. Only
+   passBoost/runBoost are needed for these — opponents never need fitStats
+   since only the human player installs/masters a scheme. */
+const EXTRA_OFFENSE_TENDENCIES = {
+  Pistol: { passBoost: 0, runBoost: 2 },
+  "Run and Shoot": { passBoost: 4, runBoost: -2 },
+  "Veer and Shoot": { passBoost: 3, runBoost: -1 },
+  "Spread Option": { passBoost: -2, runBoost: 3 },
+};
+
+const EXTRA_DEFENSE_TENDENCIES = {
+  "3-3-5 Tite": { passBoost: 2, runBoost: -1 },
+  "3-2-6": { passBoost: 4, runBoost: -4 },
+  "4-3 Multiple": { passBoost: 0, runBoost: 2 },
+};
 
 function schemesForSide(side) {
   return side === "offense" ? OFFENSE_SCHEMES : DEFENSE_SCHEMES;
@@ -1324,6 +1341,16 @@ function schemesForSide(side) {
 
 function findScheme(side, id) {
   return schemesForSide(side).find((s) => s.id === id);
+}
+
+/* Pass/run tendency for ANY scheme string that can appear on a school
+   (curated or not) — used to rate any opponent's identity, not just the
+   handful of schemes the player can personally choose. */
+function schemeTendency(side, id) {
+  const curated = findScheme(side, id);
+  if (curated) return { passBoost: curated.passBoost, runBoost: curated.runBoost };
+  const extra = (side === "offense" ? EXTRA_OFFENSE_TENDENCIES : EXTRA_DEFENSE_TENDENCIES)[id];
+  return extra || { passBoost: 0, runBoost: 0 };
 }
 
 const PHILOSOPHY_OPTIONS = [
@@ -3448,6 +3475,521 @@ const DILEMMA_EVENTS = [
     choices: [
       { label: "Pick the most vocal, energetic player", effects: { teamTalentDelta: 1, culture: -1 }, outcome: "Instant energy in the room — and a couple of quieter leaders feel overlooked." },
       { label: "Pick the most consistent, steady player", effects: { culture: 2 }, outcome: "A steady hand the room trusts, if a little low-key for some tastes." },
+    ],
+  },
+];
+
+/* ==========================================================================
+   Game Moments — live, in-game tactical decisions.
+   Unlike DILEMMA_EVENTS (off-field, fixed effects), these are resolved by a
+   real calculation: your relevant rating (pass/run offense or defense,
+   special teams, or poise) vs the opponent's, plus how aggressive the
+   choice is. Same choice can succeed or fail depending on the matchup —
+   nothing here is predetermined. See engine.js resolveGameMoment().
+
+   `side` says which unit is on the field for this decision:
+     "offense" — your offense vs their defense
+     "defense" — your defense vs their offense
+     "special"  — special teams vs special teams
+     "poise"    — a composure/situational call, not a pass/run snap
+   Each choice's `axis` picks the rating pair within that side ("pass" or
+   "run"; ignored for "special"/"poise" sides). `risk` picks a profile from
+   RISK_PROFILES that sets the base success odds and the size of the swing.
+   ========================================================================== */
+
+const RISK_PROFILES = {
+  safe: { successBase: 0.66, successReward: 3, failCost: -1 },
+  balanced: { successBase: 0.52, successReward: 5, failCost: -3 },
+  aggressive: { successBase: 0.36, successReward: 8, failCost: -6 },
+};
+
+function scoreText(diff) {
+  if (diff === 0) return "the game tied";
+  return diff > 0 ? `up by ${diff}` : `down by ${Math.abs(diff)}`;
+}
+
+function quarterText(q) {
+  const names = ["", "the first quarter", "the second quarter", "the third quarter", "the fourth quarter"];
+  return names[q] || "the fourth quarter";
+}
+
+const GAME_MOMENTS = [
+  /* ---- Offense: down & distance ---- */
+  {
+    id: "third_and_long",
+    side: "offense",
+    situation: (ctx) => `Third-and-${ctx.distance}, ${ctx.score}, midway through ${ctx.quarter} against ${ctx.opponent}. The sideline waits on your call.`,
+    choices: [
+      { label: "Take a shot deep down the sideline", axis: "pass", risk: "aggressive", success: () => "The deep ball connects! A huge gain and the sideline erupts.", fail: () => "Overthrown — incomplete. Punt team, get loose." },
+      { label: "Run a quick out to move the sticks", axis: "pass", risk: "safe", success: () => "A crisp completion picks up just enough for the first down.", fail: () => "Broken up at the last second. Fourth down decision looms." },
+      { label: "Call a draw, catch them sitting back", axis: "run", risk: "balanced", success: () => "The draw catches the defense off guard — a good gain and a fresh set of downs.", fail: () => "They read it. Stuffed short of the sticks." },
+    ],
+  },
+  {
+    id: "third_and_short",
+    side: "offense",
+    situation: (ctx) => `Third-and-${ctx.distance}, ${ctx.score}, ${ctx.quarter}. A short, manageable down and distance.`,
+    choices: [
+      { label: "Power run behind the line", axis: "run", risk: "safe", success: () => "The line gets a push and the back falls forward for the first down.", fail: () => "Stacked box stones it. Fourth down." },
+      { label: "Play-action shot off the run look", axis: "pass", risk: "aggressive", success: () => "The play fake freezes the safety — a big gain through the air.", fail: () => "The pressure gets home before the route develops. Incomplete." },
+    ],
+  },
+  {
+    id: "fourth_down_gamble",
+    side: "offense",
+    situation: (ctx) => `Fourth-and-${ctx.distance}, ${ctx.score}, ${ctx.quarter}. Do you send out the punt team or go for it?`,
+    choices: [
+      { label: "Go for it", axis: "run", risk: "aggressive", success: () => "They convert! The sideline goes wild — momentum firmly in your hands.", fail: () => "Stopped short. Turnover on downs, and the opponent takes over with great field position." },
+      { label: "Punt it away, play the field position game", axis: "run", risk: "safe", success: () => "A clean punt pins them deep in their own territory.", fail: () => "A short punt gives them a short field anyway." },
+    ],
+  },
+  {
+    id: "two_minute_first_drive",
+    side: "offense",
+    situation: (ctx) => `First-and-10 to start a two-minute drill, ${ctx.score}, late in ${ctx.quarter}.`,
+    choices: [
+      { label: "Push the ball downfield in a hurry", axis: "pass", risk: "aggressive", success: () => "Chunk plays down the field — you're in scoring range in a hurry.", fail: () => "A tipped pass nearly gets picked. The clock keeps bleeding." },
+      { label: "Methodical short passes to work the clock and chains", axis: "pass", risk: "safe", success: () => "Steady, controlled completions move the chains without much risk.", fail: () => "An incompletion stops the clock, but with little to show for it." },
+    ],
+  },
+  {
+    id: "backed_up_own_territory",
+    side: "offense",
+    situation: (ctx) => `First-and-10 from deep in your own territory, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Play it safe, run it between the tackles", axis: "run", risk: "safe", success: () => "A solid gain gets you room to breathe.", fail: () => "Stopped near the line — still pinned deep." },
+      { label: "Take a shot to flip the field", axis: "pass", risk: "aggressive", success: () => "A deep completion instantly flips the field position battle.", fail: () => "Nearly intercepted deep in your own end. That was close." },
+    ],
+  },
+  {
+    id: "third_and_medium_tempo",
+    side: "offense",
+    situation: (ctx) => `Third-and-${ctx.distance}, ${ctx.score}, ${ctx.quarter}. Your staff debates tempo before the snap.`,
+    choices: [
+      { label: "Go no-huddle, catch the defense unset", axis: "pass", risk: "balanced", success: () => "The rushed defense is caught in the wrong look — an easy conversion.", fail: () => "Your own guys aren't set either. A false start kills the tempo advantage." },
+      { label: "Slow it down, get the perfect matchup", axis: "run", risk: "safe", success: () => "A patient, well-blocked run picks up exactly what's needed.", fail: () => "They diagnose it perfectly and blow it up in the backfield." },
+    ],
+  },
+  {
+    id: "screen_pass_read",
+    side: "offense",
+    situation: (ctx) => `Second-and-${ctx.distance}, ${ctx.score}, ${ctx.quarter}. Your staff has a screen dialed up against their pass rush.`,
+    choices: [
+      { label: "Call the screen", axis: "pass", risk: "balanced", success: () => "The screen springs loose — a nice gain in space.", fail: () => "They sniff it out immediately. Loss on the play." },
+      { label: "Stick with a standard dropback", axis: "pass", risk: "safe", success: () => "A safe, on-schedule completion.", fail: () => "The rush gets home before anything develops." },
+    ],
+  },
+  {
+    id: "trick_play_moment",
+    side: "offense",
+    situation: (ctx) => `${ctx.score}, ${ctx.quarter}. Your staff has a gadget play in the pocket for exactly a moment like this.`,
+    choices: [
+      { label: "Pull the trigger on the trick play", axis: "pass", risk: "aggressive", success: () => "It works to perfection — a play the highlight shows will run all night.", fail: () => "It falls apart in execution. A costly, embarrassing loss on the play." },
+      { label: "Save it, run your bread-and-butter instead", axis: "run", risk: "safe", success: () => "Nothing fancy, just a solid, reliable gain.", fail: () => "No trickery, no luck — stuffed for a short gain." },
+    ],
+  },
+  {
+    id: "short_yardage_goal_to_go_offense",
+    side: "offense",
+    situation: (ctx) => `Third-and-goal from short range, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Quarterback sneak", axis: "run", risk: "safe", success: () => "Sneaks it in behind a great push up front. Touchdown.", fail: () => "Stood up right at the goal line. No gain." },
+      { label: "Play-action fade to the corner", axis: "pass", risk: "aggressive", success: () => "A perfectly placed fade for six.", fail: () => "Broken up in the end zone. On to fourth down." },
+    ],
+  },
+  {
+    id: "hurry_up_no_timeouts",
+    side: "offense",
+    situation: (ctx) => `${ctx.score}, no timeouts left, deep in ${ctx.quarter}.`,
+    choices: [
+      { label: "Attack the sideline to stop the clock", axis: "pass", risk: "aggressive", success: () => "Completion to the sideline — clock stopped, chains moved.", fail: () => "Incomplete, clock stopped anyway, but no ground gained." },
+      { label: "Trust the offensive line, run it up the gut", axis: "run", risk: "balanced", success: () => "A big gain, and you race to the line for one more snap.", fail: () => "A gain, but the clock keeps running and time runs out." },
+    ],
+  },
+  {
+    id: "third_and_double_digits",
+    side: "offense",
+    situation: (ctx) => `Third-and-${ctx.distance}, a long way to go, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Empty backfield, spread them thin", axis: "pass", risk: "aggressive", success: () => "Someone comes free in the empty look — big gain, first down.", fail: () => "Unblocked rusher gets home immediately. Sack." },
+      { label: "Check down and live for fourth down", axis: "pass", risk: "safe", success: () => "A modest gain sets up a much more manageable fourth down.", fail: () => "No completion at all — fourth-and-long now." },
+    ],
+  },
+  {
+    id: "midfield_momentum_play",
+    side: "offense",
+    situation: (ctx) => `First down near midfield, ${ctx.score}, ${ctx.quarter}. A chance to seize momentum.`,
+    choices: [
+      { label: "Take your shot down the field", axis: "pass", risk: "aggressive", success: () => "A explosive gain flips the game's entire complexion.", fail: () => "Incomplete, and the momentum stays exactly where it was." },
+      { label: "Establish the run, control tempo", axis: "run", risk: "balanced", success: () => "A physical, effective run sets the tone for the rest of the drive.", fail: () => "Nothing there. Back to the drawing board on second down." },
+    ],
+  },
+  {
+    id: "two_point_conversion_call",
+    side: "offense",
+    situation: (ctx) => `A two-point conversion attempt, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Run a designed pass to your top target", axis: "pass", risk: "balanced", success: () => "Perfectly placed. Two points are good.", fail: () => "Broken up in the end zone. No conversion." },
+      { label: "Power run behind your best blockers", axis: "run", risk: "balanced", success: () => "Muscled in for the conversion.", fail: () => "Stuffed at the goal line." },
+    ],
+  },
+  {
+    id: "offense_facing_stacked_box",
+    side: "offense",
+    situation: (ctx) => `${ctx.opponent} stack the box to take away the run, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Throw over the top of the coverage", axis: "pass", risk: "balanced", success: () => "The single-high safety can't get there in time — big play through the air.", fail: () => "The extra rusher gets home before the route breaks open." },
+      { label: "Run it anyway, trust your line to win", axis: "run", risk: "aggressive", success: () => "Your line just wins the physical battle despite the numbers. Big gain.", fail: () => "Exactly what the extra defender was there for. Stuffed for a loss." },
+    ],
+  },
+
+  /* ---- Offense: red zone / scoring ---- */
+  {
+    id: "red_zone_first_and_ten",
+    side: "offense",
+    situation: (ctx) => `First-and-10 from the red zone, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Attack the end zone immediately", axis: "pass", risk: "aggressive", success: () => "Touchdown strike right away — no messing around.", fail: () => "Incomplete. Back to second down inside the ten." },
+      { label: "Chip away with the run game", axis: "run", risk: "safe", success: () => "A solid gain sets up a much shorter, easier down.", fail: () => "The red zone defense clamps down. Short gain." },
+    ],
+  },
+  {
+    id: "goal_line_stand_offense",
+    side: "offense",
+    situation: (ctx) => `First-and-goal from the 2, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Pound it up the middle", axis: "run", risk: "safe", success: () => "Powers through for the score.", fail: () => "Met at the line. No gain." },
+      { label: "Play-action rollout pass", axis: "pass", risk: "balanced", success: () => "The fake buys just enough space for the touchdown throw.", fail: () => "Coverage stays home. Incomplete." },
+    ],
+  },
+  {
+    id: "red_zone_stall_decision",
+    side: "offense",
+    situation: (ctx) => `Third-and-goal after two stuffed runs, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Throw a fade to your biggest target", axis: "pass", risk: "aggressive", success: () => "Up and over the defender for six.", fail: () => "Batted down. Field goal unit comes out." },
+      { label: "Run the same play again, trust the process", axis: "run", risk: "balanced", success: () => "Third time's the charm — in for the score.", fail: () => "Stuffed again. Field goal unit comes out." },
+    ],
+  },
+  {
+    id: "field_goal_or_go",
+    side: "offense",
+    situation: (ctx) => `Fourth-and-3 from the 8-yard line, ${ctx.score}, ${ctx.quarter}. Points are there for the taking either way.`,
+    choices: [
+      { label: "Go for the touchdown", axis: "pass", risk: "aggressive", success: () => "Touchdown! The bold call pays off in full.", fail: () => "Stopped short. Zero points instead of a sure three." },
+      { label: "Kick the field goal, take the points", axis: "run", risk: "safe", success: () => "Good and through. Points on the board, no drama.", fail: () => "Pushed wide — a shocking miss from close range." },
+    ],
+  },
+  {
+    id: "goal_line_package_debate",
+    side: "offense",
+    situation: (ctx) => `Second-and-goal from the 1, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Heavy jumbo package, run it behind extra blockers", axis: "run", risk: "safe", success: () => "The extra beef up front gets the push you needed. Touchdown.", fail: () => "Even the extra blocker can't create a crease. Stuffed." },
+      { label: "Empty it out, throw a quick slant", axis: "pass", risk: "aggressive", success: () => "Caught the defense expecting run — easy score.", fail: () => "They read pass all the way. Broken up." },
+    ],
+  },
+  {
+    id: "two_minute_before_half_scoring",
+    side: "offense",
+    situation: (ctx) => `First-and-10 in the red zone with 40 seconds left before halftime, ${ctx.score}.`,
+    choices: [
+      { label: "Push for the touchdown", axis: "pass", risk: "aggressive", success: () => "Touchdown right before the half — a huge swing in momentum.", fail: () => "Incomplete, and you have to settle for a field goal try instead." },
+      { label: "Play it safe, kick the field goal now", axis: "run", risk: "safe", success: () => "Three points banked before the break, no risk taken.", fail: () => "An uncharacteristic miss leaves points on the field." },
+    ],
+  },
+  {
+    id: "red_zone_turnover_risk",
+    side: "offense",
+    situation: (ctx) => `Second-and-goal, ${ctx.score}, ${ctx.quarter}. The defense is selling out to force a turnover.`,
+    choices: [
+      { label: "Throw into a tight window anyway", axis: "pass", risk: "aggressive", success: () => "Threaded the needle for the score.", fail: () => "Picked off in the end zone. A backbreaking turnover." },
+      { label: "Dump it off safely, live for another down", axis: "pass", risk: "safe", success: () => "A safe, modest gain — no risk, no turnover.", fail: () => "Nothing there. Third down now." },
+    ],
+  },
+  {
+    id: "comeback_two_minute_drive",
+    side: "offense",
+    situation: (ctx) => `Trailing late, driving with under two minutes, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Air it out down the field", axis: "pass", risk: "aggressive", success: () => "A miraculous string of completions gets you into scoring position.", fail: () => "A costly interception ends the drive and the comeback hopes." },
+      { label: "Mix in the run to keep them honest", axis: "run", risk: "balanced", success: () => "Chunk runs move the chains and burn the clock efficiently.", fail: () => "A stuffed run wastes precious clock." },
+    ],
+  },
+
+  /* ---- Defense: stands & third-down stops ---- */
+  {
+    id: "third_down_stop_pass",
+    side: "defense",
+    situation: (ctx) => `${ctx.opponent} face third-and-${ctx.distance}, ${ctx.score}, ${ctx.quarter}. Your defense needs a stop.`,
+    choices: [
+      { label: "Bring an all-out blitz", axis: "pass", risk: "aggressive", success: () => "The blitz gets home instantly — sack, and the crowd comes alive.", fail: () => "They pick up the blitz clean, and someone gets loose for a big gain." },
+      { label: "Drop into coverage, rush four", axis: "pass", risk: "safe", success: () => "Sound coverage forces a tough throw. Incomplete.", fail: () => "Coverage breaks down just enough. Converted." },
+    ],
+  },
+  {
+    id: "third_down_stop_run",
+    side: "defense",
+    situation: (ctx) => `${ctx.opponent} face third-and-${ctx.distance} on the ground, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Stack the box to sell out against the run", axis: "run", risk: "aggressive", success: () => "Swarmed at the line — no gain, huge defensive stand.", fail: () => "They counter with a play-action shot over your loaded box. Big gain." },
+      { label: "Play it honest, stay disciplined in your gaps", axis: "run", risk: "safe", success: () => "Gap discipline holds up. Short gain, punt coming.", fail: () => "They find a crease anyway. First down, drive continues." },
+    ],
+  },
+  {
+    id: "goal_line_stand_defense",
+    side: "defense",
+    situation: (ctx) => `${ctx.opponent} at your goal line, first-and-goal from the 2, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Sell out against the run at the line", axis: "run", risk: "aggressive", success: () => "A monster defensive stand right at the goal line!", fail: () => "They counter with a play-action pass. Touchdown." },
+      { label: "Stay disciplined, honor your run/pass keys", axis: "pass", risk: "safe", success: () => "Sound discipline forces a tough situation for the offense. Held to a field goal.", fail: () => "They execute regardless. Touchdown." },
+    ],
+  },
+  {
+    id: "prevent_defense_debate",
+    side: "defense",
+    situation: (ctx) => `${ctx.opponent} threaten late with a lead in hand for you, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Keep the pressure on, play it aggressively", axis: "pass", risk: "aggressive", success: () => "The pressure forces a rushed, errant throw. Interception!", fail: () => "The blitz leaves single coverage on an island — burned deep." },
+      { label: "Drop into a soft prevent shell", axis: "pass", risk: "safe", success: () => "Nothing given up over the top. They settle for short gains and run out of time.", fail: () => "The soft coverage lets them nickel-and-dime all the way down the field." },
+    ],
+  },
+  {
+    id: "fourth_down_defensive_stop",
+    side: "defense",
+    situation: (ctx) => `${ctx.opponent} go for it on fourth-and-${ctx.distance}, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Blitz to disrupt the play immediately", axis: "run", risk: "aggressive", success: () => "The blitz blows it up before it can develop. Turnover on downs!", fail: () => "They pick it up clean and convert easily against the extra rusher." },
+      { label: "Play it disciplined, trust your fundamentals", axis: "pass", risk: "safe", success: () => "Sound tackling stops it just short. Ball goes over on downs.", fail: () => "They execute their fourth-down call perfectly regardless." },
+    ],
+  },
+  {
+    id: "two_minute_defense_before_half",
+    side: "defense",
+    situation: (ctx) => `${ctx.opponent} push for points before halftime, ${ctx.score}.`,
+    choices: [
+      { label: "Bring pressure to force a mistake", axis: "pass", risk: "aggressive", success: () => "Forced into a bad throw — interception right before the half!", fail: () => "The pressure doesn't get home, and they hit a shot play instead." },
+      { label: "Play it safe, don't give up the big play", axis: "pass", risk: "safe", success: () => "No big play allowed — they settle for a short field goal at best.", fail: () => "Death by a thousand cuts — steady completions get them into scoring position anyway." },
+    ],
+  },
+  {
+    id: "third_and_short_defense",
+    side: "defense",
+    situation: (ctx) => `${ctx.opponent} face a short third down, ${ctx.score}, ${ctx.quarter}. Everyone in the building expects run.`,
+    choices: [
+      { label: "Load the box anyway", axis: "run", risk: "safe", success: () => "The expected run gets swallowed up immediately. Stop.", fail: () => "They cross you up with a play-action shot. Burned." },
+      { label: "Disguise the coverage, stay flexible", axis: "pass", risk: "balanced", success: () => "The disguise pays off — whatever they call, your defense reacts in time.", fail: () => "The disguise doesn't fool anyone. Easy conversion." },
+    ],
+  },
+  {
+    id: "turnover_chance_strip",
+    side: "defense",
+    situation: (ctx) => `${ctx.opponent}'s running back takes a hit near the sideline, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Go for the strip", axis: "run", risk: "aggressive", success: () => "The ball comes loose — your recovery! A massive turnover.", fail: () => "Went for the ball and missed the tackle entirely. Extra yards allowed." },
+      { label: "Wrap up, guarantee the tackle", axis: "run", risk: "safe", success: () => "A sound, secure tackle. No gimmicks, no risk.", fail: () => "Even the safe tackle attempt gets shrugged off for extra yards." },
+    ],
+  },
+  {
+    id: "blitz_or_contain_qb",
+    side: "defense",
+    situation: (ctx) => `${ctx.opponent}'s quarterback has been dangerous extending plays, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Send extra pressure to get him down early", axis: "pass", risk: "aggressive", success: () => "Collapse the pocket before he can create anything. Sack.", fail: () => "He escapes the extra pressure and makes a big play on the run." },
+      { label: "Rush with contain, keep him in the pocket", axis: "pass", risk: "safe", success: () => "Disciplined rush lanes keep him boxed in. Contained, no damage.", fail: () => "He finds a crease anyway and picks up positive yardage." },
+    ],
+  },
+  {
+    id: "short_yardage_goal_to_go_defense",
+    side: "defense",
+    situation: (ctx) => `${ctx.opponent} face third-and-goal from short range, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Crash the line, sell out against the run", axis: "run", risk: "aggressive", success: () => "Stood up at the line! Huge stop, field goal only.", fail: () => "They pass instead of running into the loaded box. Touchdown." },
+      { label: "Play both run and pass honestly", axis: "pass", risk: "safe", success: () => "Sound assignment football holds them to a field goal.", fail: () => "They execute cleanly regardless. Touchdown." },
+    ],
+  },
+  {
+    id: "long_field_defense",
+    side: "defense",
+    situation: (ctx) => `${ctx.opponent} start a drive deep in their own territory, ${ctx.score}, ${ctx.quarter}. A long field to work with.`,
+    choices: [
+      { label: "Pressure early to force a three-and-out", axis: "pass", risk: "aggressive", success: () => "Immediate pressure forces a quick punt. Great field position for your offense next.", fail: () => "The pressure creates space instead — a big play flips the field the wrong way." },
+      { label: "Play sound and patient, make them earn it", axis: "run", risk: "safe", success: () => "Patient, disciplined defense forces a long, stalled drive that ends in a punt.", fail: () => "They methodically move the chains anyway." },
+    ],
+  },
+  {
+    id: "rivalry_defensive_stop",
+    side: "defense",
+    situation: (ctx) => `A crucial third down against ${ctx.opponent}, ${ctx.score}, ${ctx.quarter}, with the crowd on its feet.`,
+    choices: [
+      { label: "Bring a rare, all-out pressure package", axis: "pass", risk: "aggressive", success: () => "The house call works — a signature defensive play the fans remember for years.", fail: () => "The gamble is exposed — a huge play the other way." },
+      { label: "Trust your base defense to get the job done", axis: "run", risk: "safe", success: () => "No fireworks needed — solid execution gets the stop.", fail: () => "Even the sound approach comes up empty this time." },
+    ],
+  },
+
+  /* ---- Special teams ---- */
+  {
+    id: "onside_kick_attempt",
+    side: "special",
+    situation: (ctx) => `Trailing late, you need the ball back, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Try the surprise onside kick", axis: "special", risk: "aggressive", success: () => "Recovered! The onside kick gives you the ball right back.", fail: () => "They recover instead — a gift of great field position." },
+      { label: "Kick it away, trust your defense", axis: "special", risk: "safe", success: () => "A clean, deep kickoff. Now it's on the defense to make a stop.", fail: () => "A shanked kickoff hands them a short field anyway." },
+    ],
+  },
+  {
+    id: "long_field_goal_attempt",
+    side: "special",
+    situation: (ctx) => `A long field goal attempt as the half winds down, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Send the kicker out for the long attempt", axis: "special", risk: "aggressive", success: () => "It's good from long range! A momentum-boosting three points.", fail: () => "Just short. No points, and good field position handed to the opponent." },
+      { label: "Play it safe, take a knee instead", axis: "special", risk: "safe", success: () => "No risk taken — the half ends with no harm done.", fail: () => "A sloppy exchange on the knee-down nearly turns it over anyway." },
+    ],
+  },
+  {
+    id: "fake_punt_opportunity",
+    side: "special",
+    situation: (ctx) => `Fourth down deep in your own territory, but the punt return unit looks light, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Run the fake punt", axis: "special", risk: "aggressive", success: () => "The fake works to perfection! A huge, unexpected first down.", fail: () => "Blown up immediately. A disastrous turnover deep in your own territory." },
+      { label: "Punt it away like normal", axis: "special", risk: "safe", success: () => "A routine, solid punt. Nothing gained, nothing lost.", fail: () => "A low snap nearly gets the punt blocked. Barely gets it away." },
+    ],
+  },
+  {
+    id: "punt_return_decision",
+    side: "special",
+    situation: (ctx) => `${ctx.opponent} punt it with room to operate in the open field, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Send the return man, look for a big play", axis: "special", risk: "aggressive", success: () => "A dazzling return sets up great field position!", fail: () => "A fumble on the return hands the opponent a gift." },
+      { label: "Fair catch, play it safe", axis: "special", risk: "safe", success: () => "No risk, no reward — a clean fair catch.", fail: () => "Muffed under pressure! A costly, avoidable turnover." },
+    ],
+  },
+  {
+    id: "extra_point_or_two",
+    side: "special",
+    situation: (ctx) => `After a touchdown, the numbers say two points is worth the gamble, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Go for two", axis: "special", risk: "aggressive", success: () => "Converted! The extra point is worth the risk this time.", fail: () => "No conversion — one point short of the aggressive math." },
+      { label: "Kick the extra point", axis: "special", risk: "safe", success: () => "Automatic. One point, no drama.", fail: () => "Blocked! A rare miss on the extra point." },
+    ],
+  },
+  {
+    id: "kickoff_return_aggression",
+    side: "special",
+    situation: (ctx) => `A kickoff sails deep into your own end zone, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Bring it out, look for a big return", axis: "special", risk: "aggressive", success: () => "A big return sets your offense up in great field position!", fail: () => "Tackled deep in your own territory — a long field ahead." },
+      { label: "Take the touchback", axis: "special", risk: "safe", success: () => "Automatic, guaranteed field position at the 25.", fail: () => "A miscommunication on the touchback call costs a few extra yards of field position." },
+    ],
+  },
+  {
+    id: "field_position_punt_strategy",
+    side: "special",
+    situation: (ctx) => `Fourth down near midfield, ${ctx.score}, ${ctx.quarter}. Punt for field position or pin them deep?`,
+    choices: [
+      { label: "Coffin-corner punt attempt", axis: "special", risk: "aggressive", success: () => "Pinned inside the 5! A field-flipping punt.", fail: () => "Sails into the end zone for a touchback — no field position gained." },
+      { label: "Standard punt for distance", axis: "special", risk: "safe", success: () => "Solid, reliable distance on the punt.", fail: () => "A shorter-than-expected punt gives up more field position than planned." },
+    ],
+  },
+  {
+    id: "weather_affected_kick",
+    side: "special",
+    situation: (ctx) => `Swirling wind makes every kick an adventure today, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Trust your kicker's leg in the wind", axis: "special", risk: "aggressive", success: () => "He splits the uprights despite the conditions! Impressive kick.", fail: () => "The wind knocks it off course at the last second. No good." },
+      { label: "Adjust the gameplan to avoid a risky kick", axis: "special", risk: "safe", success: () => "Smart game management avoids the risky kick altogether.", fail: () => "The conservative plan stalls a drive that needed those points." },
+    ],
+  },
+
+  /* ---- Poise / composure / situational ---- */
+  {
+    id: "trash_talk_response",
+    side: "poise",
+    situation: (ctx) => `${ctx.opponent}'s sideline is chirping hard after a big play, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Fire the team up, match the energy", axis: "poise", risk: "aggressive", success: () => "The fire translates directly onto the field. Big response.", fail: () => "The emotion boils over into a costly penalty." },
+      { label: "Stay composed, ignore the noise", axis: "poise", risk: "safe", success: () => "Calm heads prevail — no distraction, no penalty.", fail: () => "The composed approach reads as flat — a sluggish next series." },
+    ],
+  },
+  {
+    id: "response_to_bad_call",
+    side: "poise",
+    situation: (ctx) => `A questionable officiating call goes against you, ${ctx.score}, ${ctx.quarter}. The sideline is furious.`,
+    choices: [
+      { label: "Let the team play through the frustration", axis: "poise", risk: "aggressive", success: () => "The team channels the anger into their next snap. Big response.", fail: () => "The frustration boils over into an untimely penalty." },
+      { label: "Calm the sideline down immediately", axis: "poise", risk: "safe", success: () => "A composed sideline stays focused on the task at hand.", fail: () => "The frustration lingers anyway despite the pep talk." },
+    ],
+  },
+  {
+    id: "momentum_swing_response",
+    side: "poise",
+    situation: (ctx) => `${ctx.opponent} just scored a huge, momentum-shifting play, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Call a fiery timeout, reset the mood", axis: "poise", risk: "balanced", success: () => "The timeout resets the room. The next series looks like a different team.", fail: () => "Even the timeout can't shake off the deflated body language." },
+      { label: "Keep the offense on the field, respond immediately", axis: "poise", risk: "aggressive", success: () => "An immediate answer right back — the crowd noise dies down fast.", fail: () => "Rattled, the very next play goes badly too." },
+    ],
+  },
+  {
+    id: "hostile_road_environment",
+    side: "poise",
+    situation: (ctx) => `A deafening road environment at ${ctx.opponent}, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Lean on your silent-count reps from practice", axis: "poise", risk: "safe", success: () => "The extra practice pays off — no communication issues at all.", fail: () => "Even the silent count breaks down once. A false start at a bad time." },
+      { label: "Simplify the game plan to cut down on mistakes", axis: "poise", risk: "safe", success: () => "A simplified plan avoids the confusion the crowd noise creates.", fail: () => "The simplified plan is easy for them to defend too." },
+    ],
+  },
+  {
+    id: "injury_scare_composure",
+    side: "poise",
+    situation: (ctx) => `A key player goes down and slowly gets up, ${ctx.score}, ${ctx.quarter}. The whole sideline holds its breath.`,
+    choices: [
+      { label: "Rally the next man up immediately", axis: "poise", risk: "balanced", success: () => "The backup steps in and the offense barely misses a beat.", fail: () => "The unit visibly rattled without their guy. A rough series follows." },
+      { label: "Call a timeout to regroup and refocus", axis: "poise", risk: "safe", success: () => "The extra moment to reset keeps everyone locked in.", fail: () => "The timeout doesn't fully settle the nerves — a shaky series follows." },
+    ],
+  },
+  {
+    id: "blowout_lead_management",
+    side: "poise",
+    situation: (ctx) => `A big lead in hand, ${ctx.score}, ${ctx.quarter}. How do you manage the rest of the game?`,
+    choices: [
+      { label: "Keep the starters in, chase more points", axis: "poise", risk: "aggressive", success: () => "The starters pad the lead further — a statement win.", fail: () => "An unnecessary injury risk nearly bites you late." },
+      { label: "Empty the bench, protect your starters", axis: "poise", risk: "safe", success: () => "Starters rest up healthy for next week, game well in hand.", fail: () => "The backups let the opponent creep back into it before the starters return." },
+    ],
+  },
+  {
+    id: "double_digit_deficit_response",
+    side: "poise",
+    situation: (ctx) => `Down big on the road, ${ctx.score}, ${ctx.quarter}. Some teams fold here.`,
+    choices: [
+      { label: "Challenge the team to fight until the whistle", axis: "poise", risk: "aggressive", success: () => "The message lands — a furious response that makes it a game again.", fail: () => "The deficit only grows as things unravel further." },
+      { label: "Focus on execution, not the scoreboard", axis: "poise", risk: "safe", success: () => "Steady, business-like execution chips away at the deficit.", fail: () => "The businesslike approach doesn't create the spark that was needed." },
+    ],
+  },
+  {
+    id: "controversial_ejection_response",
+    side: "poise",
+    situation: (ctx) => `A player is ejected after a targeting call, ${ctx.score}, ${ctx.quarter}. The unit has to adjust on the fly.`,
+    choices: [
+      { label: "Simplify the calls for the next man in", axis: "poise", risk: "safe", success: () => "The backup, given a simplified job, performs admirably.", fail: () => "Even the simplified role trips him up early on." },
+      { label: "Trust the backup to run the full package", axis: "poise", risk: "aggressive", success: () => "He rises to the occasion and plays like a starter.", fail: () => "The full package is too much, too fast — a rough series." },
+    ],
+  },
+  {
+    id: "sudden_change_response",
+    side: "poise",
+    situation: (ctx) => `A sudden turnover hands ${ctx.opponent} a short field, ${ctx.score}, ${ctx.quarter}. Your defense has to respond immediately.`,
+    choices: [
+      { label: "Send an aggressive, attacking call", axis: "poise", risk: "aggressive", success: () => "The defense answers the turnover with a stop of their own — bend but don't break.", fail: () => "The short field proves too much to overcome. Points allowed." },
+      { label: "Play conservative, limit the damage", axis: "poise", risk: "safe", success: () => "Bend-but-don't-break defense limits it to a field goal at worst.", fail: () => "The conservative call still gives up the touchdown." },
+    ],
+  },
+  {
+    id: "weather_composure_check",
+    side: "poise",
+    situation: (ctx) => `Miserable weather has both teams playing sloppy, ${ctx.score}, ${ctx.quarter}.`,
+    choices: [
+      { label: "Push the tempo anyway, don't let it slow you down", axis: "poise", risk: "aggressive", success: () => "Your team handles the elements better — a real advantage shows up.", fail: () => "The conditions get the better of you too. A mistake in the muck." },
+      { label: "Play conservative, ball-security football", axis: "poise", risk: "safe", success: () => "Simple, careful football avoids a costly mistake in tough conditions.", fail: () => "Even careful football can't escape the sloppy conditions. A costly slip." },
     ],
   },
 ];

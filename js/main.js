@@ -66,6 +66,15 @@ function handleClick(e) {
       const index = parseInt(btn.getAttribute("data-index"), 10);
       resolveDilemma(App.state, index);
       App.awaitingContinue = true;
+      App.lastResolvedType = "dilemma";
+      renderApp();
+      break;
+    }
+    case "moment-choice": {
+      const index = parseInt(btn.getAttribute("data-index"), 10);
+      resolveGameMoment(App.state, index);
+      App.awaitingContinue = true;
+      App.lastResolvedType = "moment";
       renderApp();
       break;
     }

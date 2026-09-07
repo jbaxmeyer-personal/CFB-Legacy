@@ -6,6 +6,8 @@ const STORAGE_KEY = "cfbLegacySave";
 const STARTING_YEAR = 2026;
 const GAMES_PER_SEASON = 12;
 const DILEMMAS_PER_SEASON = 5;
+const MOMENTS_PER_SEASON_MIN = 3;
+const MOMENTS_PER_SEASON_MAX = 6;
 const STAT_KEYS = ["offenseIQ", "defenseIQ", "recruiting", "development", "culture", "mediaSavvy"];
 
 function clamp(v, min, max) {
@@ -105,6 +107,7 @@ function newCareer(coachName, archetype) {
     weekResults: [],
     currentWeek: 0,
     dilemmaLog: [],
+    momentLog: [],
     phase: "preseason",
     lastSeasonResult: null,
     lastOffers: null,
@@ -187,12 +190,29 @@ function generateWeekPlan(state) {
   const eligibleEvents = DILEMMA_EVENTS.filter((e) => e.stages.includes(state.stage));
   const shuffledEvents = [...eligibleEvents].sort(() => Math.random() - 0.5).slice(0, DILEMMAS_PER_SEASON);
   const weekIndices = Array.from({ length: GAMES_PER_SEASON }, (_, i) => i);
-  const dilemmaWeeks = weekIndices.sort(() => Math.random() - 0.5).slice(0, shuffledEvents.length).sort((a, b) => a - b);
+  const dilemmaWeeks = [...weekIndices].sort(() => Math.random() - 0.5).slice(0, shuffledEvents.length).sort((a, b) => a - b);
 
-  const plan = opponents.map((opp, i) => ({ week: i + 1, opponent: opp, dilemmaId: null }));
+  const plan = opponents.map((opp, i) => ({ week: i + 1, opponent: opp, dilemmaId: null, momentId: null, momentCtx: null }));
   dilemmaWeeks.forEach((wIdx, i) => {
     plan[wIdx].dilemmaId = shuffledEvents[i].id;
   });
+
+  if (isRecruitingStage(state.stage)) {
+    const remaining = weekIndices.filter((i) => !dilemmaWeeks.includes(i));
+    const momentCount = Math.min(randInt(MOMENTS_PER_SEASON_MIN, MOMENTS_PER_SEASON_MAX), remaining.length);
+    const momentWeeks = [...remaining].sort(() => Math.random() - 0.5).slice(0, momentCount);
+    const shuffledMoments = [...GAME_MOMENTS].sort(() => Math.random() - 0.5).slice(0, momentWeeks.length);
+    momentWeeks.forEach((wIdx, i) => {
+      plan[wIdx].momentId = shuffledMoments[i].id;
+      plan[wIdx].momentCtx = {
+        distance: randInt(2, 12),
+        score: scoreText(randInt(-17, 17)),
+        quarter: quarterText(randInt(1, 4)),
+        opponent: plan[wIdx].opponent,
+      };
+    });
+  }
+
   return plan;
 }
 
@@ -206,6 +226,7 @@ function setPreseasonChoices(state, { trainingFocusId, philosophy, recruitingFoc
   state.weekResults = [];
   state.currentWeek = 0;
   state.dilemmaLog = [];
+  state.momentLog = [];
   state.achievementsSnapshot = [...state.achievements];
   state.phase = "inseason";
   advanceWeeks(state);
@@ -224,6 +245,16 @@ function currentDilemma(state) {
 
 function dilemmaContext(state) {
   return { pronoun: "he", possessive: "his" };
+}
+
+function currentMoment(state) {
+  const plan = state.weekPlan && state.weekPlan[state.currentWeek];
+  if (!plan || !plan.momentId) return null;
+  return GAME_MOMENTS.find((m) => m.id === plan.momentId) || null;
+}
+
+function momentTitle(id) {
+  return id.split("_").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 }
 
 function generateScore(power, oppPower, won) {
@@ -249,7 +280,7 @@ function simulateWeek(state, weekIndex, extraPower) {
 function advanceWeeks(state) {
   while (state.currentWeek < state.weekPlan.length) {
     const plan = state.weekPlan[state.currentWeek];
-    if (plan.dilemmaId) return;
+    if (plan.dilemmaId || plan.momentId) return;
     simulateWeek(state, state.currentWeek, 0);
   }
   finishSeason(state);
@@ -273,6 +304,107 @@ function resolveDilemma(state, choiceIndex) {
     title: event.title,
     choiceLabel: choice.label,
     outcome: choice.outcome,
+    opponent: gameResult.opponent,
+    us: gameResult.us,
+    them: gameResult.them,
+    win: gameResult.win,
+  });
+  save(state);
+  advanceWeeks(state);
+}
+
+/* ==========================================================================
+   In-game moments: pass/run/special/poise ratings, computed fresh each time
+   from current talent + coach stats + scheme identity — never fixed, so the
+   same choice can succeed one game and fail the next.
+   ========================================================================== */
+
+function selfPassOffense(state) {
+  const boost = schemeTendency("offense", state.offenseScheme);
+  return talentOf(state, state.school) * 0.5 + state.stats.offenseIQ * 0.4 + boost.passBoost * 3;
+}
+function selfRunOffense(state) {
+  const boost = schemeTendency("offense", state.offenseScheme);
+  return talentOf(state, state.school) * 0.5 + state.stats.offenseIQ * 0.2 + state.stats.development * 0.2 + boost.runBoost * 3;
+}
+function selfPassDefense(state) {
+  const boost = schemeTendency("defense", state.defenseScheme);
+  return talentOf(state, state.school) * 0.5 + state.stats.defenseIQ * 0.4 + boost.passBoost * 3;
+}
+function selfRunDefense(state) {
+  const boost = schemeTendency("defense", state.defenseScheme);
+  return talentOf(state, state.school) * 0.5 + state.stats.defenseIQ * 0.2 + state.stats.development * 0.2 + boost.runBoost * 3;
+}
+function selfSpecialTeams(state) {
+  return talentOf(state, state.school) * 0.4 + state.stats.development * 0.3 + state.stats.recruiting * 0.3;
+}
+function selfPoise(state) {
+  return state.stats.culture * 0.5 + state.reputation * 0.3 + state.stats.development * 0.2;
+}
+
+function oppScheme(side, opponentName) {
+  const school = getSchool(opponentName);
+  const id = school ? (side === "offense" ? school.offenseScheme : school.defenseScheme) : null;
+  return schemeTendency(side, id);
+}
+function oppPassOffense(state, name) {
+  return talentOf(state, name) * 0.7 + oppScheme("offense", name).passBoost * 3;
+}
+function oppRunOffense(state, name) {
+  return talentOf(state, name) * 0.7 + oppScheme("offense", name).runBoost * 3;
+}
+function oppPassDefense(state, name) {
+  return talentOf(state, name) * 0.7 + oppScheme("defense", name).passBoost * 3;
+}
+function oppRunDefense(state, name) {
+  return talentOf(state, name) * 0.7 + oppScheme("defense", name).runBoost * 3;
+}
+function oppSpecialTeams(state, name) {
+  return talentOf(state, name) * 0.7;
+}
+function oppPoise(state, name) {
+  return talentOf(state, name) * 0.6 + 10;
+}
+
+function momentRatings(state, side, axis, opponentName) {
+  if (side === "offense") {
+    return axis === "run"
+      ? { my: selfRunOffense(state), opp: oppRunDefense(state, opponentName) }
+      : { my: selfPassOffense(state), opp: oppPassDefense(state, opponentName) };
+  }
+  if (side === "defense") {
+    return axis === "run"
+      ? { my: selfRunDefense(state), opp: oppRunOffense(state, opponentName) }
+      : { my: selfPassDefense(state), opp: oppPassOffense(state, opponentName) };
+  }
+  if (side === "special") return { my: selfSpecialTeams(state), opp: oppSpecialTeams(state, opponentName) };
+  return { my: selfPoise(state), opp: oppPoise(state, opponentName) };
+}
+
+function resolveGameMoment(state, choiceIndex) {
+  const weekIdx = state.currentWeek;
+  const plan = state.weekPlan[weekIdx];
+  if (!plan) return;
+  const moment = GAME_MOMENTS.find((m) => m.id === plan.momentId);
+  if (!moment) return;
+  const choice = moment.choices[choiceIndex];
+  if (!choice) return;
+
+  const ratings = momentRatings(state, moment.side, choice.axis, plan.opponent);
+  const profile = RISK_PROFILES[choice.risk];
+  const gap = ratings.my - ratings.opp;
+  const successProb = clamp(profile.successBase + gap / 150, 0.08, 0.92);
+  const success = Math.random() < successProb;
+  const weekPowerDelta = success ? profile.successReward : profile.failCost;
+
+  const gameResult = simulateWeek(state, weekIdx, weekPowerDelta);
+
+  state.momentLog.push({
+    week: plan.week,
+    title: momentTitle(moment.id),
+    choiceLabel: choice.label,
+    success,
+    resultText: success ? choice.success(plan.momentCtx) : choice.fail(plan.momentCtx),
     opponent: gameResult.opponent,
     us: gameResult.us,
     them: gameResult.them,

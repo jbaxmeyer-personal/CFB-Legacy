@@ -14,6 +14,15 @@ in that week's score. Every offseason you either stay, get poached by
 another program, earn a promotion, or — if the record was bad enough —
 get shown the door and have to find your next job.
 
+As a Coordinator or Head Coach, 3-6 weeks a season also bring a live
+in-game tactical decision — 3rd-and-long, a goal-line stand, an onside
+kick, a rivalry composure check. These aren't scripted: each choice is
+graded by a real calculation comparing your team's passing/running/
+special-teams/composure rating (built from your scheme, coach stats, and
+team talent) against that week's actual opponent. The same call can
+succeed on a mismatch and fail against a tougher team — nothing here is
+predetermined.
+
 Your full coaching history is tracked: a career-stops table (school,
 title, years, seasons, cumulative record) plus career totals (bowl
 record, conference titles, playoff trips, national titles), visible in
@@ -59,7 +68,7 @@ No further configuration is needed since this is a plain static site.
 ```
 index.html        Page shell
 css/style.css      Theme (dark, matches the Dynasty Tracker / CFB Scoreboard look)
-js/data.js         Schools, conferences, dilemma events, achievements
+js/data.js         Schools, conferences, dilemma events, game moments, achievements
 js/engine.js       Game state machine (career creation, season sim, job market)
 js/ui.js           Screen rendering
 js/main.js         Event wiring + bootstrap
