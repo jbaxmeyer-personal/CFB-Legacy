@@ -8,6 +8,7 @@ const App = {
   formName: "",
   formArchetype: "offense",
   awaitingContinue: false,
+  lastResolvedType: null,
 };
 
 const STAT_LABELS = {
@@ -74,7 +75,7 @@ function renderApp() {
 
   let body = "";
   if (state.phase === "preseason") body = renderPreseason(state);
-  else if (state.phase === "inseason") body = renderDilemmaScreen(state);
+  else if (state.phase === "inseason") body = renderInSeasonScreen(state);
   else if (state.phase === "recap") body = renderRecap(state);
   else if (state.phase === "offseason") body = renderOffseason(state);
 
@@ -295,6 +296,82 @@ function renderPreseason(state) {
 }
 
 /* ==========================================================================
+   In-season: dispatch to a dilemma or a live game moment
+   ========================================================================== */
+
+function renderInSeasonScreen(state) {
+  if (App.awaitingContinue) {
+    return App.lastResolvedType === "moment" ? renderMomentScreen(state) : renderDilemmaScreen(state);
+  }
+  const plan = state.weekPlan[state.currentWeek];
+  if (!plan) return `<div class="screen"><div class="panel"><p>Resolving the season...</p></div></div>`;
+  if (plan.dilemmaId) return renderDilemmaScreen(state);
+  if (plan.momentId) return renderMomentScreen(state);
+  return `<div class="screen"><div class="panel"><p>Resolving the season...</p></div></div>`;
+}
+
+const RISK_LABELS = {
+  safe: { tag: "Safe", icon: "\u{1F6E1}️" },
+  balanced: { tag: "Balanced", icon: "⚖️" },
+  aggressive: { tag: "Aggressive", icon: "\u{1F3B2}" },
+};
+
+const MOMENT_AXIS_LABELS = {
+  offense: { pass: "Passing Offense vs. Their Pass D", run: "Running Offense vs. Their Run D" },
+  defense: { pass: "Your Pass D vs. Their Passing Attack", run: "Your Run D vs. Their Running Attack" },
+  special: { special: "Special Teams" },
+  poise: { poise: "Composure" },
+};
+
+function renderMomentScreen(state) {
+  if (App.awaitingContinue && state.momentLog.length) {
+    const last = state.momentLog[state.momentLog.length - 1];
+    const resultLabel = last.win ? "WIN" : "LOSS";
+    return `
+      <div class="screen">
+        <div class="panel event-panel">
+          <div class="muted">${last.success ? "✅ It worked" : "❌ It didn't work"}</div>
+          <h2>${escapeHtml(last.title)}</h2>
+          <p class="muted">You called: <strong>${escapeHtml(last.choiceLabel)}</strong></p>
+          <p>${escapeHtml(last.resultText)}</p>
+          <div class="game-result game-result--${last.win ? "win" : "loss"}">
+            <div class="game-result__label">Week ${last.week} vs ${escapeHtml(last.opponent)}</div>
+            <div class="game-result__score">${resultLabel} ${last.us}-${last.them}</div>
+          </div>
+          <button class="btn btn-primary btn-block" data-action="dilemma-continue">Continue</button>
+        </div>
+      </div>`;
+  }
+
+  const moment = currentMoment(state);
+  if (!moment) return `<div class="screen"><div class="panel"><p>Resolving the season...</p></div></div>`;
+  const plan = state.weekPlan[state.currentWeek];
+  const situationText = moment.situation(plan.momentCtx);
+
+  const choices = moment.choices.map((c, i) => {
+    const risk = RISK_LABELS[c.risk] || RISK_LABELS.balanced;
+    const axisLabel = (MOMENT_AXIS_LABELS[moment.side] || {})[c.axis] || "";
+    return `
+    <button class="btn btn-choice" data-action="moment-choice" data-index="${i}">
+      <div class="btn-choice__label">${escapeHtml(c.label)}</div>
+      <div class="btn-choice__tags">
+        <span class="risk-pill risk-pill--${c.risk}">${risk.icon} ${risk.tag}</span>
+        ${axisLabel ? `<span class="effect-pill">${escapeHtml(axisLabel)}</span>` : ""}
+      </div>
+    </button>`;
+  }).join("");
+
+  return `
+    <div class="screen">
+      <div class="panel event-panel">
+        <div class="muted">Week ${plan.week} of ${GAMES_PER_SEASON} &middot; Live Game Decision</div>
+        <h2>${escapeHtml(situationText)}</h2>
+        <div class="choice-stack">${choices}</div>
+      </div>
+    </div>`;
+}
+
+/* ==========================================================================
    In-season dilemmas
    ========================================================================== */
 
@@ -362,16 +439,25 @@ function renderRecap(state) {
 
   const dilemmaByWeek = {};
   state.dilemmaLog.forEach((d) => { dilemmaByWeek[d.week] = d; });
+  const momentByWeek = {};
+  state.momentLog.forEach((m) => { momentByWeek[m.week] = m; });
 
   const gameRows = r.weekResults.map((w) => {
     const d = dilemmaByWeek[w.week];
+    const m = momentByWeek[w.week];
     const resultClass = w.win ? "result-win" : "result-loss";
-    const note = d ? `${escapeHtml(d.title)}: ${escapeHtml(d.choiceLabel)}` : `<span class="muted">&mdash;</span>`;
+    let note = `<span class="muted">&mdash;</span>`;
+    if (d) note = `${escapeHtml(d.title)}: ${escapeHtml(d.choiceLabel)}`;
+    else if (m) note = `${m.success ? "✅" : "❌"} ${escapeHtml(m.title)}: ${escapeHtml(m.choiceLabel)}`;
     return `<tr><td>${w.week}</td><td>${escapeHtml(w.opponent)}</td><td class="${resultClass}">${w.win ? "W" : "L"} ${w.us}-${w.them}</td><td>${note}</td></tr>`;
   }).join("");
 
   const logHtml = state.dilemmaLog.map((d) => `
     <li><strong>${escapeHtml(d.title)}</strong> (Week ${d.week} vs ${escapeHtml(d.opponent)}): ${escapeHtml(d.choiceLabel)} — <span class="muted">${escapeHtml(d.outcome)}</span> <span class="${d.win ? "result-win" : "result-loss"}">${d.win ? "W" : "L"} ${d.us}-${d.them}</span></li>
+  `).join("");
+
+  const momentsHtml = state.momentLog.map((m) => `
+    <li>${m.success ? "✅" : "❌"} <strong>${escapeHtml(m.title)}</strong> (Week ${m.week} vs ${escapeHtml(m.opponent)}): ${escapeHtml(m.choiceLabel)} — <span class="muted">${escapeHtml(m.resultText)}</span> <span class="${m.win ? "result-win" : "result-loss"}">${m.win ? "W" : "L"} ${m.us}-${m.them}</span></li>
   `).join("");
 
   return `
@@ -386,6 +472,11 @@ function renderRecap(state) {
         <h2>Decisions That Shaped the Season</h2>
         <ul class="storyline-list">${logHtml}</ul>
       </div>
+      ${state.momentLog.length ? `
+      <div class="panel">
+        <h2>Big Moments</h2>
+        <ul class="storyline-list">${momentsHtml}</ul>
+      </div>` : ""}
       <div class="panel">
         <h2>Full Game Log</h2>
         <div class="history-panel__scroll">
