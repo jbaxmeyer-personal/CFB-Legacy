@@ -5,11 +5,25 @@ to Coordinator to Head Coach, chasing conference titles and a national
 championship along the way.
 
 Each season you pick a training focus (and, once you're calling the
-game as a Coordinator or Head Coach, a recruiting emphasis and game
-philosophy), work through a handful of narrative dilemmas, then see how
-the season played out. Every offseason you either stay, get poached by
+game as a Coordinator or Head Coach, a recruiting emphasis, a game
+philosophy, and your offensive/defensive scheme), then play through a
+real week-by-week schedule against named opponents. About five weeks a
+season bring a narrative dilemma — every choice shows its real tradeoffs
+up front (no choice is a free lunch), and the outcome plays out directly
+in that week's score. Every offseason you either stay, get poached by
 another program, earn a promotion, or — if the record was bad enough —
 get shown the door and have to find your next job.
+
+Your full coaching history is tracked: a career-stops table (school,
+title, years, seasons, cumulative record) plus career totals (bowl
+record, conference titles, playoff trips, national titles), visible in
+the header's history panel throughout and on the final career
+retrospective.
+
+Installing a new scheme costs you an installation penalty that season;
+sticking with one for two-plus seasons builds a mastery bonus instead —
+so scheme choice is a real long-term-vs-short-term tradeoff, not just
+flavor text.
 
 Schools, conferences, and starting prestige are sourced from the
 [Dynasty Tracker](https://github.com/jbaxmeyer-personal/Dynasty-Tracker)

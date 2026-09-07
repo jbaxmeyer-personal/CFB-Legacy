@@ -5,7 +5,7 @@
 const STORAGE_KEY = "cfbLegacySave";
 const STARTING_YEAR = 2026;
 const GAMES_PER_SEASON = 12;
-const DILEMMAS_PER_SEASON = 3;
+const DILEMMAS_PER_SEASON = 5;
 const STAT_KEYS = ["offenseIQ", "defenseIQ", "recruiting", "development", "culture", "mediaSavvy"];
 
 function clamp(v, min, max) {
@@ -77,7 +77,7 @@ function newCareer(coachName, archetype) {
   });
 
   const state = {
-    version: 1,
+    version: 2,
     coachName,
     archetype,
     age: 25,
@@ -93,11 +93,17 @@ function newCareer(coachName, archetype) {
     philosophy: "balanced",
     trainingFocusId: null,
     recruitingFocusId: null,
+    offenseScheme: startSchool.offenseScheme,
+    defenseScheme: startSchool.defenseScheme,
+    schemeTenure: 0,
+    schemeInstallPenaltyThisSeason: false,
     teamTalent: {},
     history: [],
     achievements: [],
-    seasonDilemmaIds: [],
-    dilemmaQueue: [],
+    achievementsSnapshot: [],
+    weekPlan: [],
+    weekResults: [],
+    currentWeek: 0,
     dilemmaLog: [],
     phase: "preseason",
     lastSeasonResult: null,
@@ -131,57 +137,149 @@ function grantAchievement(state, id) {
 }
 
 /* ==========================================================================
-   Preseason
+   Preseason: training, recruiting, philosophy, schemes
    ========================================================================== */
 
 function isRecruitingStage(stage) {
   return stage === "coordinator" || stage === "headcoach";
 }
 
-function setPreseasonChoices(state, { trainingFocusId, philosophy, recruitingFocusId }) {
+function applySchemeChoice(state, offenseSchemeId, defenseSchemeId) {
+  state.schemeInstallPenaltyThisSeason = false;
+  if (!isRecruitingStage(state.stage)) return;
+
+  const canPickOffense = state.stage === "headcoach" || state.archetype === "offense";
+  const canPickDefense = state.stage === "headcoach" || state.archetype === "defense";
+
+  if (canPickOffense && offenseSchemeId && offenseSchemeId !== state.offenseScheme) {
+    state.offenseScheme = offenseSchemeId;
+    state.schemeInstallPenaltyThisSeason = true;
+    state.schemeTenure = 0;
+  }
+  if (canPickDefense && defenseSchemeId && defenseSchemeId !== state.defenseScheme) {
+    state.defenseScheme = defenseSchemeId;
+    state.schemeInstallPenaltyThisSeason = true;
+    state.schemeTenure = 0;
+  }
+}
+
+function generateWeekPlan(state) {
+  const mySchool = getSchool(state.school);
+  const myConf = mySchool ? mySchool.conference : null;
+  const fullPool = SCHOOLS.filter((s) => s.name !== state.school);
+  const confPool = fullPool.filter((s) => s.conference === myConf);
+
+  const used = new Set([state.school]);
+  const opponents = [];
+  for (let i = 0; i < GAMES_PER_SEASON; i++) {
+    const useConf = confPool.length > 0 && Math.random() < 0.55;
+    const candidatePool = useConf ? confPool : fullPool;
+    let choice = pick(candidatePool);
+    let tries = 0;
+    while (used.has(choice.name) && tries < 30) {
+      choice = pick(candidatePool);
+      tries++;
+    }
+    used.add(choice.name);
+    opponents.push(choice.name);
+  }
+
+  const eligibleEvents = DILEMMA_EVENTS.filter((e) => e.stages.includes(state.stage));
+  const shuffledEvents = [...eligibleEvents].sort(() => Math.random() - 0.5).slice(0, DILEMMAS_PER_SEASON);
+  const weekIndices = Array.from({ length: GAMES_PER_SEASON }, (_, i) => i);
+  const dilemmaWeeks = weekIndices.sort(() => Math.random() - 0.5).slice(0, shuffledEvents.length).sort((a, b) => a - b);
+
+  const plan = opponents.map((opp, i) => ({ week: i + 1, opponent: opp, dilemmaId: null }));
+  dilemmaWeeks.forEach((wIdx, i) => {
+    plan[wIdx].dilemmaId = shuffledEvents[i].id;
+  });
+  return plan;
+}
+
+function setPreseasonChoices(state, { trainingFocusId, philosophy, recruitingFocusId, offenseSchemeId, defenseSchemeId }) {
   state.trainingFocusId = trainingFocusId;
   if (philosophy) state.philosophy = philosophy;
   if (isRecruitingStage(state.stage)) state.recruitingFocusId = recruitingFocusId;
-  state.dilemmaQueue = pickSeasonDilemmas(state);
+  applySchemeChoice(state, offenseSchemeId, defenseSchemeId);
+
+  state.weekPlan = generateWeekPlan(state);
+  state.weekResults = [];
+  state.currentWeek = 0;
   state.dilemmaLog = [];
+  state.achievementsSnapshot = [...state.achievements];
   state.phase = "inseason";
+  advanceWeeks(state);
   save(state);
 }
 
-function pickSeasonDilemmas(state) {
-  const pool = DILEMMA_EVENTS.filter((e) => e.stages.includes(state.stage));
-  const shuffled = [...pool].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, Math.min(DILEMMAS_PER_SEASON, shuffled.length)).map((e) => e.id);
-}
-
 /* ==========================================================================
-   In-season dilemmas
+   In-season: week-by-week games, dilemmas tied to specific games
    ========================================================================== */
 
 function currentDilemma(state) {
-  if (!state.dilemmaQueue.length) return null;
-  const id = state.dilemmaQueue[0];
-  return DILEMMA_EVENTS.find((e) => e.id === id) || null;
+  const plan = state.weekPlan && state.weekPlan[state.currentWeek];
+  if (!plan || !plan.dilemmaId) return null;
+  return DILEMMA_EVENTS.find((e) => e.id === plan.dilemmaId) || null;
 }
 
 function dilemmaContext(state) {
   return { pronoun: "he", possessive: "his" };
 }
 
+function generateScore(power, oppPower, won) {
+  const diff = clamp(Math.abs(power - oppPower) / 8, 0, 4);
+  const winnerScore = randInt(17, 35) + Math.round(diff * 2);
+  const loserScore = clamp(randInt(3, winnerScore - 3), 0, winnerScore - 1);
+  return won ? { us: winnerScore, them: loserScore } : { us: loserScore, them: winnerScore };
+}
+
+function simulateWeek(state, weekIndex, extraPower) {
+  const plan = state.weekPlan[weekIndex];
+  const variance = philosophyVariance(state.philosophy);
+  const power = teamPower(state) + (extraPower || 0);
+  const oppPower = talentOf(state, plan.opponent) + randRange(-6, 6);
+  const won = simulateGame(power, oppPower, variance);
+  const score = generateScore(power, oppPower, won);
+  const result = { week: plan.week, opponent: plan.opponent, us: score.us, them: score.them, win: won };
+  state.weekResults.push(result);
+  state.currentWeek = weekIndex + 1;
+  return result;
+}
+
+function advanceWeeks(state) {
+  while (state.currentWeek < state.weekPlan.length) {
+    const plan = state.weekPlan[state.currentWeek];
+    if (plan.dilemmaId) return;
+    simulateWeek(state, state.currentWeek, 0);
+  }
+  finishSeason(state);
+}
+
 function resolveDilemma(state, choiceIndex) {
-  const event = currentDilemma(state);
+  const weekIdx = state.currentWeek;
+  const plan = state.weekPlan[weekIdx];
+  if (!plan) return;
+  const event = DILEMMA_EVENTS.find((e) => e.id === plan.dilemmaId);
   if (!event) return;
   const choice = event.choices[choiceIndex];
   if (!choice) return;
 
   applyEffects(state, choice.effects || {});
-  state.dilemmaLog.push({ title: event.title, choiceLabel: choice.label, outcome: choice.outcome });
-  state.dilemmaQueue.shift();
-  save(state);
+  const weekPowerDelta = (choice.effects && choice.effects.weekPowerDelta) || 0;
+  const gameResult = simulateWeek(state, weekIdx, weekPowerDelta);
 
-  if (!state.dilemmaQueue.length) {
-    resolveSeason(state);
-  }
+  state.dilemmaLog.push({
+    week: plan.week,
+    title: event.title,
+    choiceLabel: choice.label,
+    outcome: choice.outcome,
+    opponent: gameResult.opponent,
+    us: gameResult.us,
+    them: gameResult.them,
+    win: gameResult.win,
+  });
+  save(state);
+  advanceWeeks(state);
 }
 
 function applyEffects(state, effects) {
@@ -198,19 +296,40 @@ function applyEffects(state, effects) {
 }
 
 /* ==========================================================================
-   Season simulation
+   Coach contribution, schemes, team power
    ========================================================================== */
+
+function avgStats(state, keys) {
+  return keys.reduce((sum, k) => sum + state.stats[k], 0) / keys.length;
+}
+
+function schemeMasteryBonus(state) {
+  if (state.schemeTenure < 2) return 0;
+  let bonus = 0;
+  const off = findScheme("offense", state.offenseScheme);
+  const def = findScheme("defense", state.defenseScheme);
+  if (off) bonus += (avgStats(state, off.fitStats) / 100) * 3;
+  if (def) bonus += (avgStats(state, def.fitStats) / 100) * 3;
+  return bonus;
+}
 
 function computeCoachContribution(state) {
   const s = state.stats;
   const relevantIQ = state.archetype === "offense" ? s.offenseIQ : s.defenseIQ;
+  let base;
   if (state.stage === "position") {
-    return (relevantIQ * 0.3 + s.development * 0.3 + s.culture * 0.1) / 100 * 12;
+    base = (relevantIQ * 0.3 + s.development * 0.3 + s.culture * 0.1) / 100 * 12;
+  } else if (state.stage === "coordinator") {
+    base = (relevantIQ * 0.5 + s.development * 0.3 + s.culture * 0.1) / 100 * 20;
+  } else {
+    base = ((s.offenseIQ + s.defenseIQ) / 2 * 0.4 + s.development * 0.25 + s.culture * 0.2 + s.recruiting * 0.15) / 100 * 28;
   }
-  if (state.stage === "coordinator") {
-    return (relevantIQ * 0.5 + s.development * 0.3 + s.culture * 0.1) / 100 * 20;
+
+  if (isRecruitingStage(state.stage)) {
+    base += schemeMasteryBonus(state);
+    if (state.schemeInstallPenaltyThisSeason) base -= 4;
   }
-  return ((s.offenseIQ + s.defenseIQ) / 2 * 0.4 + s.development * 0.25 + s.culture * 0.2 + s.recruiting * 0.15) / 100 * 28;
+  return base;
 }
 
 function teamPower(state) {
@@ -222,58 +341,9 @@ function simulateGame(power, oppPower, variance) {
   return Math.random() < winProb;
 }
 
-function resolveSeason(state) {
-  const school = getSchool(state.school);
-  const cWeight = conferenceWeight(school ? school.conference : "Independent");
-  const variance = philosophyVariance(state.philosophy);
-  const power = teamPower(state);
-
-  let wins = 0;
-  let losses = 0;
-  let bestWinMargin = -Infinity;
-  let worstLossMargin = Infinity;
-
-  for (let i = 0; i < GAMES_PER_SEASON; i++) {
-    const oppPower = 40 + cWeight * 0.6 + randRange(-15, 15);
-    const won = simulateGame(power, oppPower, variance);
-    const margin = power - oppPower;
-    if (won) {
-      wins++;
-      if (margin > bestWinMargin) bestWinMargin = margin;
-    } else {
-      losses++;
-      if (margin < worstLossMargin) worstLossMargin = margin;
-    }
-  }
-
-  const winPct = wins / GAMES_PER_SEASON;
-  const postseason = resolvePostseason(state, power, cWeight, variance, wins);
-
-  const result = {
-    year: state.year,
-    school: state.school,
-    title: state.title,
-    wins,
-    losses,
-    winPct,
-    postseason,
-    recruitingFocusId: state.recruitingFocusId,
-    trainingFocusId: state.trainingFocusId,
-  };
-
-  applyEndOfSeasonGrowth(state, result);
-  state.history.push({
-    year: result.year,
-    school: result.school,
-    title: result.title,
-    record: `${wins}-${losses}`,
-    note: postseason.label,
-  });
-
-  state.lastSeasonResult = result;
-  state.phase = "recap";
-  save(state);
-}
+/* ==========================================================================
+   End of season: postseason, growth, world drift
+   ========================================================================== */
 
 function resolvePostseason(state, power, cWeight, variance, wins) {
   if (wins < 6) return { label: "No bowl", champion: false, playoff: false, natty: false };
@@ -330,6 +400,26 @@ function resolvePostseason(state, power, cWeight, variance, wins) {
   return { label, champion, playoff, natty, bowlWin };
 }
 
+function driftOtherTalents(state) {
+  Object.keys(state.teamTalent).forEach((name) => {
+    if (name === state.school) return;
+    const school = getSchool(name);
+    const baseline = school ? school.startingPrestige * 16 : 40;
+    const cur = state.teamTalent[name];
+    const pull = (baseline - cur) * 0.08;
+    const noise = randRange(-3, 3);
+    state.teamTalent[name] = clamp(cur + pull + noise, 5, 99);
+  });
+}
+
+function schemeRecruitingSynergy(state) {
+  if (state.recruitingFocusId !== "blue_chip") return 0;
+  const excitingOffense = ["Spread", "Air Raid", "Power Spread"];
+  const aggressiveDefense = ["4-2-5", "3-3-5"];
+  if (excitingOffense.includes(state.offenseScheme) || aggressiveDefense.includes(state.defenseScheme)) return 1;
+  return 0;
+}
+
 function applyEndOfSeasonGrowth(state, result) {
   const focus = TRAINING_FOCUS_OPTIONS.find((f) => f.id === state.trainingFocusId);
   if (focus) {
@@ -348,10 +438,12 @@ function applyEndOfSeasonGrowth(state, result) {
       talentGrowth += rFocus.talentGrowth + randRange(-variance, variance) * (state.stats.recruiting / 100);
       if (rFocus.cultureBonus) state.stats.culture = clamp(state.stats.culture + rFocus.cultureBonus, 0, 100);
     }
+    talentGrowth += schemeRecruitingSynergy(state);
     state.stats.recruiting = clamp(state.stats.recruiting + randInt(-1, 2), 0, 100);
   }
   const cur = talentOf(state, state.school);
   state.teamTalent[state.school] = clamp(cur + talentGrowth, 5, 99);
+  driftOtherTalents(state);
 
   if (result.winPct > 0.7) state.reputation = clamp(state.reputation + 4, 0, 100);
   else if (result.winPct > 0.5) state.reputation = clamp(state.reputation + 1, 0, 100);
@@ -367,11 +459,51 @@ function applyEndOfSeasonGrowth(state, result) {
   state.seasonsTotal += 1;
   state.age += 1;
   state.year += 1;
+  state.schemeTenure += 1;
+  state.schemeInstallPenaltyThisSeason = false;
 
   const school = getSchool(state.school);
   if (school && school.startingPrestige >= 4.5) grantAchievement(state, "blue_blood");
 
   if (state.jobSecurity <= 15 && state.jobSecurity > 0) grantAchievement(state, "survived_hotseat");
+}
+
+function finishSeason(state) {
+  const wins = state.weekResults.filter((r) => r.win).length;
+  const losses = state.weekResults.length - wins;
+  const winPct = wins / GAMES_PER_SEASON;
+
+  const school = getSchool(state.school);
+  const cWeight = conferenceWeight(school ? school.conference : "Independent");
+  const variance = philosophyVariance(state.philosophy);
+  const power = teamPower(state);
+  const postseason = resolvePostseason(state, power, cWeight, variance, wins);
+
+  const result = {
+    year: state.year,
+    school: state.school,
+    title: state.title,
+    wins,
+    losses,
+    winPct,
+    postseason,
+    weekResults: [...state.weekResults],
+    recruitingFocusId: state.recruitingFocusId,
+    trainingFocusId: state.trainingFocusId,
+  };
+
+  applyEndOfSeasonGrowth(state, result);
+  state.history.push({
+    year: result.year,
+    school: result.school,
+    title: result.title,
+    record: `${wins}-${losses}`,
+    note: postseason.label,
+  });
+
+  state.lastSeasonResult = result;
+  state.phase = "recap";
+  save(state);
 }
 
 /* ==========================================================================
@@ -480,6 +612,14 @@ function acceptOffer(state, offerId) {
     state.jobSecurity = 60;
   }
 
+  if (changingSchool) {
+    const newSchool = getSchool(state.school);
+    state.offenseScheme = newSchool.offenseScheme;
+    state.defenseScheme = newSchool.defenseScheme;
+    state.schemeTenure = 0;
+    state.schemeInstallPenaltyThisSeason = false;
+  }
+
   initTalent(state, state.school);
   state.wasFired = false;
   state.lastOffers = null;
@@ -505,6 +645,52 @@ function computeLegacyScore(state) {
   if (state.achievements.includes("national_champ")) score += 20;
   if (state.achievements.includes("conference_champ")) score += 10;
   return Math.round(score);
+}
+
+/* ==========================================================================
+   Career history: stops (aggregated stints) and career totals
+   ========================================================================== */
+
+function computeCareerStops(state) {
+  const stops = [];
+  state.history.forEach((h) => {
+    const [w, l] = h.record.split("-").map(Number);
+    const last = stops[stops.length - 1];
+    if (last && last.school === h.school && last.title === h.title) {
+      last.endYear = h.year;
+      last.seasons += 1;
+      last.wins += w;
+      last.losses += l;
+      last.notes.push(h.note);
+    } else {
+      stops.push({
+        school: h.school,
+        title: h.title,
+        startYear: h.year,
+        endYear: h.year,
+        seasons: 1,
+        wins: w,
+        losses: l,
+        notes: [h.note],
+      });
+    }
+  });
+  return stops;
+}
+
+function computeCareerTotals(state) {
+  let wins = 0, losses = 0, bowlWins = 0, bowlLosses = 0, confChamps = 0, playoffs = 0, natties = 0;
+  state.history.forEach((h) => {
+    const [w, l] = h.record.split("-").map(Number);
+    wins += w;
+    losses += l;
+    if (h.note === "Bowl win") bowlWins++;
+    else if (h.note === "Bowl loss") bowlLosses++;
+    else if (h.note === "Conference Champion") confChamps++;
+    else if (h.note === "National Champion") { natties++; playoffs++; }
+    else if (h.note && h.note.indexOf("Playoff") === 0) playoffs++;
+  });
+  return { wins, losses, bowlWins, bowlLosses, confChamps, playoffs, natties, seasons: state.history.length };
 }
 
 /* ==========================================================================

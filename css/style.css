@@ -392,6 +392,123 @@ img {
   margin-top: 0.3rem;
 }
 
+.btn-choice__label {
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.btn-choice__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.effect-pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.effect-pill--pos {
+  color: var(--win);
+  border-color: rgba(52, 199, 89, 0.35);
+  background: rgba(52, 199, 89, 0.08);
+}
+
+.effect-pill--neg {
+  color: var(--danger);
+  border-color: rgba(255, 59, 48, 0.35);
+  background: rgba(255, 59, 48, 0.08);
+}
+
+.game-result {
+  margin: 0.9rem 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-panel-raised);
+}
+
+.game-result__label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.game-result__score {
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.game-result--win .game-result__score {
+  color: var(--win);
+}
+
+.game-result--loss .game-result__score {
+  color: var(--danger);
+}
+
+.result-win {
+  color: var(--win);
+  font-weight: 700;
+}
+
+.result-loss {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.current-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  border: 1px solid var(--accent-dim);
+  background: var(--accent-dim);
+  border-radius: 999px;
+  padding: 0.05rem 0.4rem;
+  vertical-align: middle;
+}
+
+.scheme-subhead {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0.9rem 0 0.5rem;
+}
+
+.totals-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+}
+
+.totals-strip__item {
+  background: var(--bg-panel-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.4rem;
+  text-align: center;
+}
+
+.totals-strip__value {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.totals-strip__label {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
 /* ==========================================================================
    Recap
    ========================================================================== */
