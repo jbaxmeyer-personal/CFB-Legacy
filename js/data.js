@@ -1529,7 +1529,7 @@ const DILEMMA_EVENTS = [
     title: "Position Battle",
     text: () => `Two players in your room are neck-and-neck for the starting job, and both sets of parents are calling.`,
     choices: [
-      { label: "Let the tape decide, no favorites", effects: { culture: 3, development: 1 }, outcome: "The room respects the fairness, even the player who loses the job." },
+      { label: "Let the tape decide, no favorites", effects: { culture: 3, development: 1, teamTalentDelta: -1 }, outcome: "The room respects the fairness, even the player who loses the job. It costs the team a little sharpness on the field this week." },
       { label: "Go with the more experienced player", effects: { culture: -1, teamTalentDelta: 1 }, outcome: "Safe, proven choice — but the young talent is frustrated." },
     ],
   },
@@ -1539,8 +1539,8 @@ const DILEMMA_EVENTS = [
     title: "The Head Coach Wants Your Read",
     text: () => `The head coach asks you point-blank in the staff meeting whether your group is ready to install a riskier wrinkle for Saturday.`,
     choices: [
-      { label: "Vouch for it — they're ready", effects: { reputation: 2, teamTalentDelta: 1, weekPowerDelta: 3 }, outcome: "It works. Your stock with the head coach rises." },
-      { label: "Advise caution", effects: { reputation: 1, culture: 1 }, outcome: "The safe call is respected, if unremarkable." },
+      { label: "Vouch for it — they're ready", effects: { reputation: 2, teamTalentDelta: 1, weekPowerDelta: 3, development: -1 }, outcome: "It works. Your stock with the head coach rises. It eats into practice time you'd rather spend elsewhere." },
+      { label: "Advise caution", effects: { reputation: 1, culture: 1, teamTalentDelta: -1 }, outcome: "The safe call is respected, if unremarkable. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -1580,7 +1580,7 @@ const DILEMMA_EVENTS = [
     text: () => `Your name is coming up in Coach of the Year conversations. A reporter wants an exclusive sit-down.`,
     choices: [
       { label: "Do the interview", effects: { mediaSavvy: 2, reputation: 2, culture: -1 }, outcome: "Good exposure, though a couple of assistants feel overlooked." },
-      { label: "Deflect credit to the staff and players", effects: { culture: 3, mediaSavvy: 1 }, outcome: "The humility plays extremely well inside the building." },
+      { label: "Deflect credit to the staff and players", effects: { culture: 3, mediaSavvy: 1, teamTalentDelta: -1 }, outcome: "The humility plays extremely well inside the building. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -1600,7 +1600,7 @@ const DILEMMA_EVENTS = [
     text: () => `The state's top recruit publicly says he's looking at programs outside the region.`,
     choices: [
       { label: "Make a personal, public pitch", effects: { mediaSavvy: 2, recruiting: 1, jobSecurity: -1 }, outcome: "It's a swing for the fences. He notices the effort." },
-      { label: "Focus recruiting resources elsewhere", effects: { recruiting: 1 }, outcome: "Pragmatic. You land depth instead of a headline name." },
+      { label: "Focus recruiting resources elsewhere", effects: { recruiting: 1, teamTalentDelta: -1 }, outcome: "Pragmatic. You land depth instead of a headline name. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -1629,7 +1629,7 @@ const DILEMMA_EVENTS = [
     title: "Trap Game",
     text: () => `A ranked opponent looms next week, and this Saturday's overmatched opponent is being overlooked in the building.`,
     choices: [
-      { label: "Sound the alarm in meetings", effects: { culture: 2, weekPowerDelta: 3 }, outcome: "The focus holds. No trap sprung." },
+      { label: "Sound the alarm in meetings", effects: { culture: 2, weekPowerDelta: 3, teamTalentDelta: -1 }, outcome: "The focus holds. No trap sprung. It costs the team a little sharpness on the field this week." },
       { label: "Let the staff coast a bit", effects: { culture: -2, teamTalentDelta: -1, development: 1, weekPowerDelta: -5 }, outcome: "A scare on the scoreboard reminds everyone why you don't look ahead — though the lighter week gets your backups real reps." },
     ],
   },
@@ -1760,7 +1760,7 @@ const DILEMMA_EVENTS = [
     text: () => `A local four-star will commit cheaply — if you promise him a specific role in writing.`,
     choices: [
       { label: "Promise the role", effects: { recruiting: 3, culture: -1 }, outcome: "He commits fast, but the current starter at that spot has questions." },
-      { label: "Recruit him straight, no promises", effects: { recruiting: 1, culture: 1 }, outcome: "Slower to close, but nobody's roster spot was ever in question." },
+      { label: "Recruit him straight, no promises", effects: { recruiting: 1, culture: 1, teamTalentDelta: -1 }, outcome: "Slower to close, but nobody's roster spot was ever in question. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -1941,7 +1941,7 @@ const DILEMMA_EVENTS = [
     title: "Travel Dress Code",
     text: () => `Players lobby to swap the coat-and-tie travel uniform for team-branded athleisure.`,
     choices: [
-      { label: "Modernize it", effects: { culture: 2, mediaSavvy: 1 }, outcome: "Comfortable, on-brand, and the roster loves it — a couple of old alumni grumble." },
+      { label: "Modernize it", effects: { culture: 2, mediaSavvy: 1, teamTalentDelta: -1 }, outcome: "Comfortable, on-brand, and the roster loves it — a couple of old alumni grumble. It costs the team a little sharpness on the field this week." },
       { label: "Keep the coat and tie", effects: { reputation: 1, culture: -1 }, outcome: "Sharp and traditional. Players see it as an outdated formality." },
     ],
   },
@@ -1971,7 +1971,7 @@ const DILEMMA_EVENTS = [
     title: "Naming Captains",
     text: () => `It's time to name team captains — the roster wants a vote, but you have your own read on who's ready.`,
     choices: [
-      { label: "Let the team vote", effects: { culture: 3 }, outcome: "Popular and democratic — though not necessarily who you'd have picked." },
+      { label: "Let the team vote", effects: { culture: 3, teamTalentDelta: -1 }, outcome: "Popular and democratic — though not necessarily who you'd have picked. It costs the team a little sharpness on the field this week." },
       { label: "Hand-pick the captains yourself", effects: { teamTalentDelta: 1, culture: -1 }, outcome: "You get the leaders you trust. A few players feel the process was rigged." },
     ],
   },
@@ -1992,7 +1992,7 @@ const DILEMMA_EVENTS = [
     text: () => `A frustrated backup tells you privately he'll enter the portal mid-season if his role doesn't change.`,
     choices: [
       { label: "Give him a clear path to more reps", effects: { teamTalentDelta: -1, culture: 1 }, outcome: "He stays, and the room he's competing in gets a little tighter." },
-      { label: "Tell him the depth chart is earned, not given", effects: { culture: -1, recruiting: -1 }, outcome: "You hold your ground. He transfers at the end of the year." },
+      { label: "Tell him the depth chart is earned, not given", effects: { culture: -1, recruiting: -1, reputation: 1 }, outcome: "You hold your ground. He transfers at the end of the year. It quietly earns you some outside credibility." },
     ],
   },
   {
@@ -2011,8 +2011,8 @@ const DILEMMA_EVENTS = [
     title: "Honor Roll Recognition",
     text: () => `A handful of your players made the academic honor roll — a rare thing to celebrate publicly.`,
     choices: [
-      { label: "Make a big deal of it publicly", effects: { mediaSavvy: 2, reputation: 1 }, outcome: "Great look for the program, and the players are visibly proud." },
-      { label: "Keep it low-key, recognize them privately", effects: { culture: 1 }, outcome: "A quieter, more personal thank-you that the players still appreciate." },
+      { label: "Make a big deal of it publicly", effects: { mediaSavvy: 2, reputation: 1, teamTalentDelta: -1 }, outcome: "Great look for the program, and the players are visibly proud. It costs the team a little sharpness on the field this week." },
+      { label: "Keep it low-key, recognize them privately", effects: { culture: 1, teamTalentDelta: -1 }, outcome: "A quieter, more personal thank-you that the players still appreciate. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2021,7 +2021,7 @@ const DILEMMA_EVENTS = [
     title: "Pregame Prayer",
     text: () => `Most of the team wants a pregame prayer circle; a few players say it makes them uncomfortable.`,
     choices: [
-      { label: "Keep it voluntary and off to the side", effects: { culture: 1 }, outcome: "Everyone gets what they need without anyone feeling pressured." },
+      { label: "Keep it voluntary and off to the side", effects: { culture: 1, development: -1 }, outcome: "Everyone gets what they need without anyone feeling pressured. It eats into practice time you'd rather spend elsewhere." },
       { label: "Make it a full-team tradition", effects: { culture: 2, teamTalentDelta: -1 }, outcome: "A powerful bonding moment for most — a quietly uncomfortable one for a few." },
     ],
   },
@@ -2031,7 +2031,7 @@ const DILEMMA_EVENTS = [
     title: "Locker Room Playlist",
     text: () => `A dispute breaks out over who controls the pregame locker room music.`,
     choices: [
-      { label: "Let the captains curate it", effects: { culture: 2 }, outcome: "One less thing for you to referee, and the room owns its own energy." },
+      { label: "Let the captains curate it", effects: { culture: 2, teamTalentDelta: -1 }, outcome: "One less thing for you to referee, and the room owns its own energy. It costs the team a little sharpness on the field this week." },
       { label: "Set a rotation yourself", effects: { culture: -1, teamTalentDelta: 1 }, outcome: "Consistent and controlled, if a little joyless." },
     ],
   },
@@ -2082,7 +2082,7 @@ const DILEMMA_EVENTS = [
     text: () => `A veteran in your room wants the good corner locker stall reassigned from a well-liked sophomore.`,
     choices: [
       { label: "Respect seniority, make the switch", effects: { culture: 1, teamTalentDelta: -1 }, outcome: "Small thing, handled the old-school way. The sophomore shrugs it off." },
-      { label: "Leave the assignments as they are", effects: { culture: -1 }, outcome: "No favoritism shown — and one veteran who feels a little disrespected." },
+      { label: "Leave the assignments as they are", effects: { culture: -1, reputation: 1 }, outcome: "No favoritism shown — and one veteran who feels a little disrespected. It quietly earns you some outside credibility." },
     ],
   },
   {
@@ -2112,7 +2112,7 @@ const DILEMMA_EVENTS = [
     text: () => `Your best player asks the program to publicly back a charity foundation he just started.`,
     choices: [
       { label: "Back it publicly", effects: { mediaSavvy: 2, culture: -1 }, outcome: "Great optics for both of you — and a couple of teammates quietly note the favoritism." },
-      { label: "Support him privately, keep the program neutral", effects: { culture: 1 }, outcome: "Quieter, and it avoids any appearance of favoritism toward one player's cause." },
+      { label: "Support him privately, keep the program neutral", effects: { culture: 1, teamTalentDelta: -1 }, outcome: "Quieter, and it avoids any appearance of favoritism toward one player's cause. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2132,7 +2132,7 @@ const DILEMMA_EVENTS = [
     text: () => `You're considering formally pairing veterans with freshmen as mentors.`,
     choices: [
       { label: "Start the program", effects: { culture: 2, development: 1, teamTalentDelta: -1 }, outcome: "A slower current season, a stronger pipeline for seasons to come." },
-      { label: "Let it happen organically", effects: { teamTalentDelta: 1 }, outcome: "No structure imposed — and some freshmen fall through the cracks." },
+      { label: "Let it happen organically", effects: { teamTalentDelta: 1, development: -1 }, outcome: "No structure imposed — and some freshmen fall through the cracks. It eats into practice time you'd rather spend elsewhere." },
     ],
   },
   {
@@ -2204,7 +2204,7 @@ const DILEMMA_EVENTS = [
     text: () => `Turnout for junior day is lighter than hoped — worth scaling back, or doubling down for next year?`,
     choices: [
       { label: "Invest more in next year's event", effects: { recruiting: 2, jobSecurity: -1 }, outcome: "A bigger swing at building the pipeline, funded out of your own budget ask." },
-      { label: "Scale it back, focus on direct visits instead", effects: { recruiting: 1 }, outcome: "Leaner and more targeted, if less of a spectacle." },
+      { label: "Scale it back, focus on direct visits instead", effects: { recruiting: 1, teamTalentDelta: -1 }, outcome: "Leaner and more targeted, if less of a spectacle. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2214,7 +2214,7 @@ const DILEMMA_EVENTS = [
     text: () => `One of your incoming signees gets left off a national all-star game roster — he's furious.`,
     choices: [
       { label: "Publicly back him", effects: { mediaSavvy: 1, recruiting: 1, culture: -1 }, outcome: "He feels seen — and a couple of teammates wonder why he needed the extra attention." },
-      { label: "Stay out of it", effects: { recruiting: -1 }, outcome: "Not your fight — and he notices you didn't step in." },
+      { label: "Stay out of it", effects: { recruiting: -1, culture: 1 }, outcome: "Not your fight — and he notices you didn't step in. Still, the room respects the honesty." },
     ],
   },
   {
@@ -2224,7 +2224,7 @@ const DILEMMA_EVENTS = [
     text: () => `A prospect who dominated your summer camp isn't rated highly by recruiting services. Your gut says otherwise.`,
     choices: [
       { label: "Offer him anyway, trust your eyes", effects: { recruiting: 1, development: 1, jobSecurity: -1 }, outcome: "A potential steal — or a swing that doesn't pan out, and it's your name on the evaluation." },
-      { label: "Defer to the industry rankings", effects: { recruiting: -1 }, outcome: "Safe and conventional. You may have just let a diamond walk out the door." },
+      { label: "Defer to the industry rankings", effects: { recruiting: -1, culture: 1 }, outcome: "Safe and conventional. You may have just let a diamond walk out the door. Still, the room respects the honesty." },
     ],
   },
   {
@@ -2233,7 +2233,7 @@ const DILEMMA_EVENTS = [
     title: "The Living Room Pitch",
     text: () => `You're sitting in a recruit's living room when his phone buzzes with a call from a blue-blood rival.`,
     choices: [
-      { label: "Address it head-on, make your closing pitch", effects: { recruiting: 2, mediaSavvy: 1 }, outcome: "Bold and direct. The family respects that you didn't flinch." },
+      { label: "Address it head-on, make your closing pitch", effects: { recruiting: 2, mediaSavvy: 1, teamTalentDelta: -1 }, outcome: "Bold and direct. The family respects that you didn't flinch. It costs the team a little sharpness on the field this week." },
       { label: "Let it go, stay composed and let the visit end naturally", effects: { culture: 1, recruiting: -1 }, outcome: "Composed, but you left something unsaid that might have mattered." },
     ],
   },
@@ -2263,7 +2263,7 @@ const DILEMMA_EVENTS = [
     title: "The Grayshirt Offer",
     text: () => `You're tight on scholarship numbers and considering a grayshirt offer to a mid-tier recruit — enroll later, save a spot now.`,
     choices: [
-      { label: "Make the offer, be upfront about it", effects: { recruiting: 1, culture: 1 }, outcome: "Honest and workable. Not every family loves the arrangement, but this one respects it." },
+      { label: "Make the offer, be upfront about it", effects: { recruiting: 1, culture: 1, teamTalentDelta: -1 }, outcome: "Honest and workable. Not every family loves the arrangement, but this one respects it. It costs the team a little sharpness on the field this week." },
       { label: "Pass, find a cleaner scholarship fit", effects: { recruiting: -1, teamTalentDelta: 1 }, outcome: "Simpler roster math — and a recruit who can actually help you sooner." },
     ],
   },
@@ -2274,7 +2274,7 @@ const DILEMMA_EVENTS = [
     text: () => `A recruit's family is quietly struggling financially — nothing you can legally offer beyond the scholarship, but you can be present.`,
     choices: [
       { label: "Connect them with legitimate support resources", effects: { culture: 2, recruiting: 1, jobSecurity: -1 }, outcome: "It means everything to that family — and even done by the book, it's the kind of gesture compliance wants documented." },
-      { label: "Keep the relationship strictly recruiting-focused", effects: { recruiting: -1 }, outcome: "Clean and cautious. It reads as a little cold to a family going through a hard time." },
+      { label: "Keep the relationship strictly recruiting-focused", effects: { recruiting: -1, culture: 1 }, outcome: "Clean and cautious. It reads as a little cold to a family going through a hard time. Still, the room respects the honesty." },
     ],
   },
   {
@@ -2304,7 +2304,7 @@ const DILEMMA_EVENTS = [
     text: () => `Twin brothers will only commit as a pair — one's a clear program need, the other's a projected backup at best.`,
     choices: [
       { label: "Take the package deal", effects: { recruiting: 1, teamTalentDelta: 1, culture: -1 }, outcome: "You land the one you needed. A roster spot goes to a depth piece instead of a true need." },
-      { label: "Pass and recruit the position separately", effects: { recruiting: -1 }, outcome: "Cleaner roster construction — and you likely lose both to a rival willing to take the deal." },
+      { label: "Pass and recruit the position separately", effects: { recruiting: -1, culture: 1 }, outcome: "Cleaner roster construction — and you likely lose both to a rival willing to take the deal. Still, the room respects the honesty." },
     ],
   },
   {
@@ -2314,7 +2314,7 @@ const DILEMMA_EVENTS = [
     text: () => `Your top target is visiting your archrival's campus the same weekend he's supposed to visit yours.`,
     choices: [
       { label: "Move heaven and earth to host him first", effects: { recruiting: 2, jobSecurity: -1 }, outcome: "A scrambled staff calendar, and you get the first and best impression." },
-      { label: "Stick to the original schedule", effects: { recruiting: -1 }, outcome: "No scramble — and your rival gets the freshest impression instead." },
+      { label: "Stick to the original schedule", effects: { recruiting: -1, culture: 1 }, outcome: "No scramble — and your rival gets the freshest impression instead. Still, the room respects the honesty." },
     ],
   },
   {
@@ -2354,7 +2354,7 @@ const DILEMMA_EVENTS = [
     text: () => `A top recruit invites your staff to his televised commitment ceremony — a big, public swing.`,
     choices: [
       { label: "Send your top assistant to be there in person", effects: { recruiting: 2, jobSecurity: -1 }, outcome: "The personal touch pays off on national television." },
-      { label: "Wish him well from afar", effects: { recruiting: -1 }, outcome: "Lower cost, lower reward — and a missed photo opportunity." },
+      { label: "Wish him well from afar", effects: { recruiting: -1, culture: 1 }, outcome: "Lower cost, lower reward — and a missed photo opportunity. Still, the room respects the honesty." },
     ],
   },
   {
@@ -2394,7 +2394,7 @@ const DILEMMA_EVENTS = [
     text: () => `A recruit you love puts up mediocre numbers at a national combine, tanking his rating overnight.`,
     choices: [
       { label: "Stick with your tape evaluation", effects: { recruiting: 1, development: 1, jobSecurity: -1 }, outcome: "Trusting your own scouting over a stopwatch — and it's your credibility on the line if the tape was wrong." },
-      { label: "Cool off on him like everyone else", effects: { recruiting: -1 }, outcome: "Following the market. You may be following it right off a good player." },
+      { label: "Cool off on him like everyone else", effects: { recruiting: -1, culture: 1 }, outcome: "Following the market. You may be following it right off a good player. Still, the room respects the honesty." },
     ],
   },
   {
@@ -2424,7 +2424,7 @@ const DILEMMA_EVENTS = [
     text: () => `National recruiting class rankings drop, and yours lands lower than the fan base expected.`,
     choices: [
       { label: "Get ahead of it publicly, contextualize the class", effects: { mediaSavvy: 2, jobSecurity: -1 }, outcome: "A confident, proactive response calms most of the noise — and now you own the narrative if the class underperforms." },
-      { label: "Say nothing, let the results speak later", effects: { culture: 1 }, outcome: "The silence gets filled with fan speculation — and the team stays focused inward instead." },
+      { label: "Say nothing, let the results speak later", effects: { culture: 1, teamTalentDelta: -1 }, outcome: "The silence gets filled with fan speculation — and the team stays focused inward instead. It costs the team a little sharpness on the field this week." },
     ],
   },
 
@@ -2446,7 +2446,7 @@ const DILEMMA_EVENTS = [
     text: () => `A popular football podcast wants an hour of unscripted conversation with you.`,
     choices: [
       { label: "Go on and be candid", effects: { mediaSavvy: 3, jobSecurity: -1 }, outcome: "Great listen, real personality — and a few quotes get taken out of context." },
-      { label: "Go on but stay guarded", effects: { mediaSavvy: 1 }, outcome: "Safe, professional, forgettable." },
+      { label: "Go on but stay guarded", effects: { mediaSavvy: 1, teamTalentDelta: -1 }, outcome: "Safe, professional, forgettable. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2456,7 +2456,7 @@ const DILEMMA_EVENTS = [
     text: () => `A caller on your weekly radio show asks point-blank if you're worried about your job security.`,
     choices: [
       { label: "Answer directly and honestly", effects: { mediaSavvy: 2, jobSecurity: -1 }, outcome: "Refreshing candor — and now it's a headline." },
-      { label: "Laugh it off and change the subject", effects: { mediaSavvy: -1 }, outcome: "Deflected, if a little awkwardly." },
+      { label: "Laugh it off and change the subject", effects: { mediaSavvy: -1, culture: 1 }, outcome: "Deflected, if a little awkwardly. Still, the room respects the honesty." },
     ],
   },
   {
@@ -2466,7 +2466,7 @@ const DILEMMA_EVENTS = [
     text: () => `A young fan mails a heartfelt letter and a hand-drawn picture of the team.`,
     choices: [
       { label: "Write back personally", effects: { mediaSavvy: 1, reputation: 1, development: -1 }, outcome: "A small gesture that means the world to one kid — and costs you an evening." },
-      { label: "Have the office send a signed photo instead", effects: { development: 1 }, outcome: "Efficient and still appreciated, if less personal." },
+      { label: "Have the office send a signed photo instead", effects: { development: 1, teamTalentDelta: -1 }, outcome: "Efficient and still appreciated, if less personal. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2636,7 +2636,7 @@ const DILEMMA_EVENTS = [
     text: () => `A local car dealership offers you a lucrative personal endorsement deal — a truck and a paycheck for a few commercials.`,
     choices: [
       { label: "Take the deal", effects: { mediaSavvy: 2, culture: -1 }, outcome: "Extra income and local fame — and a bit of an eye-roll from a locker room that doesn't get a cut." },
-      { label: "Turn it down", effects: { culture: 1 }, outcome: "Keeps things simple. You leave money on the table." },
+      { label: "Turn it down", effects: { culture: 1, teamTalentDelta: -1 }, outcome: "Keeps things simple. You leave money on the table. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2678,7 +2678,7 @@ const DILEMMA_EVENTS = [
     text: () => `Late-game strategy meeting: do you install a surprise onside kick package for this week's tight matchup?`,
     choices: [
       { label: "Install it, spring the surprise", effects: { development: -1, weekPowerDelta: 4 }, outcome: "A gutsy wrinkle that could flip a close game." },
-      { label: "Stick to the standard game plan", effects: { culture: 1 }, outcome: "Steady and predictable — no surprises for your team or theirs." },
+      { label: "Stick to the standard game plan", effects: { culture: 1, teamTalentDelta: -1 }, outcome: "Steady and predictable — no surprises for your team or theirs. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2687,7 +2687,7 @@ const DILEMMA_EVENTS = [
     title: "Two-Point Philosophy",
     text: () => `Analytics suggest going for two far more often than convention says. Do you commit to it this week?`,
     choices: [
-      { label: "Commit to the aggressive two-point chart", effects: { development: 1, weekPowerDelta: 3 }, outcome: "The numbers say it's the right call — and it looks bold when it works." },
+      { label: "Commit to the aggressive two-point chart", effects: { development: 1, weekPowerDelta: 3, teamTalentDelta: -1 }, outcome: "The numbers say it's the right call — and it looks bold when it works. It costs the team a little sharpness on the field this week." },
       { label: "Play it traditional, kick the extra points", effects: { culture: 1, weekPowerDelta: -1 }, outcome: "Conventional and safe, leaving a little expected value on the table." },
     ],
   },
@@ -2698,7 +2698,7 @@ const DILEMMA_EVENTS = [
     text: () => `Your staff has a flashy trick play ready — high risk, high reward for this week's opponent.`,
     choices: [
       { label: "Install it and call it on the right down", effects: { development: -1, weekPowerDelta: 4 }, outcome: "When it hits, it's a highlight. When it doesn't, it's a headline for the wrong reason." },
-      { label: "Save it for a bigger game", effects: { development: 1 }, outcome: "Patient roster management — this week plays it straight." },
+      { label: "Save it for a bigger game", effects: { development: 1, teamTalentDelta: -1 }, outcome: "Patient roster management — this week plays it straight. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2707,8 +2707,8 @@ const DILEMMA_EVENTS = [
     title: "Timeout Management",
     text: () => `Film review shows your staff has been slow and reactive with timeouts in close games.`,
     choices: [
-      { label: "Install a strict timeout-usage protocol", effects: { development: 1, weekPowerDelta: 2 }, outcome: "Sharper clock management gives you an edge in tight moments." },
-      { label: "Trust gut feel in the moment", effects: { culture: 1 }, outcome: "Flexible, and prone to the same late-game hesitation as before." },
+      { label: "Install a strict timeout-usage protocol", effects: { development: 1, weekPowerDelta: 2, teamTalentDelta: -1 }, outcome: "Sharper clock management gives you an edge in tight moments. It costs the team a little sharpness on the field this week." },
+      { label: "Trust gut feel in the moment", effects: { culture: 1, teamTalentDelta: -1 }, outcome: "Flexible, and prone to the same late-game hesitation as before. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2718,7 +2718,7 @@ const DILEMMA_EVENTS = [
     text: () => `Your staff debates how aggressively to throw the challenge flag on close calls this week.`,
     choices: [
       { label: "Challenge aggressively", effects: { weekPowerDelta: 2, jobSecurity: -1 }, outcome: "You win a couple of close ones — and burn a timeout when you don't." },
-      { label: "Challenge only on near-certainties", effects: { jobSecurity: 1 }, outcome: "Conservative and safe, occasionally leaving a bad call on the field." },
+      { label: "Challenge only on near-certainties", effects: { jobSecurity: 1, teamTalentDelta: -1 }, outcome: "Conservative and safe, occasionally leaving a bad call on the field. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2728,7 +2728,7 @@ const DILEMMA_EVENTS = [
     text: () => `You're being pushed to overhaul the game plan at halftime rather than making incremental tweaks.`,
     choices: [
       { label: "Blow it up and adjust aggressively", effects: { development: -1, weekPowerDelta: 3 }, outcome: "A bold reset that can completely change a game's momentum." },
-      { label: "Make small, targeted tweaks", effects: { culture: 1, weekPowerDelta: 1 }, outcome: "Steadier, and less disruptive to a plan that mostly worked." },
+      { label: "Make small, targeted tweaks", effects: { culture: 1, weekPowerDelta: 1, teamTalentDelta: -1 }, outcome: "Steadier, and less disruptive to a plan that mostly worked. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2738,7 +2738,7 @@ const DILEMMA_EVENTS = [
     text: () => `Your analysts found a tendency in this week's opponent's defensive calls — chasing it down means late nights.`,
     choices: [
       { label: "Chase it down fully", effects: { development: -1, weekPowerDelta: 4 }, outcome: "The staff is exhausted, and the edge it creates is real." },
-      { label: "Note it, but don't overinvest", effects: { development: 1 }, outcome: "Balanced preparation, a smaller tactical edge." },
+      { label: "Note it, but don't overinvest", effects: { development: 1, teamTalentDelta: -1 }, outcome: "Balanced preparation, a smaller tactical edge. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2747,8 +2747,8 @@ const DILEMMA_EVENTS = [
     title: "Tempo Decision",
     text: () => `Your staff debates going no-huddle all game to wear down a bigger, more physical opponent.`,
     choices: [
-      { label: "Go full no-huddle", effects: { teamTalentDelta: 1, weekPowerDelta: 3 }, outcome: "It taxes their depth, and yours too, by the fourth quarter." },
-      { label: "Mix tempo situationally", effects: { culture: 1, weekPowerDelta: 1 }, outcome: "Balanced and sustainable, if less disruptive." },
+      { label: "Go full no-huddle", effects: { teamTalentDelta: 1, weekPowerDelta: 3, development: -1 }, outcome: "It taxes their depth, and yours too, by the fourth quarter. It eats into practice time you'd rather spend elsewhere." },
+      { label: "Mix tempo situationally", effects: { culture: 1, weekPowerDelta: 1, teamTalentDelta: -1 }, outcome: "Balanced and sustainable, if less disruptive. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2758,7 +2758,7 @@ const DILEMMA_EVENTS = [
     text: () => `Film study suggests a surprising lineup change could exploit this week's matchup.`,
     choices: [
       { label: "Make the change", effects: { culture: -1, weekPowerDelta: 3 }, outcome: "A bold tactical move — and someone's feelings get bruised on the bench." },
-      { label: "Stick with the standard lineup", effects: { culture: 1 }, outcome: "Continuity preserved, a possible edge left unused." },
+      { label: "Stick with the standard lineup", effects: { culture: 1, teamTalentDelta: -1 }, outcome: "Continuity preserved, a possible edge left unused. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2768,7 +2768,7 @@ const DILEMMA_EVENTS = [
     text: () => `A Thursday night game means a short week and heavy travel fatigue.`,
     choices: [
       { label: "Cut practice volume, prioritize rest", effects: { development: -1, weekPowerDelta: 2 }, outcome: "Fresher legs on a short week, at the cost of normal install time." },
-      { label: "Keep the normal practice schedule", effects: { weekPowerDelta: -2 }, outcome: "Thorough preparation on tired legs — a real risk on a short week." },
+      { label: "Keep the normal practice schedule", effects: { weekPowerDelta: -2, culture: 1 }, outcome: "Thorough preparation on tired legs — a real risk on a short week. Still, the room respects the honesty." },
     ],
   },
   {
@@ -2778,7 +2778,7 @@ const DILEMMA_EVENTS = [
     text: () => `Special teams has been an afterthought — worth a dedicated emphasis week?`,
     choices: [
       { label: "Devote real practice time to it", effects: { development: -1, weekPowerDelta: 2 }, outcome: "Field position and hidden yardage improve — offense and defense get a little less time." },
-      { label: "Keep the usual limited reps", effects: { development: 1 }, outcome: "No trade-off made — and special teams stays a quiet liability." },
+      { label: "Keep the usual limited reps", effects: { development: 1, teamTalentDelta: -1 }, outcome: "No trade-off made — and special teams stays a quiet liability. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2788,7 +2788,7 @@ const DILEMMA_EVENTS = [
     text: () => `Your backup quarterback hasn't taken a live rep in weeks — worth working him in this week just in case?`,
     choices: [
       { label: "Get him meaningful garbage-time reps", effects: { development: 1, weekPowerDelta: -1 }, outcome: "Insurance for the future, a slightly awkward end to a comfortable game." },
-      { label: "Keep the starter in throughout", effects: { weekPowerDelta: 1 }, outcome: "Maximizes this week's margin — leaves the backup undercooked for an emergency." },
+      { label: "Keep the starter in throughout", effects: { weekPowerDelta: 1, teamTalentDelta: -1 }, outcome: "Maximizes this week's margin — leaves the backup undercooked for an emergency. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2798,7 +2798,7 @@ const DILEMMA_EVENTS = [
     text: () => `Your defensive staff wants to install a heavier package of coverage disguises for a pass-heavy opponent.`,
     choices: [
       { label: "Install the full disguise package", effects: { development: -1, weekPowerDelta: 3 }, outcome: "Confuses the opposing quarterback — if your own guys execute it right." },
-      { label: "Keep the coverages simple and sound", effects: { culture: 1 }, outcome: "Fewer mental errors, fewer surprises for the opponent to solve." },
+      { label: "Keep the coverages simple and sound", effects: { culture: 1, teamTalentDelta: -1 }, outcome: "Fewer mental errors, fewer surprises for the opponent to solve. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2807,7 +2807,7 @@ const DILEMMA_EVENTS = [
     title: "Field Position Philosophy",
     text: () => `Your punter argues for a more conservative, pin-them-deep approach rather than always going for it near midfield.`,
     choices: [
-      { label: "Play the field position game", effects: { weekPowerDelta: 2 }, outcome: "A patient, low-variance approach that grinds opponents down." },
+      { label: "Play the field position game", effects: { weekPowerDelta: 2, teamTalentDelta: -1 }, outcome: "A patient, low-variance approach that grinds opponents down. It costs the team a little sharpness on the field this week." },
       { label: "Stay aggressive, trust the offense", effects: { teamTalentDelta: 1, weekPowerDelta: -1 }, outcome: "Higher variance — thrilling when it hits, costly when it doesn't." },
     ],
   },
@@ -2817,8 +2817,8 @@ const DILEMMA_EVENTS = [
     title: "Walkthrough Intensity",
     text: () => `Thursday's walkthrough can be a light mental rep session or a near-full-speed dress rehearsal.`,
     choices: [
-      { label: "Run it near full speed", effects: { teamTalentDelta: 1, weekPowerDelta: 1 }, outcome: "Sharper execution Saturday, at a small injury-risk cost." },
-      { label: "Keep it a true walkthrough", effects: { development: 1 }, outcome: "Fresh legs, a slightly less polished dress rehearsal." },
+      { label: "Run it near full speed", effects: { teamTalentDelta: 1, weekPowerDelta: 1, development: -1 }, outcome: "Sharper execution Saturday, at a small injury-risk cost. It eats into practice time you'd rather spend elsewhere." },
+      { label: "Keep it a true walkthrough", effects: { development: 1, teamTalentDelta: -1 }, outcome: "Fresh legs, a slightly less polished dress rehearsal. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2827,8 +2827,8 @@ const DILEMMA_EVENTS = [
     title: "Pressure Package",
     text: () => `This week's opposing quarterback struggles under pressure — worth committing to an all-out blitz-heavy plan?`,
     choices: [
-      { label: "Commit to heavy pressure all game", effects: { teamTalentDelta: 1, weekPowerDelta: 3 }, outcome: "It rattles him — and it leaves your secondary on an island if it doesn't get home." },
-      { label: "Play a more conservative rush plan", effects: { culture: 1 }, outcome: "Sound and unspectacular, low risk of a big play against you." },
+      { label: "Commit to heavy pressure all game", effects: { teamTalentDelta: 1, weekPowerDelta: 3, development: -1 }, outcome: "It rattles him — and it leaves your secondary on an island if it doesn't get home. It eats into practice time you'd rather spend elsewhere." },
+      { label: "Play a more conservative rush plan", effects: { culture: 1, teamTalentDelta: -1 }, outcome: "Sound and unspectacular, low risk of a big play against you. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2857,7 +2857,7 @@ const DILEMMA_EVENTS = [
     title: "Bad Weather Forecast",
     text: () => `The forecast for gameday calls for heavy wind and rain — worth reworking the game plan around it?`,
     choices: [
-      { label: "Rework the plan around a run-heavy approach", effects: { weekPowerDelta: 2 }, outcome: "A smart, conditions-based adjustment that plays to the elements." },
+      { label: "Rework the plan around a run-heavy approach", effects: { weekPowerDelta: 2, teamTalentDelta: -1 }, outcome: "A smart, conditions-based adjustment that plays to the elements. It costs the team a little sharpness on the field this week." },
       { label: "Stick to the original plan and adjust live", effects: { development: 1, weekPowerDelta: -1 }, outcome: "Less prep time spent on a maybe — some fumbling in the actual conditions." },
     ],
   },
@@ -2878,7 +2878,7 @@ const DILEMMA_EVENTS = [
     text: () => `A key player is banged up but probable — do you list him as more questionable than he really is to mess with the opponent's prep?`,
     choices: [
       { label: "Play games with the injury report", effects: { mediaSavvy: -1, weekPowerDelta: 2 }, outcome: "A little gamesmanship muddies the opponent's plan — and it doesn't win you any friends." },
-      { label: "Report his status honestly", effects: { reputation: 1 }, outcome: "Straightforward and above board, no tactical edge gained." },
+      { label: "Report his status honestly", effects: { reputation: 1, teamTalentDelta: -1 }, outcome: "Straightforward and above board, no tactical edge gained. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2888,7 +2888,7 @@ const DILEMMA_EVENTS = [
     text: () => `Your staff wants to spend real practice time drilling two-minute and four-minute offense situations.`,
     choices: [
       { label: "Drill it hard this week", effects: { development: -1, weekPowerDelta: 2 }, outcome: "Composure in crunch time — less time spent on the base game plan." },
-      { label: "Trust the existing situational package", effects: { development: 1 }, outcome: "No new prep invested — you're relying on what's already installed." },
+      { label: "Trust the existing situational package", effects: { development: 1, teamTalentDelta: -1 }, outcome: "No new prep invested — you're relying on what's already installed. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -2908,7 +2908,7 @@ const DILEMMA_EVENTS = [
     text: () => `You're deciding how much extra film homework to assign your unit ahead of a complex opponent.`,
     choices: [
       { label: "Load up the homework", effects: { development: 2, culture: -1, weekPowerDelta: 1 }, outcome: "Sharper eyes on Saturday, a grumbling group by Thursday." },
-      { label: "Keep it to the standard packet", effects: { culture: 1 }, outcome: "No extra burden, no extra edge." },
+      { label: "Keep it to the standard packet", effects: { culture: 1, teamTalentDelta: -1 }, outcome: "No extra burden, no extra edge. It costs the team a little sharpness on the field this week." },
     ],
   },
 
@@ -2950,7 +2950,7 @@ const DILEMMA_EVENTS = [
     text: () => `You learn secondhand that a player lost a close family member weeks ago and never told the staff.`,
     choices: [
       { label: "Check in personally, offer real support", effects: { culture: 3, development: -1 }, outcome: "He opens up, and the relationship is stronger for it — the personal time comes out of your coaching hours." },
-      { label: "Respect his privacy, don't bring it up", effects: { culture: -1 }, outcome: "You don't intrude — and he's left carrying it alone." },
+      { label: "Respect his privacy, don't bring it up", effects: { culture: -1, reputation: 1 }, outcome: "You don't intrude — and he's left carrying it alone. It quietly earns you some outside credibility." },
     ],
   },
   {
@@ -3030,7 +3030,7 @@ const DILEMMA_EVENTS = [
     text: () => `A sharp young analyst from another program wants a shot on your staff, cheap.`,
     choices: [
       { label: "Hire him", effects: { development: 1, jobSecurity: -1 }, outcome: "Fresh energy and new ideas, at a small but real cost to squeeze into the budget." },
-      { label: "Pass, staff is full", effects: { jobSecurity: 1 }, outcome: "No new hire, no new headache." },
+      { label: "Pass, staff is full", effects: { jobSecurity: 1, teamTalentDelta: -1 }, outcome: "No new hire, no new headache. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -3070,7 +3070,7 @@ const DILEMMA_EVENTS = [
     text: () => `You want to normalize players seeing the team's sports psychologist, but there's a real stigma around it in the room.`,
     choices: [
       { label: "Talk about it openly with the whole team", effects: { culture: 3, teamTalentDelta: -1 }, outcome: "The stigma cracks and a few more players quietly start using the resource — the meeting eats into practice time." },
-      { label: "Let players seek it out privately", effects: { culture: 1 }, outcome: "No pressure applied, and the stigma lingers a little longer." },
+      { label: "Let players seek it out privately", effects: { culture: 1, development: -1 }, outcome: "No pressure applied, and the stigma lingers a little longer. It eats into practice time you'd rather spend elsewhere." },
     ],
   },
   {
@@ -3110,7 +3110,7 @@ const DILEMMA_EVENTS = [
     text: () => `A player shows up to summer camp dramatically changed physically — a real breakout, or a red flag worth asking about?`,
     choices: [
       { label: "Ask direct questions about how he did it", effects: { culture: 1, teamTalentDelta: -1 }, outcome: "Uncomfortable but responsible — and it turns out to be legitimate hard work." },
-      { label: "Just celebrate the results", effects: { teamTalentDelta: 1 }, outcome: "Momentum and confidence for him — no questions asked either way." },
+      { label: "Just celebrate the results", effects: { teamTalentDelta: 1, development: -1 }, outcome: "Momentum and confidence for him — no questions asked either way. It eats into practice time you'd rather spend elsewhere." },
     ],
   },
 
@@ -3141,7 +3141,7 @@ const DILEMMA_EVENTS = [
     title: "Throwback Jerseys",
     text: () => `The administration wants to debut flashy throwback uniforms this week for a big TV audience.`,
     choices: [
-      { label: "Wear them proudly", effects: { mediaSavvy: 2, recruiting: 1 }, outcome: "A viral uniform moment that recruits notice." },
+      { label: "Wear them proudly", effects: { mediaSavvy: 2, recruiting: 1, teamTalentDelta: -1 }, outcome: "A viral uniform moment that recruits notice. It costs the team a little sharpness on the field this week." },
       { label: "Stick with the standard uniforms", effects: { culture: 1, mediaSavvy: -1 }, outcome: "No distraction, no viral moment either." },
     ],
   },
@@ -3202,7 +3202,7 @@ const DILEMMA_EVENTS = [
     text: () => `A publisher offers you a book deal about your coaching philosophy — a nice payday, but a real time commitment.`,
     choices: [
       { label: "Sign the deal", effects: { mediaSavvy: 2, jobSecurity: -1 }, outcome: "Your name and philosophy reach a wider audience, on top of an already full plate." },
-      { label: "Pass for now", effects: { jobSecurity: 1 }, outcome: "One less thing on your plate. The opportunity may not come around twice." },
+      { label: "Pass for now", effects: { jobSecurity: 1, teamTalentDelta: -1 }, outcome: "One less thing on your plate. The opportunity may not come around twice. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -3212,7 +3212,7 @@ const DILEMMA_EVENTS = [
     text: () => `Your college alma mater has an opening and reaches out to gauge your interest, off the record.`,
     choices: [
       { label: "Take the call, explore it quietly", effects: { reputation: 1, jobSecurity: -2 }, outcome: "Flattering and tempting — and if word gets out, it looks like one foot out the door." },
-      { label: "Politely decline any conversation", effects: { culture: 1, jobSecurity: 1 }, outcome: "Total commitment signaled to your current team, whatever the alma mater thinks." },
+      { label: "Politely decline any conversation", effects: { culture: 1, jobSecurity: 1, teamTalentDelta: -1 }, outcome: "Total commitment signaled to your current team, whatever the alma mater thinks. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -3221,7 +3221,7 @@ const DILEMMA_EVENTS = [
     title: "The Handshake Snub",
     text: () => `After a hard-fought rivalry win, the opposing coach barely acknowledges your postgame handshake.`,
     choices: [
-      { label: "Let it go publicly, take the high road", effects: { reputation: 1, mediaSavvy: 1 }, outcome: "Classy and above it. The story fades in a day." },
+      { label: "Let it go publicly, take the high road", effects: { reputation: 1, mediaSavvy: 1, teamTalentDelta: -1 }, outcome: "Classy and above it. The story fades in a day. It costs the team a little sharpness on the field this week." },
       { label: "Call it out to the media", effects: { mediaSavvy: -1, culture: 1 }, outcome: "The team loves that you had their back. It keeps the story alive an extra news cycle." },
     ],
   },
@@ -3251,7 +3251,7 @@ const DILEMMA_EVENTS = [
     title: "The Rivalry Trophy",
     text: () => `Your rivalry trophy has been damaged in transit — a chance to either quietly fix it or make a bigger deal of the mishap.`,
     choices: [
-      { label: "Quietly get it repaired", effects: { culture: 1 }, outcome: "Handled with no fuss, tradition intact." },
+      { label: "Quietly get it repaired", effects: { culture: 1, teamTalentDelta: -1 }, outcome: "Handled with no fuss, tradition intact. It costs the team a little sharpness on the field this week." },
       { label: "Have some fun with it publicly", effects: { mediaSavvy: 2, culture: -1 }, outcome: "A lighthearted moment fans enjoy — the rival program is less amused." },
     ],
   },
@@ -3281,7 +3281,7 @@ const DILEMMA_EVENTS = [
     title: "Lightning Delay",
     text: () => `A long lightning delay mid-game forces both teams into an awkward, hours-long holding pattern.`,
     choices: [
-      { label: "Keep the team loose with games and film", effects: { weekPowerDelta: 2 }, outcome: "Momentum and focus survive the delay surprisingly well." },
+      { label: "Keep the team loose with games and film", effects: { weekPowerDelta: 2, teamTalentDelta: -1 }, outcome: "Momentum and focus survive the delay surprisingly well. It costs the team a little sharpness on the field this week." },
       { label: "Keep it all business, re-run the game plan", effects: { development: 1, weekPowerDelta: -1 }, outcome: "Thorough, and the extended wait saps some energy anyway." },
     ],
   },
@@ -3302,7 +3302,7 @@ const DILEMMA_EVENTS = [
     text: () => `A milestone win (your 50th, 100th, a big rivalry streak) puts you in a strong position to ask for a raise.`,
     choices: [
       { label: "Use the moment, ask for a raise", effects: { jobSecurity: 3, reputation: -1 }, outcome: "You cash in on the moment — some see the timing as opportunistic." },
-      { label: "Let the moment be about the team", effects: { culture: 2 }, outcome: "The milestone stays about the players. You leave money on the table for now." },
+      { label: "Let the moment be about the team", effects: { culture: 2, teamTalentDelta: -1 }, outcome: "The milestone stays about the players. You leave money on the table for now. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -3321,7 +3321,7 @@ const DILEMMA_EVENTS = [
     title: "After the Blowout",
     text: () => `A lopsided loss has the fan base and administration looking for a response.`,
     choices: [
-      { label: "Hold an open, honest team meeting", effects: { culture: 3 }, outcome: "The room clears the air — an uncomfortable but healthy conversation." },
+      { label: "Hold an open, honest team meeting", effects: { culture: 3, teamTalentDelta: -1 }, outcome: "The room clears the air — an uncomfortable but healthy conversation. It costs the team a little sharpness on the field this week." },
       { label: "Move on quickly, don't dwell", effects: { weekPowerDelta: 1, culture: -1 }, outcome: "Fast turnaround focus — and some unresolved tension underneath." },
     ],
   },
@@ -3332,7 +3332,7 @@ const DILEMMA_EVENTS = [
     text: () => `A long winning streak has brought outsized national attention and pressure to keep it going.`,
     choices: [
       { label: "Address the streak head-on with the team", effects: { culture: 1, weekPowerDelta: -1 }, outcome: "Naming the pressure takes some of its power away — and makes it very real in the room for a moment." },
-      { label: "Pretend the streak doesn't exist", effects: { weekPowerDelta: 2 }, outcome: "A studied nonchalance that keeps everyone loose and playing free." },
+      { label: "Pretend the streak doesn't exist", effects: { weekPowerDelta: 2, teamTalentDelta: -1 }, outcome: "A studied nonchalance that keeps everyone loose and playing free. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -3374,7 +3374,7 @@ const DILEMMA_EVENTS = [
     text: () => `A quiet, unassuming player in your room turns out to be the emotional glue holding it together.`,
     choices: [
       { label: "Publicly recognize his leadership", effects: { mediaSavvy: 1, culture: -1 }, outcome: "He's genuinely embarrassed by the spotlight, even as the room respects the callout." },
-      { label: "Let him keep leading quietly", effects: { culture: 2 }, outcome: "You respect his style, and it pays off in a quieter, more authentic way." },
+      { label: "Let him keep leading quietly", effects: { culture: 2, teamTalentDelta: -1 }, outcome: "You respect his style, and it pays off in a quieter, more authentic way. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -3414,7 +3414,7 @@ const DILEMMA_EVENTS = [
     text: () => `A communication breakdown between you and the coordinator caused a blown assignment last week.`,
     choices: [
       { label: "Own the mistake publicly in the meeting", effects: { culture: 2, reputation: -1 }, outcome: "Accountability that the room respects, even if it's a hit to your own standing." },
-      { label: "Quietly fix the process without dwelling on blame", effects: { development: 1 }, outcome: "The fix happens either way — and nobody has to feel singled out." },
+      { label: "Quietly fix the process without dwelling on blame", effects: { development: 1, teamTalentDelta: -1 }, outcome: "The fix happens either way — and nobody has to feel singled out. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -3424,7 +3424,7 @@ const DILEMMA_EVENTS = [
     text: () => `A recruiting visit puts a five-star prospect in your position room for an hour — a chance to sell your development track record.`,
     choices: [
       { label: "Give him the full, honest pitch", effects: { recruiting: 1, culture: 1, development: -1 }, outcome: "Genuine and specific, the kind of pitch that sticks with a recruit — at the cost of an hour you'd planned to spend with your current room." },
-      { label: "Let the head coach's pitch do the heavy lifting", effects: { recruiting: -1 }, outcome: "Less effort from you, and a slightly less personal impression left behind." },
+      { label: "Let the head coach's pitch do the heavy lifting", effects: { recruiting: -1, culture: 1 }, outcome: "Less effort from you, and a slightly less personal impression left behind. Still, the room respects the honesty." },
     ],
   },
   {
@@ -3434,7 +3434,7 @@ const DILEMMA_EVENTS = [
     text: () => `A proven veteran in your room has been skipping voluntary weight room sessions all offseason.`,
     choices: [
       { label: "Call him out directly, one-on-one", effects: { teamTalentDelta: 1, culture: -1 }, outcome: "A direct conversation that gets him back in the building — and creates a little friction between you." },
-      { label: "Let his production speak for itself", effects: { culture: 1 }, outcome: "No confrontation, relationship intact — and a standard the rest of the room notices isn't enforced evenly." },
+      { label: "Let his production speak for itself", effects: { culture: 1, teamTalentDelta: -1 }, outcome: "No confrontation, relationship intact — and a standard the rest of the room notices isn't enforced evenly. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -3443,7 +3443,7 @@ const DILEMMA_EVENTS = [
     title: "Who Gets the Game Ball",
     text: () => `After a hard-fought win, it's time to decide who gets the game ball — the flashy stat-sheet star, or the unsung grinder.`,
     choices: [
-      { label: "Give it to the unsung grinder", effects: { culture: 3 }, outcome: "A message that effort and sacrifice get seen, not just box scores." },
+      { label: "Give it to the unsung grinder", effects: { culture: 3, teamTalentDelta: -1 }, outcome: "A message that effort and sacrifice get seen, not just box scores. It costs the team a little sharpness on the field this week." },
       { label: "Give it to the statistical standout", effects: { mediaSavvy: 1, culture: -1 }, outcome: "The obvious, crowd-pleasing choice — and the quiet grinder notices being passed over again." },
     ],
   },
@@ -3464,7 +3464,7 @@ const DILEMMA_EVENTS = [
     text: () => `Running a youth camp, you spot a raw, ungraded kid with real physical tools nobody else has noticed yet.`,
     choices: [
       { label: "Flag him to the recruiting staff immediately", effects: { recruiting: 2, development: -1 }, outcome: "A potential future steal for the program, if the follow-up happens right." },
-      { label: "File it away for later, focus on the camp", effects: { development: 1 }, outcome: "The camp runs smoothly — the lead might go cold before anyone circles back." },
+      { label: "File it away for later, focus on the camp", effects: { development: 1, teamTalentDelta: -1 }, outcome: "The camp runs smoothly — the lead might go cold before anyone circles back. It costs the team a little sharpness on the field this week." },
     ],
   },
   {
@@ -3474,7 +3474,7 @@ const DILEMMA_EVENTS = [
     text: () => `You get to designate an informal team leader from within your own position group.`,
     choices: [
       { label: "Pick the most vocal, energetic player", effects: { teamTalentDelta: 1, culture: -1 }, outcome: "Instant energy in the room — and a couple of quieter leaders feel overlooked." },
-      { label: "Pick the most consistent, steady player", effects: { culture: 2 }, outcome: "A steady hand the room trusts, if a little low-key for some tastes." },
+      { label: "Pick the most consistent, steady player", effects: { culture: 2, teamTalentDelta: -1 }, outcome: "A steady hand the room trusts, if a little low-key for some tastes. It costs the team a little sharpness on the field this week." },
     ],
   },
 ];
@@ -3990,6 +3990,34 @@ const GAME_MOMENTS = [
     choices: [
       { label: "Push the tempo anyway, don't let it slow you down", axis: "poise", risk: "aggressive", success: () => "Your team handles the elements better — a real advantage shows up.", fail: () => "The conditions get the better of you too. A mistake in the muck." },
       { label: "Play conservative, ball-security football", axis: "poise", risk: "safe", success: () => "Simple, careful football avoids a costly mistake in tough conditions.", fail: () => "Even careful football can't escape the sloppy conditions. A costly slip." },
+    ],
+  },
+  {
+    id: "big_play_defensive_call",
+    side: "defense",
+    situation: (ctx) => `A big play develops right in front of you — ${ctx.opponent} in an empty set, ${ctx.score}, ${ctx.quarter}. The call is yours.`,
+    choices: [
+      { label: "Send the blitz", axis: "run", risk: "aggressive", success: () => "The blitz gets home before the play develops — sack, and the sideline erupts.", fail: () => "They pick up the blitz clean. Someone comes free the other way for a big gain." },
+      { label: "Play zone, keep everything in front of you", axis: "pass", risk: "safe", success: () => "Zone discipline holds — nothing gets behind you. Short gain at best.", fail: () => "A seam opens up right in the soft spot of the zone. Chunk gain." },
+      { label: "Play man, trust your corners on an island", axis: "pass", risk: "balanced", success: () => "Lockdown coverage — the throw never has anywhere to go. Incomplete.", fail: () => "Beaten off the line. The receiver's gone before the safety can help." },
+    ],
+  },
+  {
+    id: "playbook_dust_off",
+    side: "offense",
+    situation: (ctx) => `Your staff has had a wrinkle sitting in the playbook all year, never called once — ${ctx.score}, ${ctx.quarter} against ${ctx.opponent}. Is now the time?`,
+    choices: [
+      { label: "Dust it off and run it", axis: "pass", risk: "aggressive", success: () => "Nobody on their sideline has seen it on tape all year — it catches them completely flat-footed. Explosive gain.", fail: () => "There's a reason it never made the call sheet before. It falls apart, and it costs you." },
+      { label: "Stick to what's been working all year", axis: "run", risk: "safe", success: () => "No surprises needed — the bread-and-butter stuff gets the job done.", fail: () => "They've seen everything you run by now. Too predictable, and they're ready for it." },
+    ],
+  },
+  {
+    id: "rival_game_tempo_identity",
+    side: "poise",
+    situation: (ctx) => `The rivalry game against ${ctx.opponent}, ${ctx.score}, ${ctx.quarter}. Your staff is split on how to attack it.`,
+    choices: [
+      { label: "Play it aggressive, take your shots", axis: "poise", risk: "aggressive", success: () => "The aggression pays off — a statement performance in the rivalry game.", fail: () => "The aggressive approach backfires in the biggest game of the year." },
+      { label: "Play it conservative, don't beat yourselves", axis: "poise", risk: "safe", success: () => "Mistake-free, disciplined football wins out in a tight rivalry game.", fail: () => "Playing not to lose, you find a way to lose anyway." },
     ],
   },
 ];

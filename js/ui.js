@@ -452,6 +452,11 @@ function renderRecap(state) {
     return `<tr><td>${w.week}</td><td>${escapeHtml(w.opponent)}</td><td class="${resultClass}">${w.win ? "W" : "L"} ${w.us}-${w.them}</td><td>${note}</td></tr>`;
   }).join("");
 
+  const postseasonRows = (r.postseason.games || []).map((g) => {
+    const resultClass = g.win ? "result-win" : "result-loss";
+    return `<tr><td>&mdash;</td><td>${escapeHtml(g.label)}</td><td class="${resultClass}">${g.win ? "W" : "L"} ${g.us}-${g.them}</td><td class="muted">&mdash;</td></tr>`;
+  }).join("");
+
   const logHtml = state.dilemmaLog.map((d) => `
     <li><strong>${escapeHtml(d.title)}</strong> (Week ${d.week} vs ${escapeHtml(d.opponent)}): ${escapeHtml(d.choiceLabel)} — <span class="muted">${escapeHtml(d.outcome)}</span> <span class="${d.win ? "result-win" : "result-loss"}">${d.win ? "W" : "L"} ${d.us}-${d.them}</span></li>
   `).join("");
@@ -466,6 +471,7 @@ function renderRecap(state) {
       <div class="panel recap-panel">
         <div class="recap-record">${r.wins}-${r.losses}</div>
         <div class="recap-postseason">${escapeHtml(r.postseason.label)}</div>
+        <div class="muted">Regular season: ${r.regWins}-${r.regLosses}${r.postseason.games.length ? ` &middot; ${r.postseason.games.length} postseason game${r.postseason.games.length === 1 ? "" : "s"}` : ""}</div>
         ${achievementsHtml}
       </div>
       <div class="panel">
@@ -482,7 +488,7 @@ function renderRecap(state) {
         <div class="history-panel__scroll">
           <table class="history-table">
             <thead><tr><th>Wk</th><th>Opponent</th><th>Result</th><th>Decision</th></tr></thead>
-            <tbody>${gameRows}</tbody>
+            <tbody>${gameRows}${postseasonRows}</tbody>
           </table>
         </div>
       </div>

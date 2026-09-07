@@ -5,9 +5,15 @@
 const STORAGE_KEY = "cfbLegacySave";
 const STARTING_YEAR = 2026;
 const GAMES_PER_SEASON = 12;
-const DILEMMAS_PER_SEASON = 5;
-const MOMENTS_PER_SEASON_MIN = 3;
-const MOMENTS_PER_SEASON_MAX = 6;
+const MOMENTS_PER_SEASON_MIN = 6;
+const MOMENTS_PER_SEASON_MAX = 9;
+
+function dilemmasForStage(stage) {
+  // Coordinators/HCs get game moments as their main decisions; dilemmas
+  // stay a minority flavor. Position coaches don't call plays, so their
+  // off-field dilemmas are their only decisions each season.
+  return stage === "position" ? 5 : 3;
+}
 const STAT_KEYS = ["offenseIQ", "defenseIQ", "recruiting", "development", "culture", "mediaSavvy"];
 
 function clamp(v, min, max) {
@@ -188,7 +194,7 @@ function generateWeekPlan(state) {
   }
 
   const eligibleEvents = DILEMMA_EVENTS.filter((e) => e.stages.includes(state.stage));
-  const shuffledEvents = [...eligibleEvents].sort(() => Math.random() - 0.5).slice(0, DILEMMAS_PER_SEASON);
+  const shuffledEvents = [...eligibleEvents].sort(() => Math.random() - 0.5).slice(0, dilemmasForStage(state.stage));
   const weekIndices = Array.from({ length: GAMES_PER_SEASON }, (_, i) => i);
   const dilemmaWeeks = [...weekIndices].sort(() => Math.random() - 0.5).slice(0, shuffledEvents.length).sort((a, b) => a - b);
 
@@ -257,11 +263,49 @@ function momentTitle(id) {
   return id.split("_").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 }
 
+/* Real college football scores are sums of scoring plays (TD+XP=7, FG=3,
+   TD+2pt=8, TD no XP=6, safety=2) — never a plain random integer, which
+   can land on totals no real game ever produces. Build each team's score
+   out of a realistic number of scoring drives (driven by the power gap)
+   made of those actual play values. */
+const SCORING_PLAY_WEIGHTS = [
+  { points: 7, weight: 60 },
+  { points: 3, weight: 24 },
+  { points: 8, weight: 5 },
+  { points: 6, weight: 4 },
+  { points: 2, weight: 2 },
+];
+const SCORING_PLAY_TOTAL_WEIGHT = SCORING_PLAY_WEIGHTS.reduce((s, p) => s + p.weight, 0);
+
+function randomScoringPlay() {
+  let r = Math.random() * SCORING_PLAY_TOTAL_WEIGHT;
+  for (const p of SCORING_PLAY_WEIGHTS) {
+    if (r < p.weight) return p.points;
+    r -= p.weight;
+  }
+  return 7;
+}
+
+function buildTeamScore(expectedDrives) {
+  const drives = Math.max(1, Math.round(expectedDrives + randRange(-1.2, 1.2)));
+  let total = 0;
+  for (let i = 0; i < drives; i++) total += randomScoringPlay();
+  return total;
+}
+
 function generateScore(power, oppPower, won) {
-  const diff = clamp(Math.abs(power - oppPower) / 8, 0, 4);
-  const winnerScore = randInt(17, 35) + Math.round(diff * 2);
-  const loserScore = clamp(randInt(3, winnerScore - 3), 0, winnerScore - 1);
-  return won ? { us: winnerScore, them: loserScore } : { us: loserScore, them: winnerScore };
+  const baseDrives = 4.3;
+  const gapDrives = (power - oppPower) / 15;
+  const myDrives = clamp(baseDrives + gapDrives, 1.5, 7);
+  const oppDrives = clamp(baseDrives - gapDrives, 1.5, 7);
+
+  let us = buildTeamScore(myDrives);
+  let them = buildTeamScore(oppDrives);
+
+  if (won && us <= them) us = them + randomScoringPlay();
+  if (!won && them <= us) them = us + randomScoringPlay();
+
+  return { us, them };
 }
 
 function simulateWeek(state, weekIndex, extraPower) {
@@ -477,59 +521,88 @@ function simulateGame(power, oppPower, variance) {
    End of season: postseason, growth, world drift
    ========================================================================== */
 
-function resolvePostseason(state, power, cWeight, variance, wins) {
-  if (wins < 6) return { label: "No bowl", champion: false, playoff: false, natty: false };
-
-  const bowlOpp = 40 + cWeight * 0.5 + randRange(-10, 10);
-  const bowlWin = simulateGame(power, bowlOpp, variance);
-  let label = bowlWin ? "Bowl win" : "Bowl loss";
-  let champion = false;
-  let playoff = false;
+/* Postseason follows the real 12-team CFP shape: a Power-conference team
+   with a strong enough regular season plays a Conference Championship
+   Game (its result folds into the record); the conference champion (with
+   an elite record) earns a bye straight to the quarterfinal, other
+   playoff qualifiers start in the first round; anyone bowl-eligible who
+   doesn't make the playoff plays exactly one bowl game instead. Every
+   game here — CCG, bowl, or playoff round — is simulated and its
+   win/loss is added to the season's win-loss total, so the final record
+   always accounts for every game actually played. */
+function resolvePostseason(state, power, cWeight, variance, regWins, regLosses) {
+  const games = [];
+  let wins = regWins;
+  let losses = regLosses;
+  let label = "No bowl";
+  let conferenceChampion = false;
+  let playoffQualified = false;
   let natty = false;
 
-  if (bowlWin) {
-    state.reputation = clamp(state.reputation + 3, 0, 100);
-    if (state.stage === "headcoach") grantAchievement(state, "bowl_win");
+  function playGame(gameLabel, oppPowerBase, spread) {
+    const oppPower = oppPowerBase + randRange(-spread, spread);
+    const win = simulateGame(power, oppPower, variance);
+    const score = generateScore(power, oppPower, win);
+    games.push({ label: gameLabel, win, us: score.us, them: score.them });
+    if (win) wins++; else losses++;
+    return win;
   }
 
-  if (wins >= 10 && cWeight >= 14) {
-    const champChance = clamp((wins - 9) * 0.28, 0, 0.8);
-    if (Math.random() < champChance) {
-      champion = true;
-      label = "Conference Champion";
-      state.reputation = clamp(state.reputation + 5, 0, 100);
-      grantAchievement(state, "conference_champ");
+  const isPowerConf = cWeight >= 14;
+  let playedCCG = false;
+  if (isPowerConf && regWins >= 9) {
+    const qualifyChance = clamp((regWins - 8) * 0.25, 0, 0.75);
+    if (Math.random() < qualifyChance) {
+      playedCCG = true;
+      const win = playGame("Conference Championship", 58, 10);
+      conferenceChampion = win;
+      if (win) {
+        label = "Conference Champion";
+        state.reputation = clamp(state.reputation + 5, 0, 100);
+        grantAchievement(state, "conference_champ");
+      } else {
+        label = "Conference Championship — runner-up";
+      }
     }
   }
 
   const school = getSchool(state.school);
   const prestigeQualified = school && school.startingPrestige >= 3;
-  if ((champion || wins >= 11) && prestigeQualified) {
-    playoff = true;
+  playoffQualified = prestigeQualified && (conferenceChampion || wins >= 10);
+
+  if (playoffQualified) {
     grantAchievement(state, "playoff");
-    let roundsWon = 0;
-    for (let round = 0; round < 3; round++) {
-      const oppPower = 55 + randRange(-8, 12) + round * 3;
-      if (simulateGame(power + roundsWon * 2, oppPower, variance)) {
-        roundsWon++;
-      } else {
+    const bye = conferenceChampion && wins >= 11;
+    const rounds = bye
+      ? ["Playoff Quarterfinal", "Playoff Semifinal", "National Championship"]
+      : ["Playoff First Round", "Playoff Quarterfinal", "Playoff Semifinal", "National Championship"];
+    label = bye ? "Playoff — lost in the quarterfinal" : "Playoff — lost in the first round";
+    for (let i = 0; i < rounds.length; i++) {
+      const win = playGame(rounds[i], 58 + i * 4, 10);
+      if (!win) {
+        label = rounds[i] === "National Championship"
+          ? "National Championship — runner-up"
+          : `Playoff — lost in the ${rounds[i].replace("Playoff ", "").toLowerCase()}`;
         break;
       }
+      if (i === rounds.length - 1) {
+        natty = true;
+        label = "National Champion";
+        state.reputation = clamp(state.reputation + 20, 0, 100);
+        grantAchievement(state, "national_champ");
+        if (Math.random() < 0.5) grantAchievement(state, "coach_of_year");
+      }
     }
-    if (roundsWon >= 3) {
-      natty = true;
-      label = "National Champion";
-      state.reputation = clamp(state.reputation + 20, 0, 100);
-      grantAchievement(state, "national_champ");
-      if (Math.random() < 0.5) grantAchievement(state, "coach_of_year");
-    } else if (roundsWon > 0) {
-      label = `Playoff — lost round ${roundsWon + 1}`;
-    } else {
-      label = "Playoff — lost first round";
+  } else if (wins >= 6) {
+    const win = playGame("Bowl Game", 40 + cWeight * 0.5, 10);
+    label = win ? "Bowl win" : "Bowl loss";
+    if (win) {
+      state.reputation = clamp(state.reputation + 3, 0, 100);
+      if (state.stage === "headcoach") grantAchievement(state, "bowl_win");
     }
   }
 
-  return { label, champion, playoff, natty, bowlWin };
+  return { games, wins, losses, label, conferenceChampion, playoffQualified, natty };
 }
 
 function driftOtherTalents(state) {
@@ -601,20 +674,25 @@ function applyEndOfSeasonGrowth(state, result) {
 }
 
 function finishSeason(state) {
-  const wins = state.weekResults.filter((r) => r.win).length;
-  const losses = state.weekResults.length - wins;
-  const winPct = wins / GAMES_PER_SEASON;
+  const regWins = state.weekResults.filter((r) => r.win).length;
+  const regLosses = state.weekResults.length - regWins;
 
   const school = getSchool(state.school);
   const cWeight = conferenceWeight(school ? school.conference : "Independent");
   const variance = philosophyVariance(state.philosophy);
   const power = teamPower(state);
-  const postseason = resolvePostseason(state, power, cWeight, variance, wins);
+  const postseason = resolvePostseason(state, power, cWeight, variance, regWins, regLosses);
+
+  const wins = postseason.wins;
+  const losses = postseason.losses;
+  const winPct = wins / (wins + losses);
 
   const result = {
     year: state.year,
     school: state.school,
     title: state.title,
+    regWins,
+    regLosses,
     wins,
     losses,
     winPct,
@@ -820,7 +898,7 @@ function computeCareerTotals(state) {
     else if (h.note === "Bowl loss") bowlLosses++;
     else if (h.note === "Conference Champion") confChamps++;
     else if (h.note === "National Champion") { natties++; playoffs++; }
-    else if (h.note && h.note.indexOf("Playoff") === 0) playoffs++;
+    else if (h.note && (h.note.indexOf("Playoff") === 0 || h.note.indexOf("National Championship") === 0)) playoffs++;
   });
   return { wins, losses, bowlWins, bowlLosses, confChamps, playoffs, natties, seasons: state.history.length };
 }
