@@ -38,6 +38,30 @@ function describeEffects(effects) {
   });
 }
 
+/* Preseason picks (training focus, recruiting emphasis) are guaranteed
+   gains by design — no downside, ever — so these always render as green
+   pills only, never red. */
+const TRAINING_GAIN_LABELS = {
+  development: "Player Dev",
+  culture: "Culture",
+  offenseIQGain: "Offense IQ",
+  defenseIQGain: "Defense IQ",
+};
+
+function describeGuaranteedGains(effects) {
+  if (!effects) return [];
+  return Object.keys(TRAINING_GAIN_LABELS)
+    .filter((k) => effects[k])
+    .map((k) => `<span class="effect-pill effect-pill--pos">${TRAINING_GAIN_LABELS[k]} +${effects[k]}</span>`)
+    .join("");
+}
+
+function describeRecruitingGains(o) {
+  const pills = [`<span class="effect-pill effect-pill--pos">Team Talent +${o.talentGrowth}</span>`];
+  if (o.cultureBonus) pills.push(`<span class="effect-pill effect-pill--pos">Culture +${o.cultureBonus}</span>`);
+  return pills.join("");
+}
+
 function prestigeLabel(p) {
   if (p >= 4.5) return "Blue Blood";
   if (p >= 3.5) return "Power Program";
@@ -249,6 +273,7 @@ function renderPreseason(state) {
       <input type="radio" name="training" value="${o.id}" data-field="draft.trainingFocusId" ${draft.trainingFocusId === o.id ? "checked" : ""}>
       <div class="choice-card__title">${o.label}</div>
       <div class="choice-card__desc">${o.description}</div>
+      <div class="btn-choice__tags">${describeGuaranteedGains(o.effects)}</div>
     </label>`).join("");
 
   let recruitingSection = "";
@@ -260,6 +285,7 @@ function renderPreseason(state) {
         <input type="radio" name="recruiting" value="${o.id}" data-field="draft.recruitingFocusId" ${draft.recruitingFocusId === o.id ? "checked" : ""}>
         <div class="choice-card__title">${o.label}</div>
         <div class="choice-card__desc">${o.description}</div>
+        <div class="btn-choice__tags">${describeRecruitingGains(o)}</div>
       </label>`).join("");
     recruitingSection = `<section class="panel"><h2>Recruiting Emphasis</h2><div class="choice-grid">${recruitCards}</div></section>`;
 
