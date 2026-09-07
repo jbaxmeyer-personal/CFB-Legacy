@@ -6,22 +6,35 @@ championship along the way.
 
 Each season you pick a training focus (and, once you're calling the
 game as a Coordinator or Head Coach, a recruiting emphasis, a game
-philosophy, and your offensive/defensive scheme), then play through a
-real week-by-week schedule against named opponents. About five weeks a
-season bring a narrative dilemma — every choice shows its real tradeoffs
-up front (no choice is a free lunch), and the outcome plays out directly
-in that week's score. Every offseason you either stay, get poached by
-another program, earn a promotion, or — if the record was bad enough —
-get shown the door and have to find your next job.
+philosophy, and your offensive/defensive scheme — these preseason picks
+are pure, guaranteed gains with no downside, by design), then play
+through a real week-by-week schedule against named opponents.
 
-As a Coordinator or Head Coach, 3-6 weeks a season also bring a live
-in-game tactical decision — 3rd-and-long, a goal-line stand, an onside
-kick, a rivalry composure check. These aren't scripted: each choice is
-graded by a real calculation comparing your team's passing/running/
-special-teams/composure rating (built from your scheme, coach stats, and
-team talent) against that week's actual opponent. The same call can
-succeed on a mismatch and fail against a tougher team — nothing here is
-predetermined.
+As a Coordinator or Head Coach, most weeks (6-9 out of 12) bring a live
+in-game tactical decision: 3rd-and-long (run or pass), 4th-and-short (go
+for it or punt), a big defensive snap (blitz, zone, or man), a trick play
+that's sat in the playbook all year, a rivalry-game identity call. These
+aren't scripted — each choice is graded by a real calculation comparing
+your team's passing/running/special-teams/composure rating (built from
+your scheme, coach stats, and team talent) against that week's actual
+opponent, so the same call can succeed on a mismatch and fail against a
+tougher team. A handful of weeks (3) bring an off-field dilemma instead —
+recruiting, a locker-room situation, a media moment — and every one of
+those has a genuine cost and benefit on both sides, never a free win.
+Position Coaches don't call plays, so their decisions are all off-field
+(5 a season). Every offseason you either stay, get poached by another
+program, earn a promotion, or — if the record was bad enough — get shown
+the door and have to find your next job.
+
+The postseason is modeled on the real 12-team CFP: a strong regular
+season earns a Conference Championship Game, the conference champion
+with an elite record gets a first-round bye, everyone else who qualifies
+plays into the bracket, and anyone bowl-eligible who misses the playoff
+plays one bowl game — every one of those games is simulated and counted,
+so a season's final record always reconciles (12 regular-season games
+plus however many postseason games were actually played). Final scores
+are built from real scoring-play combinations (touchdowns, field goals,
+safeties), not arbitrary numbers.
 
 Your full coaching history is tracked: a career-stops table (school,
 title, years, seasons, cumulative record) plus career totals (bowl
