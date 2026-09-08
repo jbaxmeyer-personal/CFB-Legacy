@@ -76,6 +76,53 @@ function escapeHtml(str) {
   }[c]));
 }
 
+function teamBadgeAbbrev(schoolName) {
+  const words = schoolName.replace(/[^a-zA-Z0-9 ]/g, "").split(" ").filter(Boolean);
+  if (!words.length) return "?";
+  if (words.length === 1) return words[0].slice(0, 3).toUpperCase();
+  return words.map((w) => w[0]).join("").slice(0, 4).toUpperCase();
+}
+
+// Self-hosted fallback badge (school initials on its own brand colors) for
+// when a school has no ESPN id mapped, or the CDN image fails to load —
+// no licensed logo asset needed for this to always render something.
+function teamBadgeHtml(schoolName, size) {
+  const school = getSchool(schoolName);
+  const bg = (school && school.primaryColor) || "#2a3441";
+  const fg = (school && school.secondaryColor) || "#f4f6f9";
+  const label = teamBadgeAbbrev(schoolName);
+  const fontSize = (label.length > 3 ? size * 0.32 : size * 0.4).toFixed(1);
+  return `<span class="team-badge" role="img" aria-label="${escapeHtml(schoolName)}" title="${escapeHtml(schoolName)}" style="width:${size}px;height:${size}px;background:${bg};color:${fg};font-size:${fontSize}px;">${label}</span>`;
+}
+
+// Real team logos via ESPN's public logo CDN, keyed by a best-effort espnId
+// mapping in data.js (not an official partnership, just ESPN's own asset
+// URLs). Falls back to the generated abbreviation badge if the school has
+// no mapped id, or if the image fails to load.
+function teamLogoHtml(schoolName, size) {
+  size = size || 40;
+  const school = getSchool(schoolName);
+  if (!school || !school.espnId) return teamBadgeHtml(schoolName, size);
+  return `<img class="team-logo-img" src="https://a.espncdn.com/i/teamlogos/ncaa/500-dark/${school.espnId}.png" alt="${escapeHtml(schoolName)}" title="${escapeHtml(schoolName)}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;" data-espn-id="${school.espnId}" data-school="${escapeHtml(schoolName)}" data-size="${size}" data-stage="dark" onerror="handleTeamLogoError(this)">`;
+}
+
+function handleTeamLogoError(img) {
+  if (img.dataset.stage === "dark") {
+    img.dataset.stage = "light";
+    img.src = `https://a.espncdn.com/i/teamlogos/ncaa/500/${img.dataset.espnId}.png`;
+    return;
+  }
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = teamBadgeHtml(img.dataset.school, parseInt(img.dataset.size, 10));
+  img.replaceWith(wrapper.firstElementChild);
+}
+
+function seasonRecordSoFar(state) {
+  const wins = state.weekResults.filter((r) => r.win).length;
+  const losses = state.weekResults.length - wins;
+  return { wins, losses };
+}
+
 function statBar(label, value) {
   const pct = clamp(value, 0, 100);
   return `
@@ -119,6 +166,12 @@ function renderHeader(state) {
 
   const statsHtml = STAT_KEYS.map((k) => statBar(STAT_LABELS[k], state.stats[k])).join("");
 
+  const showRecord = state.phase === "inseason" || state.phase === "recap";
+  const record = showRecord ? seasonRecordSoFar(state) : null;
+  const recordPill = record
+    ? `<div class="pill pill--record">${record.wins}-${record.losses}</div>`
+    : "";
+
   return `
     <header class="app-header">
       <div class="school-banner" style="background:${gradient}">
@@ -127,11 +180,13 @@ function renderHeader(state) {
           <div class="school-banner__sub">${escapeHtml(state.title)} &middot; ${escapeHtml(state.school)}</div>
           <div class="school-banner__meta">${escapeHtml(conf)} &middot; ${tier} &middot; Age ${state.age} &middot; ${state.year}</div>
         </div>
+        <div class="school-banner__logo">${teamLogoHtml(state.school, 48)}</div>
       </div>
       <div class="header-row">
         <div class="pill">${stageLabel}</div>
         <div class="pill pill--rep">Reputation ${Math.round(state.reputation)}</div>
         <div class="pill ${state.jobSecurity <= 25 ? "pill--danger" : ""}">Job Security ${Math.round(state.jobSecurity)}</div>
+        ${recordPill}
       </div>
       <div class="stat-grid">${statsHtml}</div>
     </header>`;
