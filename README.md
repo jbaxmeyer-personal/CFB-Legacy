@@ -85,4 +85,15 @@ js/data.js         Schools, conferences, dilemma events, game moments, achieveme
 js/engine.js       Game state machine (career creation, season sim, job market)
 js/ui.js           Screen rendering
 js/main.js         Event wiring + bootstrap
+js/update-banner.js  "New version available" banner (no service worker needed)
 ```
+
+### Update banner
+
+There's no build step or service worker here, so new-version detection works
+by re-fetching the app's own source files with the cache disabled and
+comparing their ETag/Last-Modified fingerprints against what this page load
+started with. It checks whenever the tab regains focus, plus a slow hourly
+poll while the tab stays open, and shows a "Refresh" banner when something's
+changed on the server — same UX as the Dynasty Tracker and CFB Scoreboard
+update banners, just without their PWA service-worker machinery.
