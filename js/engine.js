@@ -222,11 +222,22 @@ function generateWeekPlan(state) {
   return plan;
 }
 
+function applyTrainingFocusGains(state, trainingFocusId) {
+  const focus = TRAINING_FOCUS_OPTIONS.find((f) => f.id === trainingFocusId);
+  if (!focus) return;
+  const eff = focus.effects;
+  if (eff.development) state.stats.development = clamp(state.stats.development + eff.development, 0, 100);
+  if (eff.culture) state.stats.culture = clamp(state.stats.culture + eff.culture, 0, 100);
+  if (eff.offenseIQGain) state.stats.offenseIQ = clamp(state.stats.offenseIQ + eff.offenseIQGain, 0, 100);
+  if (eff.defenseIQGain) state.stats.defenseIQ = clamp(state.stats.defenseIQ + eff.defenseIQGain, 0, 100);
+}
+
 function setPreseasonChoices(state, { trainingFocusId, philosophy, recruitingFocusId, offenseSchemeId, defenseSchemeId }) {
   state.trainingFocusId = trainingFocusId;
   if (philosophy) state.philosophy = philosophy;
   if (isRecruitingStage(state.stage)) state.recruitingFocusId = recruitingFocusId;
   applySchemeChoice(state, offenseSchemeId, defenseSchemeId);
+  applyTrainingFocusGains(state, trainingFocusId);
 
   state.weekPlan = generateWeekPlan(state);
   state.weekResults = [];
@@ -626,14 +637,9 @@ function schemeRecruitingSynergy(state) {
 }
 
 function applyEndOfSeasonGrowth(state, result) {
-  const focus = TRAINING_FOCUS_OPTIONS.find((f) => f.id === state.trainingFocusId);
-  if (focus) {
-    const eff = focus.effects;
-    if (eff.development) state.stats.development = clamp(state.stats.development + eff.development, 0, 100);
-    if (eff.culture) state.stats.culture = clamp(state.stats.culture + eff.culture, 0, 100);
-    if (eff.offenseIQGain) state.stats.offenseIQ = clamp(state.stats.offenseIQ + eff.offenseIQGain, 0, 100);
-    if (eff.defenseIQGain) state.stats.defenseIQ = clamp(state.stats.defenseIQ + eff.defenseIQGain, 0, 100);
-  }
+  // Training focus gains are applied immediately in setPreseasonChoices
+  // (matching the guaranteed-gain pill shown on the preseason card), not
+  // deferred to here.
 
   let talentGrowth = (result.winPct - 0.5) * 6;
   if (isRecruitingStage(state.stage)) {
