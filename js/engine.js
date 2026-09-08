@@ -203,21 +203,22 @@ function generateWeekPlan(state) {
     plan[wIdx].dilemmaId = shuffledEvents[i].id;
   });
 
-  if (isRecruitingStage(state.stage)) {
-    const remaining = weekIndices.filter((i) => !dilemmaWeeks.includes(i));
-    const momentCount = Math.min(randInt(MOMENTS_PER_SEASON_MIN, MOMENTS_PER_SEASON_MAX), remaining.length);
-    const momentWeeks = [...remaining].sort(() => Math.random() - 0.5).slice(0, momentCount);
-    const shuffledMoments = [...GAME_MOMENTS].sort(() => Math.random() - 0.5).slice(0, momentWeeks.length);
-    momentWeeks.forEach((wIdx, i) => {
-      plan[wIdx].momentId = shuffledMoments[i].id;
-      plan[wIdx].momentCtx = {
-        distance: randInt(2, 12),
-        score: scoreText(randInt(-17, 17)),
-        quarter: quarterText(randInt(1, 4)),
-        opponent: plan[wIdx].opponent,
-      };
-    });
-  }
+  // In-game tactical moments (3rd-and-long, blitz calls, trick plays) are
+  // the majority decision type at every coaching stage, not just once
+  // you're calling plays as a coordinator or head coach.
+  const remaining = weekIndices.filter((i) => !dilemmaWeeks.includes(i));
+  const momentCount = Math.min(randInt(MOMENTS_PER_SEASON_MIN, MOMENTS_PER_SEASON_MAX), remaining.length);
+  const momentWeeks = [...remaining].sort(() => Math.random() - 0.5).slice(0, momentCount);
+  const shuffledMoments = [...GAME_MOMENTS].sort(() => Math.random() - 0.5).slice(0, momentWeeks.length);
+  momentWeeks.forEach((wIdx, i) => {
+    plan[wIdx].momentId = shuffledMoments[i].id;
+    plan[wIdx].momentCtx = {
+      distance: randInt(2, 12),
+      score: scoreText(randInt(-17, 17)),
+      quarter: quarterText(randInt(1, 4)),
+      opponent: plan[wIdx].opponent,
+    };
+  });
 
   return plan;
 }
