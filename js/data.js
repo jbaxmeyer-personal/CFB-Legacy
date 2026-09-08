@@ -8,6 +8,7 @@
 const SCHOOLS = [
   {
     "name": "Air Force",
+    "espnId": 2005,
     "conference": "Mountain West",
     "startingPrestige": 1,
     "offenseScheme": "Option",
@@ -17,6 +18,7 @@ const SCHOOLS = [
   },
   {
     "name": "Akron",
+    "espnId": 2006,
     "conference": "MAC",
     "startingPrestige": 0,
     "offenseScheme": "Spread",
@@ -24,6 +26,7 @@ const SCHOOLS = [
   },
   {
     "name": "Alabama",
+    "espnId": 333,
     "conference": "SEC",
     "startingPrestige": 5,
     "offenseScheme": "Multiple Offense",
@@ -33,6 +36,7 @@ const SCHOOLS = [
   },
   {
     "name": "App St.",
+    "espnId": 2026,
     "conference": "Sun Belt",
     "startingPrestige": 1,
     "offenseScheme": "Multiple Offense",
@@ -42,6 +46,7 @@ const SCHOOLS = [
   },
   {
     "name": "Arizona",
+    "espnId": 12,
     "conference": "Big 12",
     "startingPrestige": 2.5,
     "offenseScheme": "Multiple Offense",
@@ -51,6 +56,7 @@ const SCHOOLS = [
   },
   {
     "name": "Arizona State",
+    "espnId": 9,
     "conference": "Big 12",
     "startingPrestige": 3,
     "offenseScheme": "Multiple Offense",
@@ -60,6 +66,7 @@ const SCHOOLS = [
   },
   {
     "name": "Arkansas",
+    "espnId": 8,
     "conference": "SEC",
     "startingPrestige": 3,
     "offenseScheme": "Spread",
@@ -69,6 +76,7 @@ const SCHOOLS = [
   },
   {
     "name": "Arkansas State",
+    "espnId": 2032,
     "conference": "Sun Belt",
     "startingPrestige": 1,
     "offenseScheme": "Power Spread",
@@ -76,6 +84,7 @@ const SCHOOLS = [
   },
   {
     "name": "Army",
+    "espnId": 349,
     "conference": "AAC",
     "startingPrestige": 2.5,
     "offenseScheme": "Option",
@@ -85,6 +94,7 @@ const SCHOOLS = [
   },
   {
     "name": "Auburn",
+    "espnId": 2,
     "conference": "SEC",
     "startingPrestige": 3.5,
     "offenseScheme": "Veer and Shoot",
@@ -94,6 +104,7 @@ const SCHOOLS = [
   },
   {
     "name": "Ball State",
+    "espnId": 2050,
     "conference": "MAC",
     "startingPrestige": 0.5,
     "offenseScheme": "Spread",
@@ -101,6 +112,7 @@ const SCHOOLS = [
   },
   {
     "name": "Baylor",
+    "espnId": 239,
     "conference": "Big 12",
     "startingPrestige": 2.5,
     "offenseScheme": "Air Raid",
@@ -110,6 +122,7 @@ const SCHOOLS = [
   },
   {
     "name": "Boise State",
+    "espnId": 68,
     "conference": "Pac-12",
     "startingPrestige": 2.5,
     "offenseScheme": "Pro Style",
@@ -119,6 +132,7 @@ const SCHOOLS = [
   },
   {
     "name": "Boston College",
+    "espnId": 103,
     "conference": "ACC",
     "startingPrestige": 2.5,
     "offenseScheme": "Multiple Offense",
@@ -128,6 +142,7 @@ const SCHOOLS = [
   },
   {
     "name": "Bowling Green",
+    "espnId": 189,
     "conference": "MAC",
     "startingPrestige": 0.5,
     "offenseScheme": "Multiple Offense",
@@ -135,6 +150,7 @@ const SCHOOLS = [
   },
   {
     "name": "Buffalo",
+    "espnId": 2084,
     "conference": "MAC",
     "startingPrestige": 0,
     "offenseScheme": "Power Spread",
@@ -142,6 +158,7 @@ const SCHOOLS = [
   },
   {
     "name": "BYU",
+    "espnId": 252,
     "conference": "Big 12",
     "startingPrestige": 4,
     "offenseScheme": "Power Spread",
@@ -151,6 +168,7 @@ const SCHOOLS = [
   },
   {
     "name": "California",
+    "espnId": 25,
     "conference": "ACC",
     "startingPrestige": 3,
     "offenseScheme": "Spread",
@@ -160,6 +178,7 @@ const SCHOOLS = [
   },
   {
     "name": "C. Michigan",
+    "espnId": 2117,
     "conference": "MAC",
     "startingPrestige": 1,
     "offenseScheme": "Option",
@@ -167,6 +186,7 @@ const SCHOOLS = [
   },
   {
     "name": "Charlotte",
+    "espnId": 2429,
     "conference": "AAC",
     "startingPrestige": 0.5,
     "offenseScheme": "Pistol",
@@ -176,6 +196,7 @@ const SCHOOLS = [
   },
   {
     "name": "Cincinnati",
+    "espnId": 2132,
     "conference": "Big 12",
     "startingPrestige": 2.5,
     "offenseScheme": "Pistol",
@@ -185,6 +206,7 @@ const SCHOOLS = [
   },
   {
     "name": "Clemson",
+    "espnId": 228,
     "conference": "ACC",
     "startingPrestige": 4,
     "offenseScheme": "Air Raid",
@@ -194,6 +216,7 @@ const SCHOOLS = [
   },
   {
     "name": "C. Carolina",
+    "espnId": 324,
     "conference": "Sun Belt",
     "startingPrestige": 1,
     "offenseScheme": "Power Spread",
@@ -203,6 +226,7 @@ const SCHOOLS = [
   },
   {
     "name": "Colorado",
+    "espnId": 38,
     "conference": "Big 12",
     "startingPrestige": 3,
     "offenseScheme": "Power Spread",
@@ -212,6 +236,7 @@ const SCHOOLS = [
   },
   {
     "name": "Colorado State",
+    "espnId": 36,
     "conference": "Pac-12",
     "startingPrestige": 1.5,
     "offenseScheme": "Spread",
@@ -219,6 +244,7 @@ const SCHOOLS = [
   },
   {
     "name": "UConn",
+    "espnId": 41,
     "conference": "Independent",
     "startingPrestige": 1.5,
     "offenseScheme": "Spread",
@@ -226,6 +252,7 @@ const SCHOOLS = [
   },
   {
     "name": "Delaware",
+    "espnId": 48,
     "conference": "CUSA",
     "startingPrestige": 1,
     "offenseScheme": "Spread",
@@ -233,6 +260,7 @@ const SCHOOLS = [
   },
   {
     "name": "Duke",
+    "espnId": 150,
     "conference": "ACC",
     "startingPrestige": 3,
     "offenseScheme": "Veer and Shoot",
@@ -242,6 +270,7 @@ const SCHOOLS = [
   },
   {
     "name": "E. Michigan",
+    "espnId": 2199,
     "conference": "MAC",
     "startingPrestige": 0.5,
     "offenseScheme": "Spread",
@@ -249,6 +278,7 @@ const SCHOOLS = [
   },
   {
     "name": "East Carolina",
+    "espnId": 151,
     "conference": "AAC",
     "startingPrestige": 2,
     "offenseScheme": "Veer and Shoot",
@@ -258,6 +288,7 @@ const SCHOOLS = [
   },
   {
     "name": "FIU",
+    "espnId": 2229,
     "conference": "CUSA",
     "startingPrestige": 1,
     "offenseScheme": "Power Spread",
@@ -265,6 +296,7 @@ const SCHOOLS = [
   },
   {
     "name": "Florida",
+    "espnId": 57,
     "conference": "SEC",
     "startingPrestige": 4,
     "offenseScheme": "Power Spread",
@@ -274,6 +306,7 @@ const SCHOOLS = [
   },
   {
     "name": "Fla Atlantic",
+    "espnId": 2226,
     "conference": "AAC",
     "startingPrestige": 1,
     "offenseScheme": "Air Raid",
@@ -281,6 +314,7 @@ const SCHOOLS = [
   },
   {
     "name": "Florida State",
+    "espnId": 52,
     "conference": "ACC",
     "startingPrestige": 3.5,
     "offenseScheme": "Spread",
@@ -290,6 +324,7 @@ const SCHOOLS = [
   },
   {
     "name": "Fresno State",
+    "espnId": 278,
     "conference": "Pac-12",
     "startingPrestige": 1.5,
     "offenseScheme": "Spread",
@@ -299,6 +334,7 @@ const SCHOOLS = [
   },
   {
     "name": "Georgia",
+    "espnId": 61,
     "conference": "SEC",
     "startingPrestige": 5,
     "offenseScheme": "Multiple Offense",
@@ -308,6 +344,7 @@ const SCHOOLS = [
   },
   {
     "name": "GA Southern",
+    "espnId": 290,
     "conference": "Sun Belt",
     "startingPrestige": 1,
     "offenseScheme": "Spread",
@@ -315,6 +352,7 @@ const SCHOOLS = [
   },
   {
     "name": "Georgia State",
+    "espnId": 2247,
     "conference": "Sun Belt",
     "startingPrestige": 0,
     "offenseScheme": "Multiple Offense",
@@ -322,6 +360,7 @@ const SCHOOLS = [
   },
   {
     "name": "Georgia Tech",
+    "espnId": 59,
     "conference": "ACC",
     "startingPrestige": 3.5,
     "offenseScheme": "Power Spread",
@@ -331,6 +370,7 @@ const SCHOOLS = [
   },
   {
     "name": "Hawai'i",
+    "espnId": 62,
     "conference": "Mountain West",
     "startingPrestige": 1.5,
     "offenseScheme": "Run and Shoot",
@@ -338,6 +378,7 @@ const SCHOOLS = [
   },
   {
     "name": "Houston",
+    "espnId": 248,
     "conference": "Big 12",
     "startingPrestige": 3,
     "offenseScheme": "Spread",
@@ -347,6 +388,7 @@ const SCHOOLS = [
   },
   {
     "name": "Illinois",
+    "espnId": 356,
     "conference": "Big Ten",
     "startingPrestige": 3.5,
     "offenseScheme": "Multiple Offense",
@@ -356,6 +398,7 @@ const SCHOOLS = [
   },
   {
     "name": "Indiana",
+    "espnId": 84,
     "conference": "Big Ten",
     "startingPrestige": 4.5,
     "offenseScheme": "Spread",
@@ -365,6 +408,7 @@ const SCHOOLS = [
   },
   {
     "name": "Iowa",
+    "espnId": 2294,
     "conference": "Big Ten",
     "startingPrestige": 3.5,
     "offenseScheme": "Pro Style",
@@ -374,6 +418,7 @@ const SCHOOLS = [
   },
   {
     "name": "Iowa State",
+    "espnId": 66,
     "conference": "Big 12",
     "startingPrestige": 2.5,
     "offenseScheme": "Power Spread",
@@ -383,6 +428,7 @@ const SCHOOLS = [
   },
   {
     "name": "Jax State",
+    "espnId": 55,
     "conference": "CUSA",
     "startingPrestige": 1,
     "offenseScheme": "Spread",
@@ -390,6 +436,7 @@ const SCHOOLS = [
   },
   {
     "name": "James Madison",
+    "espnId": 256,
     "conference": "Sun Belt",
     "startingPrestige": 1.5,
     "offenseScheme": "Power Spread",
@@ -399,6 +446,7 @@ const SCHOOLS = [
   },
   {
     "name": "Kansas",
+    "espnId": 2305,
     "conference": "Big 12",
     "startingPrestige": 2.5,
     "offenseScheme": "Spread",
@@ -408,6 +456,7 @@ const SCHOOLS = [
   },
   {
     "name": "Kansas State",
+    "espnId": 2306,
     "conference": "Big 12",
     "startingPrestige": 2.5,
     "offenseScheme": "Power Spread",
@@ -417,6 +466,7 @@ const SCHOOLS = [
   },
   {
     "name": "Kennesaw St.",
+    "espnId": 338,
     "conference": "CUSA",
     "startingPrestige": 1,
     "offenseScheme": "Veer and Shoot",
@@ -424,6 +474,7 @@ const SCHOOLS = [
   },
   {
     "name": "Kent State",
+    "espnId": 2309,
     "conference": "MAC",
     "startingPrestige": 0,
     "offenseScheme": "Veer and Shoot",
@@ -431,6 +482,7 @@ const SCHOOLS = [
   },
   {
     "name": "Kentucky",
+    "espnId": 96,
     "conference": "SEC",
     "startingPrestige": 3,
     "offenseScheme": "Spread",
@@ -440,6 +492,7 @@ const SCHOOLS = [
   },
   {
     "name": "Liberty",
+    "espnId": 2335,
     "conference": "CUSA",
     "startingPrestige": 1,
     "offenseScheme": "Spread",
@@ -449,6 +502,7 @@ const SCHOOLS = [
   },
   {
     "name": "Louisiana",
+    "espnId": 309,
     "conference": "Sun Belt",
     "startingPrestige": 1,
     "offenseScheme": "Spread",
@@ -456,6 +510,7 @@ const SCHOOLS = [
   },
   {
     "name": "Louisiana Tech",
+    "espnId": 2348,
     "conference": "Sun Belt",
     "startingPrestige": 1,
     "offenseScheme": "Air Raid",
@@ -463,6 +518,7 @@ const SCHOOLS = [
   },
   {
     "name": "Louisville",
+    "espnId": 97,
     "conference": "ACC",
     "startingPrestige": 3,
     "offenseScheme": "Multiple Offense",
@@ -472,6 +528,7 @@ const SCHOOLS = [
   },
   {
     "name": "LSU",
+    "espnId": 99,
     "conference": "SEC",
     "startingPrestige": 4.5,
     "offenseScheme": "Veer and Shoot",
@@ -481,6 +538,7 @@ const SCHOOLS = [
   },
   {
     "name": "Marshall",
+    "espnId": 276,
     "conference": "Sun Belt",
     "startingPrestige": 1,
     "offenseScheme": "Spread",
@@ -490,6 +548,7 @@ const SCHOOLS = [
   },
   {
     "name": "Maryland",
+    "espnId": 120,
     "conference": "Big Ten",
     "startingPrestige": 2.5,
     "offenseScheme": "Spread",
@@ -499,6 +558,7 @@ const SCHOOLS = [
   },
   {
     "name": "Memphis",
+    "espnId": 235,
     "conference": "AAC",
     "startingPrestige": 2,
     "offenseScheme": "Veer and Shoot",
@@ -508,6 +568,7 @@ const SCHOOLS = [
   },
   {
     "name": "Miami",
+    "espnId": 2390,
     "conference": "ACC",
     "startingPrestige": 4.5,
     "offenseScheme": "Air Raid",
@@ -517,6 +578,7 @@ const SCHOOLS = [
   },
   {
     "name": "Miami (OH)",
+    "espnId": 193,
     "conference": "MAC",
     "startingPrestige": 1,
     "offenseScheme": "Air Raid",
@@ -524,6 +586,7 @@ const SCHOOLS = [
   },
   {
     "name": "Michigan",
+    "espnId": 130,
     "conference": "Big Ten",
     "startingPrestige": 4.5,
     "offenseScheme": "Spread",
@@ -533,6 +596,7 @@ const SCHOOLS = [
   },
   {
     "name": "Michigan State",
+    "espnId": 127,
     "conference": "Big Ten",
     "startingPrestige": 3.5,
     "offenseScheme": "Spread Option",
@@ -542,6 +606,7 @@ const SCHOOLS = [
   },
   {
     "name": "Middle Tenn",
+    "espnId": 2393,
     "conference": "CUSA",
     "startingPrestige": 0.5,
     "offenseScheme": "Spread",
@@ -549,6 +614,7 @@ const SCHOOLS = [
   },
   {
     "name": "Minnesota",
+    "espnId": 135,
     "conference": "Big Ten",
     "startingPrestige": 3.5,
     "offenseScheme": "Multiple Offense",
@@ -558,6 +624,7 @@ const SCHOOLS = [
   },
   {
     "name": "Mississippi St",
+    "espnId": 344,
     "conference": "SEC",
     "startingPrestige": 2.5,
     "offenseScheme": "Veer and Shoot",
@@ -567,6 +634,7 @@ const SCHOOLS = [
   },
   {
     "name": "Missouri",
+    "espnId": 142,
     "conference": "SEC",
     "startingPrestige": 3,
     "offenseScheme": "Pistol",
@@ -576,6 +644,7 @@ const SCHOOLS = [
   },
   {
     "name": "Missouri State",
+    "espnId": 2623,
     "conference": "CUSA",
     "startingPrestige": 0.5,
     "offenseScheme": "Spread",
@@ -583,6 +652,7 @@ const SCHOOLS = [
   },
   {
     "name": "Navy",
+    "espnId": 2426,
     "conference": "AAC",
     "startingPrestige": 2.5,
     "offenseScheme": "Option",
@@ -592,6 +662,7 @@ const SCHOOLS = [
   },
   {
     "name": "NC State",
+    "espnId": 152,
     "conference": "ACC",
     "startingPrestige": 3,
     "offenseScheme": "Power Spread",
@@ -601,6 +672,7 @@ const SCHOOLS = [
   },
   {
     "name": "Nebraska",
+    "espnId": 158,
     "conference": "Big Ten",
     "startingPrestige": 4,
     "offenseScheme": "Multiple Offense",
@@ -610,6 +682,7 @@ const SCHOOLS = [
   },
   {
     "name": "Nevada",
+    "espnId": 2440,
     "conference": "Mountain West",
     "startingPrestige": 1,
     "offenseScheme": "Spread",
@@ -617,6 +690,7 @@ const SCHOOLS = [
   },
   {
     "name": "New Mexico",
+    "espnId": 167,
     "conference": "Mountain West",
     "startingPrestige": 1,
     "offenseScheme": "Spread",
@@ -624,6 +698,7 @@ const SCHOOLS = [
   },
   {
     "name": "New Mexico St.",
+    "espnId": 166,
     "conference": "CUSA",
     "startingPrestige": 1,
     "offenseScheme": "Spread",
@@ -631,6 +706,7 @@ const SCHOOLS = [
   },
   {
     "name": "North Carolina",
+    "espnId": 153,
     "conference": "ACC",
     "startingPrestige": 2.5,
     "offenseScheme": "Spread",
@@ -640,6 +716,7 @@ const SCHOOLS = [
   },
   {
     "name": "NDSU",
+    "espnId": 2449,
     "conference": "Mountain West",
     "startingPrestige": 1.5,
     "offenseScheme": "Spread Option",
@@ -647,6 +724,7 @@ const SCHOOLS = [
   },
   {
     "name": "North Texas",
+    "espnId": 249,
     "conference": "AAC",
     "startingPrestige": 1.5,
     "offenseScheme": "Air Raid",
@@ -656,6 +734,7 @@ const SCHOOLS = [
   },
   {
     "name": "N. Illinois",
+    "espnId": 2459,
     "conference": "Mountain West",
     "startingPrestige": 1,
     "offenseScheme": "Multiple Offense",
@@ -663,6 +742,7 @@ const SCHOOLS = [
   },
   {
     "name": "Northwestern",
+    "espnId": 77,
     "conference": "Big Ten",
     "startingPrestige": 2.5,
     "offenseScheme": "Spread",
@@ -672,6 +752,7 @@ const SCHOOLS = [
   },
   {
     "name": "Notre Dame",
+    "espnId": 87,
     "conference": "Independent",
     "startingPrestige": 4.5,
     "offenseScheme": "Power Spread",
@@ -681,6 +762,7 @@ const SCHOOLS = [
   },
   {
     "name": "Ohio",
+    "espnId": 195,
     "conference": "MAC",
     "startingPrestige": 1,
     "offenseScheme": "Pistol",
@@ -688,6 +770,7 @@ const SCHOOLS = [
   },
   {
     "name": "Ohio State",
+    "espnId": 194,
     "conference": "Big Ten",
     "startingPrestige": 5,
     "offenseScheme": "Spread",
@@ -697,6 +780,7 @@ const SCHOOLS = [
   },
   {
     "name": "Oklahoma",
+    "espnId": 201,
     "conference": "SEC",
     "startingPrestige": 4.5,
     "offenseScheme": "Air Raid",
@@ -706,6 +790,7 @@ const SCHOOLS = [
   },
   {
     "name": "Oklahoma State",
+    "espnId": 197,
     "conference": "Big 12",
     "startingPrestige": 3,
     "offenseScheme": "Air Raid",
@@ -715,6 +800,7 @@ const SCHOOLS = [
   },
   {
     "name": "Old Dominion",
+    "espnId": 295,
     "conference": "Sun Belt",
     "startingPrestige": 1,
     "offenseScheme": "Veer and Shoot",
@@ -722,6 +808,7 @@ const SCHOOLS = [
   },
   {
     "name": "Ole Miss",
+    "espnId": 145,
     "conference": "SEC",
     "startingPrestige": 4.5,
     "offenseScheme": "Veer and Shoot",
@@ -731,6 +818,7 @@ const SCHOOLS = [
   },
   {
     "name": "Oregon",
+    "espnId": 2483,
     "conference": "Big Ten",
     "startingPrestige": 4.5,
     "offenseScheme": "Spread",
@@ -740,6 +828,7 @@ const SCHOOLS = [
   },
   {
     "name": "Oregon State",
+    "espnId": 204,
     "conference": "Pac-12",
     "startingPrestige": 2,
     "offenseScheme": "Spread Option",
@@ -747,6 +836,7 @@ const SCHOOLS = [
   },
   {
     "name": "Penn State",
+    "espnId": 213,
     "conference": "Big Ten",
     "startingPrestige": 4,
     "offenseScheme": "Power Spread",
@@ -756,6 +846,7 @@ const SCHOOLS = [
   },
   {
     "name": "Pittsburgh",
+    "espnId": 221,
     "conference": "ACC",
     "startingPrestige": 3,
     "offenseScheme": "Spread",
@@ -765,6 +856,7 @@ const SCHOOLS = [
   },
   {
     "name": "Purdue",
+    "espnId": 2509,
     "conference": "Big Ten",
     "startingPrestige": 2,
     "offenseScheme": "Air Raid",
@@ -774,6 +866,7 @@ const SCHOOLS = [
   },
   {
     "name": "Rice",
+    "espnId": 242,
     "conference": "AAC",
     "startingPrestige": 1.5,
     "offenseScheme": "Spread Option",
@@ -783,6 +876,7 @@ const SCHOOLS = [
   },
   {
     "name": "Rutgers",
+    "espnId": 164,
     "conference": "Big Ten",
     "startingPrestige": 2,
     "offenseScheme": "Spread",
@@ -792,6 +886,7 @@ const SCHOOLS = [
   },
   {
     "name": "Sacramento State",
+    "espnId": 16,
     "conference": "MAC",
     "startingPrestige": 1,
     "offenseScheme": "Spread Option",
@@ -799,6 +894,7 @@ const SCHOOLS = [
   },
   {
     "name": "Sam Houston",
+    "espnId": 2534,
     "conference": "CUSA",
     "startingPrestige": 0.5,
     "offenseScheme": "Air Raid",
@@ -806,6 +902,7 @@ const SCHOOLS = [
   },
   {
     "name": "San Diego St.",
+    "espnId": 21,
     "conference": "Pac-12",
     "startingPrestige": 1,
     "offenseScheme": "Veer and Shoot",
@@ -815,6 +912,7 @@ const SCHOOLS = [
   },
   {
     "name": "San Jose State",
+    "espnId": 23,
     "conference": "Mountain West",
     "startingPrestige": 1.5,
     "offenseScheme": "Run and Shoot",
@@ -822,6 +920,7 @@ const SCHOOLS = [
   },
   {
     "name": "SMU",
+    "espnId": 2567,
     "conference": "ACC",
     "startingPrestige": 3,
     "offenseScheme": "Spread",
@@ -831,6 +930,7 @@ const SCHOOLS = [
   },
   {
     "name": "South Alabama",
+    "espnId": 6,
     "conference": "Sun Belt",
     "startingPrestige": 0.5,
     "offenseScheme": "Spread",
@@ -840,6 +940,7 @@ const SCHOOLS = [
   },
   {
     "name": "South Carolina",
+    "espnId": 2579,
     "conference": "SEC",
     "startingPrestige": 3,
     "offenseScheme": "Power Spread",
@@ -849,6 +950,7 @@ const SCHOOLS = [
   },
   {
     "name": "Southern Miss",
+    "espnId": 2572,
     "conference": "Sun Belt",
     "startingPrestige": 0.5,
     "offenseScheme": "Power Spread",
@@ -856,6 +958,7 @@ const SCHOOLS = [
   },
   {
     "name": "Stanford",
+    "espnId": 24,
     "conference": "ACC",
     "startingPrestige": 3,
     "offenseScheme": "Spread Option",
@@ -865,6 +968,7 @@ const SCHOOLS = [
   },
   {
     "name": "Syracuse",
+    "espnId": 183,
     "conference": "ACC",
     "startingPrestige": 3,
     "offenseScheme": "Spread",
@@ -874,6 +978,7 @@ const SCHOOLS = [
   },
   {
     "name": "TCU",
+    "espnId": 2628,
     "conference": "Big 12",
     "startingPrestige": 3.5,
     "offenseScheme": "Air Raid",
@@ -883,6 +988,7 @@ const SCHOOLS = [
   },
   {
     "name": "Temple",
+    "espnId": 218,
     "conference": "AAC",
     "startingPrestige": 1,
     "offenseScheme": "Spread",
@@ -892,6 +998,7 @@ const SCHOOLS = [
   },
   {
     "name": "Tennessee",
+    "espnId": 2633,
     "conference": "SEC",
     "startingPrestige": 4,
     "offenseScheme": "Veer and Shoot",
@@ -901,6 +1008,7 @@ const SCHOOLS = [
   },
   {
     "name": "Texas",
+    "espnId": 251,
     "conference": "SEC",
     "startingPrestige": 4.5,
     "offenseScheme": "Spread",
@@ -910,6 +1018,7 @@ const SCHOOLS = [
   },
   {
     "name": "Texas A&M",
+    "espnId": 245,
     "conference": "SEC",
     "startingPrestige": 4.5,
     "offenseScheme": "Power Spread",
@@ -919,6 +1028,7 @@ const SCHOOLS = [
   },
   {
     "name": "Texas State",
+    "espnId": 326,
     "conference": "Pac-12",
     "startingPrestige": 1,
     "offenseScheme": "Veer and Shoot",
@@ -926,6 +1036,7 @@ const SCHOOLS = [
   },
   {
     "name": "Texas Tech",
+    "espnId": 2641,
     "conference": "Big 12",
     "startingPrestige": 3.5,
     "offenseScheme": "Veer and Shoot",
@@ -935,6 +1046,7 @@ const SCHOOLS = [
   },
   {
     "name": "Toledo",
+    "espnId": 2649,
     "conference": "MAC",
     "startingPrestige": 1,
     "offenseScheme": "Spread Option",
@@ -944,6 +1056,7 @@ const SCHOOLS = [
   },
   {
     "name": "Troy",
+    "espnId": 2653,
     "conference": "Sun Belt",
     "startingPrestige": 1,
     "offenseScheme": "Power Spread",
@@ -953,6 +1066,7 @@ const SCHOOLS = [
   },
   {
     "name": "Tulane",
+    "espnId": 2655,
     "conference": "AAC",
     "startingPrestige": 2.5,
     "offenseScheme": "Spread Option",
@@ -962,6 +1076,7 @@ const SCHOOLS = [
   },
   {
     "name": "Tulsa",
+    "espnId": 202,
     "conference": "AAC",
     "startingPrestige": 1.5,
     "offenseScheme": "Spread",
@@ -971,6 +1086,7 @@ const SCHOOLS = [
   },
   {
     "name": "UAB",
+    "espnId": 5,
     "conference": "AAC",
     "startingPrestige": 1,
     "offenseScheme": "Spread",
@@ -980,6 +1096,7 @@ const SCHOOLS = [
   },
   {
     "name": "UCF",
+    "espnId": 2116,
     "conference": "Big 12",
     "startingPrestige": 2.5,
     "offenseScheme": "Spread",
@@ -989,6 +1106,7 @@ const SCHOOLS = [
   },
   {
     "name": "UCLA",
+    "espnId": 26,
     "conference": "Big Ten",
     "startingPrestige": 3.5,
     "offenseScheme": "Spread",
@@ -998,6 +1116,7 @@ const SCHOOLS = [
   },
   {
     "name": "UL Monroe",
+    "espnId": 2433,
     "conference": "Sun Belt",
     "startingPrestige": 0.5,
     "offenseScheme": "Multiple Offense",
@@ -1005,6 +1124,7 @@ const SCHOOLS = [
   },
   {
     "name": "UMass",
+    "espnId": 113,
     "conference": "MAC",
     "startingPrestige": 0.5,
     "offenseScheme": "Spread",
@@ -1012,6 +1132,7 @@ const SCHOOLS = [
   },
   {
     "name": "UNLV",
+    "espnId": 2439,
     "conference": "Mountain West",
     "startingPrestige": 1.5,
     "offenseScheme": "Spread",
@@ -1021,6 +1142,7 @@ const SCHOOLS = [
   },
   {
     "name": "USC",
+    "espnId": 30,
     "conference": "Big Ten",
     "startingPrestige": 4.5,
     "offenseScheme": "Air Raid",
@@ -1030,6 +1152,7 @@ const SCHOOLS = [
   },
   {
     "name": "USF",
+    "espnId": 58,
     "conference": "AAC",
     "startingPrestige": 1.5,
     "offenseScheme": "Multiple Offense",
@@ -1039,6 +1162,7 @@ const SCHOOLS = [
   },
   {
     "name": "Utah",
+    "espnId": 254,
     "conference": "Big 12",
     "startingPrestige": 3.5,
     "offenseScheme": "Spread",
@@ -1048,6 +1172,7 @@ const SCHOOLS = [
   },
   {
     "name": "Utah State",
+    "espnId": 328,
     "conference": "Pac-12",
     "startingPrestige": 1.5,
     "offenseScheme": "Spread",
@@ -1055,6 +1180,7 @@ const SCHOOLS = [
   },
   {
     "name": "UTEP",
+    "espnId": 2638,
     "conference": "Mountain West",
     "startingPrestige": 0.5,
     "offenseScheme": "Air Raid",
@@ -1064,6 +1190,7 @@ const SCHOOLS = [
   },
   {
     "name": "UTSA",
+    "espnId": 2636,
     "conference": "AAC",
     "startingPrestige": 1.5,
     "offenseScheme": "Power Spread",
@@ -1073,6 +1200,7 @@ const SCHOOLS = [
   },
   {
     "name": "Vanderbilt",
+    "espnId": 238,
     "conference": "SEC",
     "startingPrestige": 2.5,
     "offenseScheme": "Pistol",
@@ -1082,6 +1210,7 @@ const SCHOOLS = [
   },
   {
     "name": "Virginia",
+    "espnId": 258,
     "conference": "ACC",
     "startingPrestige": 3,
     "offenseScheme": "Spread",
@@ -1091,6 +1220,7 @@ const SCHOOLS = [
   },
   {
     "name": "Virginia Tech",
+    "espnId": 259,
     "conference": "ACC",
     "startingPrestige": 3,
     "offenseScheme": "Power Spread",
@@ -1100,6 +1230,7 @@ const SCHOOLS = [
   },
   {
     "name": "Wake Forest",
+    "espnId": 154,
     "conference": "ACC",
     "startingPrestige": 2,
     "offenseScheme": "Spread",
@@ -1109,6 +1240,7 @@ const SCHOOLS = [
   },
   {
     "name": "Washington",
+    "espnId": 264,
     "conference": "Big Ten",
     "startingPrestige": 4,
     "offenseScheme": "Multiple Offense",
@@ -1118,6 +1250,7 @@ const SCHOOLS = [
   },
   {
     "name": "Washington St.",
+    "espnId": 265,
     "conference": "Pac-12",
     "startingPrestige": 2,
     "offenseScheme": "Pistol",
@@ -1125,6 +1258,7 @@ const SCHOOLS = [
   },
   {
     "name": "West Virginia",
+    "espnId": 277,
     "conference": "Big 12",
     "startingPrestige": 2.5,
     "offenseScheme": "Spread",
@@ -1134,6 +1268,7 @@ const SCHOOLS = [
   },
   {
     "name": "W. Kentucky",
+    "espnId": 98,
     "conference": "CUSA",
     "startingPrestige": 1.5,
     "offenseScheme": "Air Raid",
@@ -1141,6 +1276,7 @@ const SCHOOLS = [
   },
   {
     "name": "W. Michigan",
+    "espnId": 2711,
     "conference": "MAC",
     "startingPrestige": 1,
     "offenseScheme": "Spread",
@@ -1150,6 +1286,7 @@ const SCHOOLS = [
   },
   {
     "name": "Wisconsin",
+    "espnId": 275,
     "conference": "Big Ten",
     "startingPrestige": 3,
     "offenseScheme": "Multiple Offense",
@@ -1159,6 +1296,7 @@ const SCHOOLS = [
   },
   {
     "name": "Wyoming",
+    "espnId": 2751,
     "conference": "Mountain West",
     "startingPrestige": 1,
     "offenseScheme": "Multiple Offense",
