@@ -168,8 +168,8 @@ function renderHeader(state) {
 
   const showRecord = state.phase === "inseason" || state.phase === "recap";
   const record = showRecord ? seasonRecordSoFar(state) : null;
-  const recordPill = record
-    ? `<div class="pill pill--record">${record.wins}-${record.losses}</div>`
+  const recordBadge = record
+    ? `<div class="school-banner__record">${record.wins}-${record.losses}</div>`
     : "";
 
   return `
@@ -180,13 +180,15 @@ function renderHeader(state) {
           <div class="school-banner__sub">${escapeHtml(state.title)} &middot; ${escapeHtml(state.school)}</div>
           <div class="school-banner__meta">${escapeHtml(conf)} &middot; ${tier} &middot; Age ${state.age} &middot; ${state.year}</div>
         </div>
-        <div class="school-banner__logo">${teamLogoHtml(state.school, 48)}</div>
+        <div class="school-banner__side">
+          <div class="school-banner__logo">${teamLogoHtml(state.school, 48)}</div>
+          ${recordBadge}
+        </div>
       </div>
       <div class="header-row">
         <div class="pill">${stageLabel}</div>
         <div class="pill pill--rep">Reputation ${Math.round(state.reputation)}</div>
         <div class="pill ${state.jobSecurity <= 25 ? "pill--danger" : ""}">Job Security ${Math.round(state.jobSecurity)}</div>
-        ${recordPill}
       </div>
       <div class="stat-grid">${statsHtml}</div>
     </header>`;

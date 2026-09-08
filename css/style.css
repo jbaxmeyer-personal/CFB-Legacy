@@ -222,10 +222,17 @@ img {
   margin-top: 0.15rem;
 }
 
-.school-banner__logo {
+.school-banner__side {
   position: absolute;
   top: 1rem;
   right: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.school-banner__logo {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -235,6 +242,16 @@ img {
   align-items: center;
   justify-content: center;
   padding: 6px;
+}
+
+.school-banner__record {
+  background: rgba(10, 13, 18, 0.45);
+  backdrop-filter: blur(2px);
+  border-radius: 999px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #fff;
 }
 
 .team-logo-img {
@@ -278,12 +295,6 @@ img {
 .pill--danger {
   color: var(--danger);
   border-color: rgba(255, 59, 48, 0.4);
-}
-
-.pill--record {
-  color: var(--text-primary);
-  border-color: var(--border-strong);
-  font-weight: 800;
 }
 
 .stat-grid {
