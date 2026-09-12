@@ -134,6 +134,7 @@ function newCareer(coachName, archetype) {
     currentWeek: 0,
     dilemmaLog: [],
     momentLog: [],
+    regularSeasonComplete: false,
     phase: "preseason",
     lastSeasonResult: null,
     lastOffers: null,
@@ -264,9 +265,14 @@ function setPreseasonChoices(state, { trainingFocusId, philosophy, recruitingFoc
   state.currentWeek = 0;
   state.dilemmaLog = [];
   state.momentLog = [];
+  state.regularSeasonComplete = false;
   state.achievementsSnapshot = [...state.achievements];
   state.phase = "inseason";
   advanceWeeks(state);
+  // Only reachable if the whole season somehow had zero decisions — there's
+  // no outcome screen to show first in that case, so it's safe to jump
+  // straight into the postseason.
+  if (state.regularSeasonComplete) beginPostseason(state);
   save(state);
 }
 
@@ -352,13 +358,20 @@ function simulateWeek(state, weekIndex, extraPower, forcedWin) {
   return result;
 }
 
+// Does NOT start the postseason itself, even once every regular-season
+// week is simulated — if the just-resolved decision was the season's
+// last one, the player still needs to see that decision's outcome screen
+// first. Setting regularSeasonComplete instead lets the UI layer start
+// the postseason only once the player clicks past that outcome (see
+// main.js's "dilemma-continue" handler), the same deferred pattern the
+// postseason-to-postseason transition already uses.
 function advanceWeeks(state) {
   while (state.currentWeek < state.weekPlan.length) {
     const plan = state.weekPlan[state.currentWeek];
     if (plan.dilemmaId || plan.momentId) return;
     simulateWeek(state, state.currentWeek, 0);
   }
-  beginPostseason(state);
+  state.regularSeasonComplete = true;
 }
 
 function resolveDilemma(state, choiceIndex) {
