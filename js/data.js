@@ -1391,25 +1391,25 @@ const TRAINING_FOCUS_OPTIONS = [
     id: "conditioning",
     label: "Conditioning",
     description: "Grind the strength & conditioning program. Fewer late-game collapses, slower scheme install.",
-    effects: { development: 2, culture: 1 },
+    effects: { development: 4, culture: 2 },
   },
   {
     id: "scheme",
     label: "Scheme Installation",
     description: "Bury the playbook into muscle memory. Sharper execution on your side of the ball.",
-    effects: { offenseIQGain: 1, defenseIQGain: 1, development: 1 },
+    effects: { offenseIQGain: 2, defenseIQGain: 2, development: 2 },
   },
   {
     id: "discipline",
     label: "Culture & Discipline",
     description: "Tighten the locker room. Fewer off-field incidents, slower talent growth.",
-    effects: { culture: 3 },
+    effects: { culture: 6 },
   },
   {
     id: "development",
     label: "Player Development",
     description: "Individualized reps for underclassmen. Talent compounds season over season.",
-    effects: { development: 3 },
+    effects: { development: 6 },
   },
 ];
 
@@ -1418,23 +1418,23 @@ const RECRUITING_FOCUS_OPTIONS = [
     id: "blue_chip",
     label: "Blue-Chip Push",
     description: "Chase the state's top targets. High ceiling, but you can strike out and get nothing.",
-    talentGrowth: 4,
+    talentGrowth: 8,
     variance: 6,
   },
   {
     id: "balanced",
     label: "Balanced Class",
     description: "Fill needs across the board. Steady, unspectacular growth.",
-    talentGrowth: 2,
+    talentGrowth: 4,
     variance: 2,
   },
   {
     id: "in_state",
     label: "In-State Pipeline",
     description: "Lock down the home turf. Reliable, culture-friendly, modest upside.",
-    talentGrowth: 1.5,
+    talentGrowth: 3,
     variance: 1,
-    cultureBonus: 1,
+    cultureBonus: 2,
   },
 ];
 

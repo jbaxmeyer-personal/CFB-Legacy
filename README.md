@@ -7,34 +7,49 @@ championship along the way.
 Each season you pick a training focus (and, once you're calling the
 game as a Coordinator or Head Coach, a recruiting emphasis, a game
 philosophy, and your offensive/defensive scheme — these preseason picks
-are pure, guaranteed gains with no downside, by design), then play
-through a real week-by-week schedule against named opponents.
+are pure, guaranteed gains with no downside, by design, and a meaningful
+one at that), then play a real, realistic week-by-week schedule: 9
+conference games against your own conference's other members (as many
+as a small conference actually has, for the rare ones with fewer than
+10 teams) plus non-conference games filling out the 12-game slate.
 
-As a Coordinator or Head Coach, most weeks (6-9 out of 12) bring a live
-in-game tactical decision: 3rd-and-long (run or pass), 4th-and-short (go
-for it or punt), a big defensive snap (blitz, zone, or man), a trick play
-that's sat in the playbook all year, a rivalry-game identity call. These
-aren't scripted — each choice is graded by a real calculation comparing
+Every season brings exactly six decisions: four live in-game tactical
+calls and two off-field dilemmas. The tactical calls are the majority
+on purpose — 3rd-and-long (run or pass), 4th-and-short (go for it or
+punt), a big defensive snap (blitz, zone, or man), a trick play that's
+sat in the playbook all year, a rivalry-game identity call. These
+aren't scripted: each choice is graded by a real calculation comparing
 your team's passing/running/special-teams/composure rating (built from
 your scheme, coach stats, and team talent) against that week's actual
-opponent, so the same call can succeed on a mismatch and fail against a
-tougher team. A handful of weeks (3) bring an off-field dilemma instead —
-recruiting, a locker-room situation, a media moment — and every one of
-those has a genuine cost and benefit on both sides, never a free win.
-Position Coaches don't call plays, so their decisions are all off-field
-(5 a season). Every offseason you either stay, get poached by another
-program, earn a promotion, or — if the record was bad enough — get shown
-the door and have to find your next job.
+opponent, and getting the call right directly wins that game while
+getting it wrong directly loses it — the rating gap only decides how
+likely the call is to work, never whether working translates into a
+win. Position Coaches and Coordinators only see tactical calls for
+their own side of the ball (a Head Coach gets both); special-teams and
+game-management calls aren't tied to a side, so everyone sees those.
+The two off-field dilemmas — recruiting, a locker-room situation, a
+media moment — stay probabilistic instead, and every one of those has
+a genuine cost and benefit on both sides, never a free win. Every
+offseason you either stay, get poached by another program, earn a
+promotion, or — if the record was bad enough — get shown the door and
+have to find your next job.
 
-The postseason is modeled on the real 12-team CFP: a strong regular
-season earns a Conference Championship Game, the conference champion
-with an elite record gets a first-round bye, everyone else who qualifies
-plays into the bracket, and anyone bowl-eligible who misses the playoff
-plays one bowl game — every one of those games is simulated and counted,
-so a season's final record always reconciles (12 regular-season games
-plus however many postseason games were actually played). Final scores
-are built from real scoring-play combinations (touchdowns, field goals,
-safeties), not arbitrary numbers.
+The postseason is modeled on the real 12-team CFP. A Conference
+Championship Game is on the table for anyone still alive in the race —
+zero conference losses always gets you there, one loss is a coin flip,
+two or more and you're out — and the conference champion with an elite
+record gets a first-round bye into the playoff; everyone else who
+qualifies plays into the bracket, and anyone bowl-eligible who misses
+the playoff plays one bowl game. Every one of those games gets its own
+live tactical decision too, resolved the same win-follows-the-call way
+as a regular-season moment, one game at a time — win the CCG and you
+get a decision in the playoff; keep winning and you get one in each
+round, all the way to a National Championship decision. Every game is
+simulated and counted, so a season's final record always reconciles
+(12 regular-season games plus however many postseason games were
+actually played). Final scores are built from real scoring-play
+combinations (touchdowns, field goals, safeties), not arbitrary
+numbers.
 
 Your full coaching history is tracked: a career-stops table (school,
 title, years, seasons, cumulative record) plus career totals (bowl

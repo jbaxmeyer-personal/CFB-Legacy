@@ -147,6 +147,7 @@ function renderApp() {
   let body = "";
   if (state.phase === "preseason") body = renderPreseason(state);
   else if (state.phase === "inseason") body = renderInSeasonScreen(state);
+  else if (state.phase === "postseason") body = renderPostseasonScreen(state);
   else if (state.phase === "recap") body = renderRecap(state);
   else if (state.phase === "offseason") body = renderOffseason(state);
 
@@ -166,8 +167,10 @@ function renderHeader(state) {
 
   const statsHtml = STAT_KEYS.map((k) => statBar(STAT_LABELS[k], state.stats[k])).join("");
 
-  const showRecord = state.phase === "inseason" || state.phase === "recap";
-  const record = showRecord ? seasonRecordSoFar(state) : null;
+  let record = null;
+  if (state.phase === "inseason") record = seasonRecordSoFar(state);
+  else if (state.phase === "postseason" && state.postseason) record = { wins: state.postseason.wins, losses: state.postseason.losses };
+  else if (state.phase === "recap" && state.lastSeasonResult) record = { wins: state.lastSeasonResult.wins, losses: state.lastSeasonResult.losses };
   const recordBadge = record
     ? `<div class="school-banner__record">${record.wins}-${record.losses}</div>`
     : "";
@@ -455,6 +458,63 @@ function renderMomentScreen(state) {
 }
 
 /* ==========================================================================
+   Postseason: one live decision per game actually played (CCG, bowl, or
+   each playoff round), resolved and shown one at a time before the next
+   game is even generated.
+   ========================================================================== */
+
+function renderPostseasonScreen(state) {
+  const ps = state.postseason;
+  if (!ps) return `<div class="screen"><div class="panel"><p>Resolving the postseason...</p></div></div>`;
+
+  if (App.awaitingContinue && ps.momentLog.length) {
+    const last = ps.momentLog[ps.momentLog.length - 1];
+    const resultLabel = last.win ? "WIN" : "LOSS";
+    return `
+      <div class="screen">
+        <div class="panel event-panel">
+          <div class="muted">${last.success ? "✅ It worked" : "❌ It didn't work"}</div>
+          <h2>${escapeHtml(last.title)}</h2>
+          <p class="muted">You called: <strong>${escapeHtml(last.choiceLabel)}</strong></p>
+          <p>${escapeHtml(last.resultText)}</p>
+          <div class="game-result game-result--${last.win ? "win" : "loss"}">
+            <div class="game-result__label">${escapeHtml(last.stageLabel)}</div>
+            <div class="game-result__score">${resultLabel} ${last.us}-${last.them}</div>
+          </div>
+          <button class="btn btn-primary btn-block" data-action="dilemma-continue">Continue</button>
+        </div>
+      </div>`;
+  }
+
+  const moment = currentPostseasonMoment(state);
+  const slot = currentPostseasonSlot(state);
+  if (!moment || !slot) return `<div class="screen"><div class="panel"><p>Resolving the postseason...</p></div></div>`;
+  const situationText = moment.situation(ps.momentCtx);
+
+  const choices = moment.choices.map((c, i) => {
+    const risk = RISK_LABELS[c.risk] || RISK_LABELS.balanced;
+    const axisLabel = (MOMENT_AXIS_LABELS[moment.side] || {})[c.axis] || "";
+    return `
+    <button class="btn btn-choice" data-action="postseason-choice" data-index="${i}">
+      <div class="btn-choice__label">${escapeHtml(c.label)}</div>
+      <div class="btn-choice__tags">
+        <span class="risk-pill risk-pill--${c.risk}">${risk.icon} ${risk.tag}</span>
+        ${axisLabel ? `<span class="effect-pill">${escapeHtml(axisLabel)}</span>` : ""}
+      </div>
+    </button>`;
+  }).join("");
+
+  return `
+    <div class="screen">
+      <div class="panel event-panel">
+        <div class="muted">${escapeHtml(slot.label)} &middot; Live Game Decision</div>
+        <h2>${escapeHtml(situationText)}</h2>
+        <div class="choice-stack">${choices}</div>
+      </div>
+    </div>`;
+}
+
+/* ==========================================================================
    In-season dilemmas
    ========================================================================== */
 
@@ -535,9 +595,14 @@ function renderRecap(state) {
     return `<tr><td>${w.week}</td><td>${escapeHtml(w.opponent)}</td><td class="${resultClass}">${w.win ? "W" : "L"} ${w.us}-${w.them}</td><td>${note}</td></tr>`;
   }).join("");
 
+  const postseasonMomentByLabel = {};
+  (r.postseasonMomentLog || []).forEach((m) => { postseasonMomentByLabel[m.stageLabel] = m; });
+
   const postseasonRows = (r.postseason.games || []).map((g) => {
+    const m = postseasonMomentByLabel[g.label];
     const resultClass = g.win ? "result-win" : "result-loss";
-    return `<tr><td>&mdash;</td><td>${escapeHtml(g.label)}</td><td class="${resultClass}">${g.win ? "W" : "L"} ${g.us}-${g.them}</td><td class="muted">&mdash;</td></tr>`;
+    const note = m ? `${m.success ? "✅" : "❌"} ${escapeHtml(m.title)}: ${escapeHtml(m.choiceLabel)}` : `<span class="muted">&mdash;</span>`;
+    return `<tr><td>&mdash;</td><td>${escapeHtml(g.label)}</td><td class="${resultClass}">${g.win ? "W" : "L"} ${g.us}-${g.them}</td><td>${note}</td></tr>`;
   }).join("");
 
   const logHtml = state.dilemmaLog.map((d) => `
@@ -546,6 +611,8 @@ function renderRecap(state) {
 
   const momentsHtml = state.momentLog.map((m) => `
     <li>${m.success ? "✅" : "❌"} <strong>${escapeHtml(m.title)}</strong> (Week ${m.week} vs ${escapeHtml(m.opponent)}): ${escapeHtml(m.choiceLabel)} — <span class="muted">${escapeHtml(m.resultText)}</span> <span class="${m.win ? "result-win" : "result-loss"}">${m.win ? "W" : "L"} ${m.us}-${m.them}</span></li>
+  `).join("") + (r.postseasonMomentLog || []).map((m) => `
+    <li>${m.success ? "✅" : "❌"} <strong>${escapeHtml(m.title)}</strong> (${escapeHtml(m.stageLabel)}): ${escapeHtml(m.choiceLabel)} — <span class="muted">${escapeHtml(m.resultText)}</span> <span class="${m.win ? "result-win" : "result-loss"}">${m.win ? "W" : "L"} ${m.us}-${m.them}</span></li>
   `).join("");
 
   return `
@@ -561,7 +628,7 @@ function renderRecap(state) {
         <h2>Decisions That Shaped the Season</h2>
         <ul class="storyline-list">${logHtml}</ul>
       </div>
-      ${state.momentLog.length ? `
+      ${momentsHtml ? `
       <div class="panel">
         <h2>Big Moments</h2>
         <ul class="storyline-list">${momentsHtml}</ul>
