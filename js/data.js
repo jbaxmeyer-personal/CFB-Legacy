@@ -2346,13 +2346,13 @@ const DILEMMA_EVENTS = [
     ],
   },
   {
-    id: "all_star_game_snub",
+    id: "player_of_week_snub",
     stages: ["coordinator", "headcoach"],
-    title: "All-Star Game Snub",
-    text: () => `One of your incoming signees gets left off a national all-star game roster — he's furious.`,
+    title: "Player of the Week Snub",
+    text: () => `One of your players puts together a huge performance, but the conference names someone else Player of the Week instead — he's furious.`,
     choices: [
-      { label: "Publicly back him", effects: { mediaSavvy: 1, recruiting: 1, culture: -1 }, outcome: "He feels seen — and a couple of teammates wonder why he needed the extra attention." },
-      { label: "Stay out of it", effects: { recruiting: -1, culture: 1 }, outcome: "Not your fight — and he notices you didn't step in. Still, the room respects the honesty." },
+      { label: "Publicly back him", effects: { mediaSavvy: 1, culture: -1 }, outcome: "He feels seen — and a couple of teammates wonder why he needed the extra attention." },
+      { label: "Stay out of it", effects: { culture: 1, mediaSavvy: -1 }, outcome: "Not your fight — and he notices you didn't step in. Still, the room respects the honesty." },
     ],
   },
   {
