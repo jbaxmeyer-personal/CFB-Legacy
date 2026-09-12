@@ -162,6 +162,23 @@ function talentOf(state, schoolName) {
   return initTalent(state, schoolName);
 }
 
+// A program's real standing evolves with what you've built there (talent
+// grown through recruiting/development/wins), not just where it started —
+// so "team status" is read off the current, drifting talent number rather
+// than the school's frozen startingPrestige. talentOf's scale roughly
+// mirrors startingPrestige*16, so this just inverts that.
+function currentPrestige(state, schoolName) {
+  return clamp(talentOf(state, schoolName) / 16, 0, 5);
+}
+
+// How good a team at this prestige level "should" be — used to judge a
+// season by whether it beat or missed expectations, not by a flat
+// win-percentage bucket that treats a 10-3 year the same at a blue blood
+// and at a bottom feeder.
+function expectedWinPct(prestige) {
+  return clamp(0.32 + prestige * 0.086, 0.25, 0.78);
+}
+
 function grantAchievement(state, id) {
   if (!state.achievements.includes(id)) state.achievements.push(id);
 }
@@ -607,7 +624,7 @@ function pickPostseasonOpponent(state, oppPowerBase, exclude) {
 function planPostseasonRounds(state, wins, conferenceChampion, exclude) {
   const school = getSchool(state.school);
   const cWeight = conferenceWeight(school ? school.conference : "Independent");
-  const prestigeQualified = school && school.startingPrestige >= 3;
+  const prestigeQualified = currentPrestige(state, state.school) >= 3;
   const playoffQualified = prestigeQualified && (conferenceChampion || wins >= 10);
   const used = [...exclude];
 
@@ -813,6 +830,11 @@ function applyEndOfSeasonGrowth(state, result) {
   // (matching the guaranteed-gain pill shown on the preseason card), not
   // deferred to here.
 
+  // Captured before this season's growth is applied, so the reputation
+  // swing below judges the season against the team's status going INTO
+  // it, not the status it just grew into because of it.
+  const prestigeGoingIn = currentPrestige(state, state.school);
+
   let talentGrowth = (result.winPct - 0.5) * 6;
   if (isRecruitingStage(state.stage)) {
     const rFocus = RECRUITING_FOCUS_OPTIONS.find((f) => f.id === state.recruitingFocusId);
@@ -828,10 +850,12 @@ function applyEndOfSeasonGrowth(state, result) {
   state.teamTalent[state.school] = clamp(cur + talentGrowth, 5, 99);
   driftOtherTalents(state);
 
-  if (result.winPct > 0.7) state.reputation = clamp(state.reputation + 4, 0, 100);
-  else if (result.winPct > 0.5) state.reputation = clamp(state.reputation + 1, 0, 100);
-  else if (result.winPct < 0.25) state.reputation = clamp(state.reputation - 4, 0, 100);
-  else if (result.winPct < 0.42) state.reputation = clamp(state.reputation - 1, 0, 100);
+  // Reputation moves with how far the season beat or missed what a team
+  // of this status "should" do, not a flat win-percentage bucket — a 10-3
+  // year is a much bigger deal at a Rebuilding program than at a Blue
+  // Blood, and should move the needle a lot more.
+  const repDelta = Math.round((result.winPct - expectedWinPct(prestigeGoingIn)) * 24);
+  state.reputation = clamp(state.reputation + repDelta, 0, 100);
 
   let secDelta = (result.winPct - 0.5) * 24;
   state.jobSecurity = clamp(state.jobSecurity + secDelta, 0, 100);
@@ -897,9 +921,11 @@ function finishSeasonAfterPostseason(state) {
    Offseason / job market
    ========================================================================== */
 
+// Drives the prestige band future job offers are drawn from, so a coach
+// who's actually built a program up (or run one into the ground) sees
+// offers reflecting that, not just the job's native starting tier.
 function currentSchoolPrestige(state) {
-  const s = getSchool(state.school);
-  return s ? s.startingPrestige : 1;
+  return currentPrestige(state, state.school);
 }
 
 function beginOffseason(state) {
