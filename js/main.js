@@ -88,6 +88,7 @@ function handleClick(e) {
     case "dilemma-continue": {
       App.awaitingContinue = false;
       if (App.state.phase === "postseason") continuePostseason(App.state);
+      else if (App.state.phase === "inseason" && App.state.regularSeasonComplete) beginPostseason(App.state);
       renderApp();
       break;
     }
