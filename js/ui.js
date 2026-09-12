@@ -123,6 +123,19 @@ function seasonRecordSoFar(state) {
   return { wins, losses };
 }
 
+const POSTSEASON_STAGE_TAGS = {
+  "Conference Championship": "CCG",
+  "Bowl Game": "Bowl",
+  "Playoff First Round": "R1",
+  "Playoff Quarterfinal": "QF",
+  "Playoff Semifinal": "SF",
+  "National Championship": "NC",
+};
+
+function postseasonStageTag(label) {
+  return POSTSEASON_STAGE_TAGS[label] || label;
+}
+
 function statBar(label, value) {
   const pct = clamp(value, 0, 100);
   return `
@@ -478,7 +491,7 @@ function renderPostseasonScreen(state) {
           <p class="muted">You called: <strong>${escapeHtml(last.choiceLabel)}</strong></p>
           <p>${escapeHtml(last.resultText)}</p>
           <div class="game-result game-result--${last.win ? "win" : "loss"}">
-            <div class="game-result__label">${escapeHtml(last.stageLabel)}</div>
+            <div class="game-result__label">${escapeHtml(last.stageLabel)} vs ${escapeHtml(last.opponent)}</div>
             <div class="game-result__score">${resultLabel} ${last.us}-${last.them}</div>
           </div>
           <button class="btn btn-primary btn-block" data-action="dilemma-continue">Continue</button>
@@ -507,7 +520,7 @@ function renderPostseasonScreen(state) {
   return `
     <div class="screen">
       <div class="panel event-panel">
-        <div class="muted">${escapeHtml(slot.label)} &middot; Live Game Decision</div>
+        <div class="muted">${escapeHtml(slot.label)} vs ${escapeHtml(slot.opponent)} &middot; Live Game Decision</div>
         <h2>${escapeHtml(situationText)}</h2>
         <div class="choice-stack">${choices}</div>
       </div>
@@ -602,7 +615,7 @@ function renderRecap(state) {
     const m = postseasonMomentByLabel[g.label];
     const resultClass = g.win ? "result-win" : "result-loss";
     const note = m ? `${m.success ? "✅" : "❌"} ${escapeHtml(m.title)}: ${escapeHtml(m.choiceLabel)}` : `<span class="muted">&mdash;</span>`;
-    return `<tr><td>&mdash;</td><td>${escapeHtml(g.label)}</td><td class="${resultClass}">${g.win ? "W" : "L"} ${g.us}-${g.them}</td><td>${note}</td></tr>`;
+    return `<tr><td>${escapeHtml(postseasonStageTag(g.label))}</td><td>${escapeHtml(g.opponent || g.label)}</td><td class="${resultClass}">${g.win ? "W" : "L"} ${g.us}-${g.them}</td><td>${note}</td></tr>`;
   }).join("");
 
   const logHtml = state.dilemmaLog.map((d) => `
@@ -612,7 +625,7 @@ function renderRecap(state) {
   const momentsHtml = state.momentLog.map((m) => `
     <li>${m.success ? "✅" : "❌"} <strong>${escapeHtml(m.title)}</strong> (Week ${m.week} vs ${escapeHtml(m.opponent)}): ${escapeHtml(m.choiceLabel)} — <span class="muted">${escapeHtml(m.resultText)}</span> <span class="${m.win ? "result-win" : "result-loss"}">${m.win ? "W" : "L"} ${m.us}-${m.them}</span></li>
   `).join("") + (r.postseasonMomentLog || []).map((m) => `
-    <li>${m.success ? "✅" : "❌"} <strong>${escapeHtml(m.title)}</strong> (${escapeHtml(m.stageLabel)}): ${escapeHtml(m.choiceLabel)} — <span class="muted">${escapeHtml(m.resultText)}</span> <span class="${m.win ? "result-win" : "result-loss"}">${m.win ? "W" : "L"} ${m.us}-${m.them}</span></li>
+    <li>${m.success ? "✅" : "❌"} <strong>${escapeHtml(m.title)}</strong> (${escapeHtml(m.stageLabel)} vs ${escapeHtml(m.opponent)}): ${escapeHtml(m.choiceLabel)} — <span class="muted">${escapeHtml(m.resultText)}</span> <span class="${m.win ? "result-win" : "result-loss"}">${m.win ? "W" : "L"} ${m.us}-${m.them}</span></li>
   `).join("");
 
   return `
