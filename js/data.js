@@ -3848,6 +3848,7 @@ const GAME_MOMENTS = [
   {
     id: "comeback_two_minute_drive",
     side: "offense",
+    scoreBias: "trailing",
     situation: (ctx) => `Trailing late, driving with under two minutes, ${ctx.score}, ${ctx.quarter}.`,
     choices: [
       { label: "Air it out down the field", axis: "pass", risk: "aggressive", success: () => "A miraculous string of completions gets you into scoring position.", fail: () => "A costly interception ends the drive and the comeback hopes." },
@@ -3886,6 +3887,7 @@ const GAME_MOMENTS = [
   {
     id: "prevent_defense_debate",
     side: "defense",
+    scoreBias: "leading",
     situation: (ctx) => `${ctx.opponent} threaten late with a lead in hand for you, ${ctx.score}, ${ctx.quarter}.`,
     choices: [
       { label: "Keep the pressure on, play it aggressively", axis: "pass", risk: "aggressive", success: () => "The pressure forces a rushed, errant throw. Interception!", fail: () => "The blitz leaves single coverage on an island — burned deep." },
@@ -3969,6 +3971,7 @@ const GAME_MOMENTS = [
   {
     id: "onside_kick_attempt",
     side: "special",
+    scoreBias: "trailing",
     situation: (ctx) => `Trailing late, you need the ball back, ${ctx.score}, ${ctx.quarter}.`,
     choices: [
       { label: "Try the surprise onside kick", axis: "special", risk: "aggressive", success: () => "Recovered! The onside kick gives you the ball right back.", fail: () => "They recover instead — a gift of great field position." },
@@ -4088,6 +4091,7 @@ const GAME_MOMENTS = [
   {
     id: "blowout_lead_management",
     side: "poise",
+    scoreBias: "bigLeading",
     situation: (ctx) => `A big lead in hand, ${ctx.score}, ${ctx.quarter}. How do you manage the rest of the game?`,
     choices: [
       { label: "Keep the starters in, chase more points", axis: "poise", risk: "aggressive", success: () => "The starters pad the lead further — a statement win.", fail: () => "An unnecessary injury risk nearly bites you late." },
@@ -4097,6 +4101,7 @@ const GAME_MOMENTS = [
   {
     id: "double_digit_deficit_response",
     side: "poise",
+    scoreBias: "bigTrailing",
     situation: (ctx) => `Down big on the road, ${ctx.score}, ${ctx.quarter}. Some teams fold here.`,
     choices: [
       { label: "Challenge the team to fight until the whistle", axis: "poise", risk: "aggressive", success: () => "The message lands — a furious response that makes it a game again.", fail: () => "The deficit only grows as things unravel further." },
