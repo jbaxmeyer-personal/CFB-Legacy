@@ -175,7 +175,7 @@ function renderHeader(state) {
   const school = getSchool(state.school);
   const gradient = teamGradient(state.school);
   const conf = school ? (CONFERENCE_NAMES[school.conference] || school.conference) : "";
-  const tier = school ? prestigeLabel(school.startingPrestige) : "";
+  const tier = school ? prestigeLabel(currentPrestige(state, state.school)) : "";
   const stageLabel = STAGE_LABELS[state.stage];
 
   const statsHtml = STAT_KEYS.map((k) => statBar(STAT_LABELS[k], state.stats[k])).join("");
@@ -685,7 +685,10 @@ function renderOffseason(state) {
     const school = getSchool(o.school);
     const gradient = teamGradient(o.school);
     const conf = school ? (CONFERENCE_NAMES[school.conference] || school.conference) : "";
-    const tier = school ? prestigeLabel(school.startingPrestige) : "";
+    // The "stay" card is your current program, so its tier reflects what
+    // you've actually built there; other offers show the job's own
+    // native standing, since you haven't coached those programs yet.
+    const tier = school ? prestigeLabel(o.kind === "stay" ? currentPrestige(state, o.school) : school.startingPrestige) : "";
     const kindLabel = o.kind === "stay" ? "Stay" : o.kind === "promotion" ? "Promotion" : "Lateral Move";
     return `
       <div class="offer-card">
