@@ -594,28 +594,46 @@ function ccgQualifyChance(confLosses) {
   return 0;
 }
 
-function planPostseasonRounds(state, wins, conferenceChampion) {
+// Every postseason game gets a real opponent school (picked by a prestige
+// band matching how tough that round should be), not just a synthetic
+// power number — so the recap can say who you actually played, and so
+// moment text that references ${ctx.opponent} isn't left showing "Bowl
+// Game" as if it were a team name.
+function pickPostseasonOpponent(state, oppPowerBase, exclude) {
+  const centerPrestige = oppPowerBase / 16;
+  return pickSchoolByPrestigeRange(clamp(centerPrestige - 1, 0, 5), clamp(centerPrestige + 1, 0, 5), exclude);
+}
+
+function planPostseasonRounds(state, wins, conferenceChampion, exclude) {
   const school = getSchool(state.school);
   const cWeight = conferenceWeight(school ? school.conference : "Independent");
   const prestigeQualified = school && school.startingPrestige >= 3;
   const playoffQualified = prestigeQualified && (conferenceChampion || wins >= 10);
+  const used = [...exclude];
 
   if (playoffQualified) {
     const bye = conferenceChampion && wins >= 11;
     const rounds = bye
       ? ["Playoff Quarterfinal", "Playoff Semifinal", "National Championship"]
       : ["Playoff First Round", "Playoff Quarterfinal", "Playoff Semifinal", "National Championship"];
-    return { playoffQualified: true, slots: rounds.map((label, i) => ({ label, oppPowerBase: 58 + i * 4, spread: 10 })) };
+    const slots = rounds.map((label, i) => {
+      const opp = pickPostseasonOpponent(state, 58 + i * 4, used);
+      used.push(opp.name);
+      return { label, opponent: opp.name, spread: 10 };
+    });
+    return { playoffQualified: true, slots };
   }
   if (wins >= 6) {
-    return { playoffQualified: false, slots: [{ label: "Bowl Game", oppPowerBase: 40 + cWeight * 0.5, spread: 10 }] };
+    const opp = pickPostseasonOpponent(state, 40 + cWeight * 0.5, used);
+    return { playoffQualified: false, slots: [{ label: "Bowl Game", opponent: opp.name, spread: 10 }] };
   }
   return { playoffQualified: false, slots: [] };
 }
 
 function planPostseasonMainStage(state) {
   const ps = state.postseason;
-  const planned = planPostseasonRounds(state, ps.wins, ps.conferenceChampion);
+  const exclude = [state.school, ...ps.games.map((g) => g.opponent).filter(Boolean)];
+  const planned = planPostseasonRounds(state, ps.wins, ps.conferenceChampion, exclude);
   ps.playoffQualified = planned.playoffQualified;
   if (planned.playoffQualified) grantAchievement(state, "playoff");
   ps.queue = planned.slots;
@@ -651,7 +669,8 @@ function beginPostseason(state) {
   state.phase = "postseason";
 
   if (myConf && Math.random() < ccgQualifyChance(confLosses)) {
-    state.postseason.queue = [{ label: "Conference Championship", oppPowerBase: 58, spread: 10, isCCG: true }];
+    const ccgOpponent = pickPostseasonOpponent(state, 58, [state.school]);
+    state.postseason.queue = [{ label: "Conference Championship", opponent: ccgOpponent.name, spread: 10, isCCG: true }];
   } else {
     state.postseason.stage = "main";
     planPostseasonMainStage(state);
@@ -689,7 +708,7 @@ function advancePostseasonStep(state) {
     distance: randInt(2, 12),
     score: scoreText(randomScoreDiff(moment.scoreBias)),
     quarter: quarterText(randInt(1, 4)),
-    opponent: slot.label,
+    opponent: slot.opponent,
   };
   save(state);
 }
@@ -705,7 +724,7 @@ function resolvePostseasonMoment(state, choiceIndex) {
   if (!choice) return;
 
   const my = selfMomentRating(state, moment.side, choice.axis);
-  const opp = slot.oppPowerBase + randRange(-slot.spread, slot.spread);
+  const opp = talentOf(state, slot.opponent) + randRange(-slot.spread, slot.spread);
   const profile = RISK_PROFILES[choice.risk];
   const gap = my - opp;
   const successProb = clamp(profile.successBase + gap / 150, 0.08, 0.92);
@@ -715,7 +734,7 @@ function resolvePostseasonMoment(state, choiceIndex) {
   const power = teamPower(state) + (success ? profile.successReward : profile.failCost);
   const score = generateScore(power, opp, win);
 
-  ps.games.push({ label: slot.label, win, us: score.us, them: score.them });
+  ps.games.push({ label: slot.label, opponent: slot.opponent, win, us: score.us, them: score.them });
   if (win) ps.wins++; else ps.losses++;
 
   if (slot.isCCG) {
@@ -750,6 +769,7 @@ function resolvePostseasonMoment(state, choiceIndex) {
 
   ps.momentLog.push({
     stageLabel: slot.label,
+    opponent: slot.opponent,
     title: momentTitle(moment.id),
     choiceLabel: choice.label,
     success,
