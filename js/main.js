@@ -78,8 +78,16 @@ function handleClick(e) {
       renderApp();
       break;
     }
+    case "postseason-choice": {
+      const index = parseInt(btn.getAttribute("data-index"), 10);
+      resolvePostseasonMoment(App.state, index);
+      App.awaitingContinue = true;
+      renderApp();
+      break;
+    }
     case "dilemma-continue": {
       App.awaitingContinue = false;
+      if (App.state.phase === "postseason") continuePostseason(App.state);
       renderApp();
       break;
     }

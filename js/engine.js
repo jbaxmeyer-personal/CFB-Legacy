@@ -5,16 +5,24 @@
 const STORAGE_KEY = "cfbLegacySave";
 const STARTING_YEAR = 2026;
 const GAMES_PER_SEASON = 12;
-const MOMENTS_PER_SEASON_MIN = 6;
-const MOMENTS_PER_SEASON_MAX = 9;
+const CONFERENCE_GAMES_TARGET = 9;
+// Six regular-season decisions total: four in-game tactical moments (the
+// majority, calculated live off a real rating gap) and two off-field
+// dilemmas. Postseason games each get their own decision on top of this.
+const MOMENTS_PER_SEASON = 4;
+const DILEMMAS_PER_SEASON = 2;
 
-function dilemmasForStage(stage) {
-  // Coordinators/HCs get game moments as their main decisions; dilemmas
-  // stay a minority flavor. Position coaches don't call plays, so their
-  // off-field dilemmas are their only decisions each season.
-  return stage === "position" ? 5 : 3;
-}
 const STAT_KEYS = ["offenseIQ", "defenseIQ", "recruiting", "development", "culture", "mediaSavvy"];
+
+// Position coaches and coordinators only call the side of the ball they
+// actually coach; a Head Coach oversees both. "special"/"poise" moments
+// (special teams, game management, composure) aren't tied to either side,
+// so everyone sees those regardless of archetype.
+function eligibleMoments(state) {
+  if (state.stage === "headcoach") return GAME_MOMENTS;
+  const opposite = state.archetype === "offense" ? "defense" : "offense";
+  return GAME_MOMENTS.filter((m) => m.side !== opposite);
+}
 
 function clamp(v, min, max) {
   return Math.max(min, Math.min(max, v));
@@ -177,28 +185,25 @@ function generateWeekPlan(state) {
   const myConf = mySchool ? mySchool.conference : null;
   const fullPool = SCHOOLS.filter((s) => s.name !== state.school);
   const confPool = fullPool.filter((s) => s.conference === myConf);
+  const nonConfPool = fullPool.filter((s) => s.conference !== myConf);
 
-  const used = new Set([state.school]);
-  const opponents = [];
-  for (let i = 0; i < GAMES_PER_SEASON; i++) {
-    const useConf = confPool.length > 0 && Math.random() < 0.55;
-    const candidatePool = useConf ? confPool : fullPool;
-    let choice = pick(candidatePool);
-    let tries = 0;
-    while (used.has(choice.name) && tries < 30) {
-      choice = pick(candidatePool);
-      tries++;
-    }
-    used.add(choice.name);
-    opponents.push(choice.name);
-  }
+  // Realistic conference scheduling: 9 conference games (or as many as a
+  // small conference actually has other members for) plus non-conference
+  // games filling the rest of the 12-game slate.
+  const confGameCount = myConf ? Math.min(CONFERENCE_GAMES_TARGET, confPool.length) : 0;
+  const shuffledConf = [...confPool].sort(() => Math.random() - 0.5).slice(0, confGameCount);
+  const nonConfGameCount = GAMES_PER_SEASON - shuffledConf.length;
+  const shuffledNonConf = [...nonConfPool].sort(() => Math.random() - 0.5).slice(0, nonConfGameCount);
+
+  const schedule = [...shuffledConf.map((s) => ({ name: s.name, conference: true })), ...shuffledNonConf.map((s) => ({ name: s.name, conference: false }))]
+    .sort(() => Math.random() - 0.5);
 
   const eligibleEvents = DILEMMA_EVENTS.filter((e) => e.stages.includes(state.stage));
-  const shuffledEvents = [...eligibleEvents].sort(() => Math.random() - 0.5).slice(0, dilemmasForStage(state.stage));
+  const shuffledEvents = [...eligibleEvents].sort(() => Math.random() - 0.5).slice(0, DILEMMAS_PER_SEASON);
   const weekIndices = Array.from({ length: GAMES_PER_SEASON }, (_, i) => i);
   const dilemmaWeeks = [...weekIndices].sort(() => Math.random() - 0.5).slice(0, shuffledEvents.length).sort((a, b) => a - b);
 
-  const plan = opponents.map((opp, i) => ({ week: i + 1, opponent: opp, dilemmaId: null, momentId: null, momentCtx: null }));
+  const plan = schedule.map((opp, i) => ({ week: i + 1, opponent: opp.name, conference: opp.conference, dilemmaId: null, momentId: null, momentCtx: null }));
   dilemmaWeeks.forEach((wIdx, i) => {
     plan[wIdx].dilemmaId = shuffledEvents[i].id;
   });
@@ -207,9 +212,10 @@ function generateWeekPlan(state) {
   // the majority decision type at every coaching stage, not just once
   // you're calling plays as a coordinator or head coach.
   const remaining = weekIndices.filter((i) => !dilemmaWeeks.includes(i));
-  const momentCount = Math.min(randInt(MOMENTS_PER_SEASON_MIN, MOMENTS_PER_SEASON_MAX), remaining.length);
+  const momentPool = eligibleMoments(state);
+  const momentCount = Math.min(MOMENTS_PER_SEASON, remaining.length);
   const momentWeeks = [...remaining].sort(() => Math.random() - 0.5).slice(0, momentCount);
-  const shuffledMoments = [...GAME_MOMENTS].sort(() => Math.random() - 0.5).slice(0, momentWeeks.length);
+  const shuffledMoments = [...momentPool].sort(() => Math.random() - 0.5).slice(0, momentWeeks.length);
   momentWeeks.forEach((wIdx, i) => {
     plan[wIdx].momentId = shuffledMoments[i].id;
     plan[wIdx].momentCtx = {
@@ -320,12 +326,12 @@ function generateScore(power, oppPower, won) {
   return { us, them };
 }
 
-function simulateWeek(state, weekIndex, extraPower) {
+function simulateWeek(state, weekIndex, extraPower, forcedWin) {
   const plan = state.weekPlan[weekIndex];
   const variance = philosophyVariance(state.philosophy);
   const power = teamPower(state) + (extraPower || 0);
   const oppPower = talentOf(state, plan.opponent) + randRange(-6, 6);
-  const won = simulateGame(power, oppPower, variance);
+  const won = forcedWin === undefined ? simulateGame(power, oppPower, variance) : forcedWin;
   const score = generateScore(power, oppPower, won);
   const result = { week: plan.week, opponent: plan.opponent, us: score.us, them: score.them, win: won };
   state.weekResults.push(result);
@@ -339,7 +345,7 @@ function advanceWeeks(state) {
     if (plan.dilemmaId || plan.momentId) return;
     simulateWeek(state, state.currentWeek, 0);
   }
-  finishSeason(state);
+  beginPostseason(state);
 }
 
 function resolveDilemma(state, choiceIndex) {
@@ -422,21 +428,29 @@ function oppPoise(state, name) {
   return talentOf(state, name) * 0.6 + 10;
 }
 
-function momentRatings(state, side, axis, opponentName) {
-  if (side === "offense") {
-    return axis === "run"
-      ? { my: selfRunOffense(state), opp: oppRunDefense(state, opponentName) }
-      : { my: selfPassOffense(state), opp: oppPassDefense(state, opponentName) };
-  }
-  if (side === "defense") {
-    return axis === "run"
-      ? { my: selfRunDefense(state), opp: oppRunOffense(state, opponentName) }
-      : { my: selfPassDefense(state), opp: oppPassOffense(state, opponentName) };
-  }
-  if (side === "special") return { my: selfSpecialTeams(state), opp: oppSpecialTeams(state, opponentName) };
-  return { my: selfPoise(state), opp: oppPoise(state, opponentName) };
+function selfMomentRating(state, side, axis) {
+  if (side === "offense") return axis === "run" ? selfRunOffense(state) : selfPassOffense(state);
+  if (side === "defense") return axis === "run" ? selfRunDefense(state) : selfPassDefense(state);
+  if (side === "special") return selfSpecialTeams(state);
+  return selfPoise(state);
 }
 
+function momentRatings(state, side, axis, opponentName) {
+  const my = selfMomentRating(state, side, axis);
+  let opp;
+  if (side === "offense") opp = axis === "run" ? oppRunDefense(state, opponentName) : oppPassDefense(state, opponentName);
+  else if (side === "defense") opp = axis === "run" ? oppRunOffense(state, opponentName) : oppPassOffense(state, opponentName);
+  else if (side === "special") opp = oppSpecialTeams(state, opponentName);
+  else opp = oppPoise(state, opponentName);
+  return { my, opp };
+}
+
+/* A live in-game call directly decides that game's outcome: pull off the
+   read (pass vs. blitz, a trick play, going for it) and you win it; get it
+   wrong and you lose it. The rating gap only shapes how likely the call is
+   to work, not whether working translates into a win — that link is
+   direct, the way a coach actually feels it from the sideline. Off-field
+   dilemmas stay probabilistic since they aren't a live football decision. */
 function resolveGameMoment(state, choiceIndex) {
   const weekIdx = state.currentWeek;
   const plan = state.weekPlan[weekIdx];
@@ -453,7 +467,7 @@ function resolveGameMoment(state, choiceIndex) {
   const success = Math.random() < successProb;
   const weekPowerDelta = success ? profile.successReward : profile.failCost;
 
-  const gameResult = simulateWeek(state, weekIdx, weekPowerDelta);
+  const gameResult = simulateWeek(state, weekIdx, weekPowerDelta, success);
 
   state.momentLog.push({
     week: plan.week,
@@ -533,88 +547,199 @@ function simulateGame(power, oppPower, variance) {
    End of season: postseason, growth, world drift
    ========================================================================== */
 
-/* Postseason follows the real 12-team CFP shape: a Power-conference team
-   with a strong enough regular season plays a Conference Championship
-   Game (its result folds into the record); the conference champion (with
-   an elite record) earns a bye straight to the quarterfinal, other
-   playoff qualifiers start in the first round; anyone bowl-eligible who
-   doesn't make the playoff plays exactly one bowl game instead. Every
-   game here — CCG, bowl, or playoff round — is simulated and its
-   win/loss is added to the season's win-loss total, so the final record
-   always accounts for every game actually played. */
-function resolvePostseason(state, power, cWeight, variance, regWins, regLosses) {
-  const games = [];
-  let wins = regWins;
-  let losses = regLosses;
-  let label = "No bowl";
-  let conferenceChampion = false;
-  let playoffQualified = false;
-  let natty = false;
+/* Postseason follows the real 12-team CFP shape: a conference-championship
+   game for anyone still in the conference race (0 conference losses always
+   qualifies, 1 loss is a coin flip), a bye to the quarterfinal for an elite
+   conference champion, other playoff qualifiers starting in the first
+   round, and exactly one bowl game for anyone bowl-eligible who misses the
+   playoff. Every postseason game — CCG, bowl, or playoff round — gets its
+   own live decision, same as an in-season moment, and that decision
+   directly decides the game (see resolveGameMoment). The whole thing is a
+   stepwise queue rather than one synchronous resolve, so each game's
+   decision and outcome renders before the next one is even generated. */
+function computeConferenceLosses(state) {
+  const confWeeks = new Set(state.weekPlan.filter((p) => p.conference).map((p) => p.week));
+  return state.weekResults.filter((r) => confWeeks.has(r.week) && !r.win).length;
+}
 
-  function playGame(gameLabel, oppPowerBase, spread) {
-    const oppPower = oppPowerBase + randRange(-spread, spread);
-    const win = simulateGame(power, oppPower, variance);
-    const score = generateScore(power, oppPower, win);
-    games.push({ label: gameLabel, win, us: score.us, them: score.them });
-    if (win) wins++; else losses++;
-    return win;
-  }
+function ccgQualifyChance(confLosses) {
+  if (confLosses <= 0) return 1;
+  if (confLosses === 1) return 0.5;
+  return 0;
+}
 
-  const isPowerConf = cWeight >= 14;
-  let playedCCG = false;
-  if (isPowerConf && regWins >= 9) {
-    const qualifyChance = clamp((regWins - 8) * 0.25, 0, 0.75);
-    if (Math.random() < qualifyChance) {
-      playedCCG = true;
-      const win = playGame("Conference Championship", 58, 10);
-      conferenceChampion = win;
-      if (win) {
-        label = "Conference Champion";
-        state.reputation = clamp(state.reputation + 5, 0, 100);
-        grantAchievement(state, "conference_champ");
-      } else {
-        label = "Conference Championship — runner-up";
-      }
-    }
-  }
-
+function planPostseasonRounds(state, wins, conferenceChampion) {
   const school = getSchool(state.school);
+  const cWeight = conferenceWeight(school ? school.conference : "Independent");
   const prestigeQualified = school && school.startingPrestige >= 3;
-  playoffQualified = prestigeQualified && (conferenceChampion || wins >= 10);
+  const playoffQualified = prestigeQualified && (conferenceChampion || wins >= 10);
 
   if (playoffQualified) {
-    grantAchievement(state, "playoff");
     const bye = conferenceChampion && wins >= 11;
     const rounds = bye
       ? ["Playoff Quarterfinal", "Playoff Semifinal", "National Championship"]
       : ["Playoff First Round", "Playoff Quarterfinal", "Playoff Semifinal", "National Championship"];
-    label = bye ? "Playoff — lost in the quarterfinal" : "Playoff — lost in the first round";
-    for (let i = 0; i < rounds.length; i++) {
-      const win = playGame(rounds[i], 58 + i * 4, 10);
-      if (!win) {
-        label = rounds[i] === "National Championship"
-          ? "National Championship — runner-up"
-          : `Playoff — lost in the ${rounds[i].replace("Playoff ", "").toLowerCase()}`;
-        break;
-      }
-      if (i === rounds.length - 1) {
-        natty = true;
-        label = "National Champion";
-        state.reputation = clamp(state.reputation + 20, 0, 100);
-        grantAchievement(state, "national_champ");
-        if (Math.random() < 0.5) grantAchievement(state, "coach_of_year");
-      }
+    return { playoffQualified: true, slots: rounds.map((label, i) => ({ label, oppPowerBase: 58 + i * 4, spread: 10 })) };
+  }
+  if (wins >= 6) {
+    return { playoffQualified: false, slots: [{ label: "Bowl Game", oppPowerBase: 40 + cWeight * 0.5, spread: 10 }] };
+  }
+  return { playoffQualified: false, slots: [] };
+}
+
+function planPostseasonMainStage(state) {
+  const ps = state.postseason;
+  const planned = planPostseasonRounds(state, ps.wins, ps.conferenceChampion);
+  ps.playoffQualified = planned.playoffQualified;
+  if (planned.playoffQualified) grantAchievement(state, "playoff");
+  ps.queue = planned.slots;
+  ps.queueIndex = 0;
+  if (planned.slots.length === 0 && !ps.ccgPlayed) ps.label = "No bowl";
+}
+
+function beginPostseason(state) {
+  const regWins = state.weekResults.filter((r) => r.win).length;
+  const regLosses = state.weekResults.length - regWins;
+  const school = getSchool(state.school);
+  const myConf = school ? school.conference : null;
+  const confLosses = computeConferenceLosses(state);
+
+  state.postseason = {
+    regWins,
+    regLosses,
+    wins: regWins,
+    losses: regLosses,
+    conferenceChampion: false,
+    playoffQualified: false,
+    natty: false,
+    label: "No bowl",
+    ccgPlayed: false,
+    games: [],
+    momentLog: [],
+    queue: [],
+    queueIndex: 0,
+    stage: "ccg",
+    momentId: null,
+    momentCtx: null,
+  };
+  state.phase = "postseason";
+
+  if (myConf && Math.random() < ccgQualifyChance(confLosses)) {
+    state.postseason.queue = [{ label: "Conference Championship", oppPowerBase: 58, spread: 10, isCCG: true }];
+  } else {
+    state.postseason.stage = "main";
+    planPostseasonMainStage(state);
+  }
+  advancePostseasonStep(state);
+}
+
+function currentPostseasonMoment(state) {
+  if (!state.postseason || !state.postseason.momentId) return null;
+  return GAME_MOMENTS.find((m) => m.id === state.postseason.momentId) || null;
+}
+
+function currentPostseasonSlot(state) {
+  if (!state.postseason) return null;
+  return state.postseason.queue[state.postseason.queueIndex] || null;
+}
+
+function advancePostseasonStep(state) {
+  const ps = state.postseason;
+  const slot = ps.queue[ps.queueIndex];
+  if (!slot) {
+    if (ps.stage === "ccg") {
+      ps.stage = "main";
+      planPostseasonMainStage(state);
+      advancePostseasonStep(state);
+      return;
     }
-  } else if (wins >= 6) {
-    const win = playGame("Bowl Game", 40 + cWeight * 0.5, 10);
-    label = win ? "Bowl win" : "Bowl loss";
+    finishSeasonAfterPostseason(state);
+    return;
+  }
+  const pool = eligibleMoments(state);
+  const moment = pick(pool);
+  ps.momentId = moment.id;
+  ps.momentCtx = {
+    distance: randInt(2, 12),
+    score: scoreText(randInt(-17, 17)),
+    quarter: quarterText(randInt(1, 4)),
+    opponent: slot.label,
+  };
+  save(state);
+}
+
+function resolvePostseasonMoment(state, choiceIndex) {
+  const ps = state.postseason;
+  if (!ps) return;
+  const slot = ps.queue[ps.queueIndex];
+  if (!slot) return;
+  const moment = GAME_MOMENTS.find((m) => m.id === ps.momentId);
+  if (!moment) return;
+  const choice = moment.choices[choiceIndex];
+  if (!choice) return;
+
+  const my = selfMomentRating(state, moment.side, choice.axis);
+  const opp = slot.oppPowerBase + randRange(-slot.spread, slot.spread);
+  const profile = RISK_PROFILES[choice.risk];
+  const gap = my - opp;
+  const successProb = clamp(profile.successBase + gap / 150, 0.08, 0.92);
+  const success = Math.random() < successProb;
+  const win = success;
+
+  const power = teamPower(state) + (success ? profile.successReward : profile.failCost);
+  const score = generateScore(power, opp, win);
+
+  ps.games.push({ label: slot.label, win, us: score.us, them: score.them });
+  if (win) ps.wins++; else ps.losses++;
+
+  if (slot.isCCG) {
+    ps.ccgPlayed = true;
+    ps.conferenceChampion = win;
+    if (win) {
+      ps.label = "Conference Champion";
+      state.reputation = clamp(state.reputation + 5, 0, 100);
+      grantAchievement(state, "conference_champ");
+    } else {
+      ps.label = "Conference Championship — runner-up";
+    }
+  } else if (slot.label === "Bowl Game") {
+    ps.label = win ? "Bowl win" : "Bowl loss";
     if (win) {
       state.reputation = clamp(state.reputation + 3, 0, 100);
       if (state.stage === "headcoach") grantAchievement(state, "bowl_win");
     }
+  } else if (!win) {
+    ps.label = slot.label === "National Championship"
+      ? "National Championship — runner-up"
+      : `Playoff — lost in the ${slot.label.replace("Playoff ", "").toLowerCase()}`;
+  } else if (slot.label === "National Championship") {
+    ps.natty = true;
+    ps.label = "National Champion";
+    state.reputation = clamp(state.reputation + 20, 0, 100);
+    grantAchievement(state, "national_champ");
+    if (Math.random() < 0.5) grantAchievement(state, "coach_of_year");
+  } else {
+    ps.label = "Playoff — advancing";
   }
 
-  return { games, wins, losses, label, conferenceChampion, playoffQualified, natty };
+  ps.momentLog.push({
+    stageLabel: slot.label,
+    title: momentTitle(moment.id),
+    choiceLabel: choice.label,
+    success,
+    resultText: success ? choice.success(ps.momentCtx) : choice.fail(ps.momentCtx),
+    us: score.us,
+    them: score.them,
+    win,
+  });
+
+  if (!win) ps.queue = ps.queue.slice(0, ps.queueIndex + 1);
+  ps.queueIndex++;
+  save(state);
+}
+
+function continuePostseason(state) {
+  advancePostseasonStep(state);
 }
 
 function driftOtherTalents(state) {
@@ -680,30 +805,29 @@ function applyEndOfSeasonGrowth(state, result) {
   if (state.jobSecurity <= 15 && state.jobSecurity > 0) grantAchievement(state, "survived_hotseat");
 }
 
-function finishSeason(state) {
-  const regWins = state.weekResults.filter((r) => r.win).length;
-  const regLosses = state.weekResults.length - regWins;
-
-  const school = getSchool(state.school);
-  const cWeight = conferenceWeight(school ? school.conference : "Independent");
-  const variance = philosophyVariance(state.philosophy);
-  const power = teamPower(state);
-  const postseason = resolvePostseason(state, power, cWeight, variance, regWins, regLosses);
-
-  const wins = postseason.wins;
-  const losses = postseason.losses;
+function finishSeasonAfterPostseason(state) {
+  const ps = state.postseason;
+  const wins = ps.wins;
+  const losses = ps.losses;
   const winPct = wins / (wins + losses);
 
   const result = {
     year: state.year,
     school: state.school,
     title: state.title,
-    regWins,
-    regLosses,
+    regWins: ps.regWins,
+    regLosses: ps.regLosses,
     wins,
     losses,
     winPct,
-    postseason,
+    postseason: {
+      games: ps.games,
+      label: ps.label,
+      conferenceChampion: ps.conferenceChampion,
+      playoffQualified: ps.playoffQualified,
+      natty: ps.natty,
+    },
+    postseasonMomentLog: ps.momentLog,
     weekResults: [...state.weekResults],
     recruitingFocusId: state.recruitingFocusId,
     trainingFocusId: state.trainingFocusId,
@@ -715,7 +839,7 @@ function finishSeason(state) {
     school: result.school,
     title: result.title,
     record: `${wins}-${losses}`,
-    note: postseason.label,
+    note: ps.label,
   });
 
   state.lastSeasonResult = result;
