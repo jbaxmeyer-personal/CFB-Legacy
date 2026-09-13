@@ -55,6 +55,15 @@ function conferenceWeight(conference) {
   return CONFERENCE_WEIGHT[conference] ?? 10;
 }
 
+// "Independent" is a real value in each school's conference field, but it
+// isn't an actual conference — an Independent has no conference games, no
+// conference standings, and no Conference Championship Game to play in
+// (Notre Dame and UConn being the real-world examples).
+function realConference(school) {
+  if (!school || !school.conference || school.conference === "Independent") return null;
+  return school.conference;
+}
+
 function philosophyVariance(philosophy) {
   if (philosophy === "conservative") return 9;
   if (philosophy === "aggressive") return 17;
@@ -205,7 +214,7 @@ function applySchemeChoice(state, offenseSchemeId, defenseSchemeId) {
 
 function generateWeekPlan(state) {
   const mySchool = getSchool(state.school);
-  const myConf = mySchool ? mySchool.conference : null;
+  const myConf = realConference(mySchool);
   const fullPool = SCHOOLS.filter((s) => s.name !== state.school);
   const confPool = fullPool.filter((s) => s.conference === myConf);
   const nonConfPool = fullPool.filter((s) => s.conference !== myConf);
@@ -617,7 +626,7 @@ function pickPostseasonOpponent(state, oppPowerBase, exclude, sameConferenceOnly
     // A Conference Championship Game is only ever played within your own
     // conference, unlike a bowl or playoff matchup, which can be (and
     // often is) cross-conference.
-    const myConf = getSchool(state.school) ? getSchool(state.school).conference : null;
+    const myConf = realConference(getSchool(state.school));
     if (myConf) {
       const inConfBand = SCHOOLS.filter((s) => s.conference === myConf && s.startingPrestige >= minP && s.startingPrestige <= maxP && !exclude.includes(s.name));
       if (inConfBand.length > 0) return pick(inConfBand);
@@ -669,7 +678,7 @@ function beginPostseason(state) {
   const regWins = state.weekResults.filter((r) => r.win).length;
   const regLosses = state.weekResults.length - regWins;
   const school = getSchool(state.school);
-  const myConf = school ? school.conference : null;
+  const myConf = realConference(school);
   const confLosses = computeConferenceLosses(state);
 
   state.postseason = {
