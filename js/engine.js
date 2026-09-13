@@ -65,11 +65,16 @@ function philosophyVariance(philosophy) {
    Career creation
    ========================================================================== */
 
-function pickSchoolByPrestigeRange(minP, maxP, excludeNames) {
+function pickSchoolByPrestigeRange(minP, maxP, excludeNames, biasHigh) {
   const exclude = excludeNames || [];
   let pool = SCHOOLS.filter((s) => s.startingPrestige >= minP && s.startingPrestige <= maxP && !exclude.includes(s.name));
   if (pool.length === 0) pool = SCHOOLS.filter((s) => !exclude.includes(s.name));
   if (pool.length === 0) pool = SCHOOLS;
+  if (biasHigh) {
+    const a = pick(pool);
+    const b = pick(pool);
+    return a.startingPrestige >= b.startingPrestige ? a : b;
+  }
   return pick(pool);
 }
 
@@ -974,13 +979,24 @@ function generateJobOffers(state, fired) {
   // circling; a season that just blew past what your program's status
   // should produce adds a burst of fresh interest on top of that, so a
   // breakout year pays off immediately instead of only through reputation
-  // slowly climbing over future offseasons.
+  // slowly climbing over future offseasons. A real postseason achievement
+  // (making the playoff, winning it all) is its own signal on top of raw
+  // win% — a title run can beat expectations by less, numerically, than a
+  // merely-good season at a modest program, but it's a much bigger deal.
   const repFactor = state.reputation / 100;
   const lastResult = state.lastSeasonResult;
   const performanceEdge = lastResult ? lastResult.winPct - expectedWinPct(myPrestige) : 0;
   const breakoutBonus = Math.round(clamp(performanceEdge, 0, 1) * 4);
+  const postseason = lastResult ? lastResult.postseason : null;
+  const wonNatty = !!(postseason && postseason.natty);
+  const madePlayoff = !!(postseason && postseason.playoffQualified);
+  const wonConfChamp = !!(postseason && postseason.conferenceChampion);
+  const achievementOfferBonus = wonNatty ? 4 : madePlayoff ? 2 : wonConfChamp ? 1 : 0;
+  const achievementPrestigeBoost = wonNatty ? 1.5 : madePlayoff ? 0.75 : wonConfChamp ? 0.3 : 0;
+  const achievementPromoBonus = wonNatty ? 0.25 : madePlayoff ? 0.1 : 0;
+
   const baseMax = 2 + Math.round(repFactor * 4);
-  const numExternal = fired ? randInt(0, 2) : clamp(randInt(1, baseMax) + breakoutBonus, 1, 9);
+  const numExternal = fired ? randInt(0, 2) : clamp(randInt(1, baseMax) + breakoutBonus + achievementOfferBonus, 1, 9);
 
   const usedSchools = new Set([state.school]);
 
@@ -989,18 +1005,25 @@ function generateJobOffers(state, fired) {
     let promotionRoll = Math.random();
     let promoted = false;
 
-    if (state.stage === "position" && promotionRoll < 0.2 + repFactor * 0.35) {
+    if (state.stage === "position" && promotionRoll < 0.2 + repFactor * 0.35 + achievementPromoBonus) {
       stage = "coordinator";
       promoted = true;
-    } else if (state.stage === "coordinator" && promotionRoll < 0.12 + repFactor * 0.3) {
+    } else if (state.stage === "coordinator" && promotionRoll < 0.12 + repFactor * 0.3 + achievementPromoBonus) {
       stage = "headcoach";
       promoted = true;
     }
 
-    let minP, maxP;
+    let minP, maxP, biasHigh;
     if (promoted) {
-      minP = 0;
-      maxP = clamp(1.5 + repFactor * 2, 1, 4);
+      // A promotion offer's ceiling is anchored to whichever is higher:
+      // your built-up reputation, or the tier of the program you're
+      // already succeeding at (a coordinator at a Blue Blood shouldn't be
+      // capped out of Blue Blood-caliber jobs just because reputation
+      // alone says "Solid Program"), plus a bump for a real postseason
+      // achievement this past season.
+      minP = clamp(Math.max(repFactor * 3 - 0.5, myPrestige - 2), 0, 4);
+      maxP = clamp(Math.max(2 + repFactor * 3, myPrestige - 0.5) + achievementPrestigeBoost, 1, 5);
+      biasHigh = true;
     } else if (fired) {
       minP = 0;
       maxP = clamp(myPrestige - 0.5, 0, 5);
@@ -1010,7 +1033,7 @@ function generateJobOffers(state, fired) {
       maxP = clamp(myPrestige + drift + 1, 0, 5);
     }
 
-    const target = pickSchoolByPrestigeRange(minP, maxP, [...usedSchools]);
+    const target = pickSchoolByPrestigeRange(minP, maxP, [...usedSchools], biasHigh);
     if (!target) continue;
     usedSchools.add(target.name);
 
