@@ -1411,6 +1411,18 @@ const TRAINING_FOCUS_OPTIONS = [
     description: "Individualized reps for underclassmen. Talent compounds season over season.",
     effects: { development: 6 },
   },
+  {
+    id: "recruiting_trail",
+    label: "Recruiting Trail",
+    description: "Hit the road hard on the recruiting circuit. A sharper eye for evaluating and closing talent.",
+    effects: { recruitingGain: 6 },
+  },
+  {
+    id: "media_relations",
+    label: "Media & Program Visibility",
+    description: "Get out in front of cameras and boosters. A more polished, press-ready program.",
+    effects: { mediaSavvyGain: 6 },
+  },
 ];
 
 const RECRUITING_FOCUS_OPTIONS = [

@@ -270,6 +270,8 @@ function applyTrainingFocusGains(state, trainingFocusId) {
   if (eff.culture) state.stats.culture = clamp(state.stats.culture + eff.culture, 0, 100);
   if (eff.offenseIQGain) state.stats.offenseIQ = clamp(state.stats.offenseIQ + eff.offenseIQGain, 0, 100);
   if (eff.defenseIQGain) state.stats.defenseIQ = clamp(state.stats.defenseIQ + eff.defenseIQGain, 0, 100);
+  if (eff.recruitingGain) state.stats.recruiting = clamp(state.stats.recruiting + eff.recruitingGain, 0, 100);
+  if (eff.mediaSavvyGain) state.stats.mediaSavvy = clamp(state.stats.mediaSavvy + eff.mediaSavvyGain, 0, 100);
 }
 
 function setPreseasonChoices(state, { trainingFocusId, philosophy, recruitingFocusId, offenseSchemeId, defenseSchemeId }) {

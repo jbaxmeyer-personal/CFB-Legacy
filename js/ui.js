@@ -46,6 +46,8 @@ const TRAINING_GAIN_LABELS = {
   culture: "Culture",
   offenseIQGain: "Offense IQ",
   defenseIQGain: "Defense IQ",
+  recruitingGain: "Recruiting",
+  mediaSavvyGain: "Media Savvy",
 };
 
 function describeGuaranteedGains(effects) {
