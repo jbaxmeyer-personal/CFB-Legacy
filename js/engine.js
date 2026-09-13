@@ -604,9 +604,23 @@ function ccgQualifyChance(confLosses) {
 // power number — so the recap can say who you actually played, and so
 // moment text that references ${ctx.opponent} isn't left showing "Bowl
 // Game" as if it were a team name.
-function pickPostseasonOpponent(state, oppPowerBase, exclude) {
+function pickPostseasonOpponent(state, oppPowerBase, exclude, sameConferenceOnly) {
   const centerPrestige = oppPowerBase / 16;
-  return pickSchoolByPrestigeRange(clamp(centerPrestige - 1, 0, 5), clamp(centerPrestige + 1, 0, 5), exclude);
+  const minP = clamp(centerPrestige - 1, 0, 5);
+  const maxP = clamp(centerPrestige + 1, 0, 5);
+  if (sameConferenceOnly) {
+    // A Conference Championship Game is only ever played within your own
+    // conference, unlike a bowl or playoff matchup, which can be (and
+    // often is) cross-conference.
+    const myConf = getSchool(state.school) ? getSchool(state.school).conference : null;
+    if (myConf) {
+      const inConfBand = SCHOOLS.filter((s) => s.conference === myConf && s.startingPrestige >= minP && s.startingPrestige <= maxP && !exclude.includes(s.name));
+      if (inConfBand.length > 0) return pick(inConfBand);
+      const anyInConf = SCHOOLS.filter((s) => s.conference === myConf && !exclude.includes(s.name));
+      if (anyInConf.length > 0) return pick(anyInConf);
+    }
+  }
+  return pickSchoolByPrestigeRange(minP, maxP, exclude);
 }
 
 function planPostseasonRounds(state, wins, conferenceChampion, exclude) {
@@ -674,7 +688,7 @@ function beginPostseason(state) {
   state.phase = "postseason";
 
   if (myConf && Math.random() < ccgQualifyChance(confLosses)) {
-    const ccgOpponent = pickPostseasonOpponent(state, 58, [state.school]);
+    const ccgOpponent = pickPostseasonOpponent(state, 58, [state.school], true);
     state.postseason.queue = [{ label: "Conference Championship", opponent: ccgOpponent.name, spread: 10, isCCG: true }];
   } else {
     state.postseason.stage = "main";
