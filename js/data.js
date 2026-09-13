@@ -3643,7 +3643,7 @@ const RISK_PROFILES = {
 
 function scoreText(diff) {
   if (diff === 0) return "the game tied";
-  return diff > 0 ? `up by ${diff}` : `down by ${Math.abs(diff)}`;
+  return diff > 0 ? "leading" : "trailing";
 }
 
 function quarterText(q) {
@@ -3848,8 +3848,7 @@ const GAME_MOMENTS = [
   {
     id: "comeback_two_minute_drive",
     side: "offense",
-    scoreBias: "trailing",
-    situation: (ctx) => `Trailing late, driving with under two minutes, ${ctx.score}, ${ctx.quarter}.`,
+    situation: (ctx) => `Trailing late, driving with under two minutes, ${ctx.quarter}.`,
     choices: [
       { label: "Air it out down the field", axis: "pass", risk: "aggressive", success: () => "A miraculous string of completions gets you into scoring position.", fail: () => "A costly interception ends the drive and the comeback hopes." },
       { label: "Mix in the run to keep them honest", axis: "run", risk: "balanced", success: () => "Chunk runs move the chains and burn the clock efficiently.", fail: () => "A stuffed run wastes precious clock." },
@@ -3887,8 +3886,7 @@ const GAME_MOMENTS = [
   {
     id: "prevent_defense_debate",
     side: "defense",
-    scoreBias: "leading",
-    situation: (ctx) => `${ctx.opponent} threaten late with a lead in hand for you, ${ctx.score}, ${ctx.quarter}.`,
+    situation: (ctx) => `${ctx.opponent} threaten late with a lead in hand for you, ${ctx.quarter}.`,
     choices: [
       { label: "Keep the pressure on, play it aggressively", axis: "pass", risk: "aggressive", success: () => "The pressure forces a rushed, errant throw. Interception!", fail: () => "The blitz leaves single coverage on an island — burned deep." },
       { label: "Drop into a soft prevent shell", axis: "pass", risk: "safe", success: () => "Nothing given up over the top. They settle for short gains and run out of time.", fail: () => "The soft coverage lets them nickel-and-dime all the way down the field." },
@@ -3971,8 +3969,7 @@ const GAME_MOMENTS = [
   {
     id: "onside_kick_attempt",
     side: "special",
-    scoreBias: "trailing",
-    situation: (ctx) => `Trailing late, you need the ball back, ${ctx.score}, ${ctx.quarter}.`,
+    situation: (ctx) => `Trailing late, you need the ball back, ${ctx.quarter}.`,
     choices: [
       { label: "Try the surprise onside kick", axis: "special", risk: "aggressive", success: () => "Recovered! The onside kick gives you the ball right back.", fail: () => "They recover instead — a gift of great field position." },
       { label: "Kick it away, trust your defense", axis: "special", risk: "safe", success: () => "A clean, deep kickoff. Now it's on the defense to make a stop.", fail: () => "A shanked kickoff hands them a short field anyway." },
@@ -4091,8 +4088,7 @@ const GAME_MOMENTS = [
   {
     id: "blowout_lead_management",
     side: "poise",
-    scoreBias: "bigLeading",
-    situation: (ctx) => `A big lead in hand, ${ctx.score}, ${ctx.quarter}. How do you manage the rest of the game?`,
+    situation: (ctx) => `A big lead in hand, ${ctx.quarter}. How do you manage the rest of the game?`,
     choices: [
       { label: "Keep the starters in, chase more points", axis: "poise", risk: "aggressive", success: () => "The starters pad the lead further — a statement win.", fail: () => "An unnecessary injury risk nearly bites you late." },
       { label: "Empty the bench, protect your starters", axis: "poise", risk: "safe", success: () => "Starters rest up healthy for next week, game well in hand.", fail: () => "The backups let the opponent creep back into it before the starters return." },
@@ -4101,8 +4097,7 @@ const GAME_MOMENTS = [
   {
     id: "double_digit_deficit_response",
     side: "poise",
-    scoreBias: "bigTrailing",
-    situation: (ctx) => `Down big on the road, ${ctx.score}, ${ctx.quarter}. Some teams fold here.`,
+    situation: (ctx) => `Down big on the road, ${ctx.quarter}. Some teams fold here.`,
     choices: [
       { label: "Challenge the team to fight until the whistle", axis: "poise", risk: "aggressive", success: () => "The message lands — a furious response that makes it a game again.", fail: () => "The deficit only grows as things unravel further." },
       { label: "Focus on execution, not the scoreboard", axis: "poise", risk: "safe", success: () => "Steady, business-like execution chips away at the deficit.", fail: () => "The businesslike approach doesn't create the spark that was needed." },
