@@ -14,18 +14,6 @@ const DILEMMAS_PER_SEASON = 2;
 
 const STAT_KEYS = ["offenseIQ", "defenseIQ", "recruiting", "development", "culture", "mediaSavvy"];
 
-// Some moments' flavor text hardcodes a game state (trailing, protecting
-// a big lead, etc.) — the generated score has to agree with that premise
-// instead of being rolled fully independently, or you get nonsense like
-// "Trailing late... up by 16."
-function randomScoreDiff(scoreBias) {
-  if (scoreBias === "trailing") return randInt(-17, -1);
-  if (scoreBias === "leading") return randInt(1, 17);
-  if (scoreBias === "bigTrailing") return randInt(-24, -10);
-  if (scoreBias === "bigLeading") return randInt(10, 24);
-  return randInt(-17, 17);
-}
-
 // Position coaches and coordinators only call the side of the ball they
 // actually coach; a Head Coach oversees both. "special"/"poise" moments
 // (special teams, game management, composure) aren't tied to either side,
@@ -251,7 +239,7 @@ function generateWeekPlan(state) {
     plan[wIdx].momentId = moment.id;
     plan[wIdx].momentCtx = {
       distance: randInt(2, 12),
-      score: scoreText(randomScoreDiff(moment.scoreBias)),
+      score: scoreText(randInt(-17, 17)),
       quarter: quarterText(randInt(1, 4)),
       opponent: plan[wIdx].opponent,
     };
@@ -723,7 +711,7 @@ function advancePostseasonStep(state) {
   ps.momentId = moment.id;
   ps.momentCtx = {
     distance: randInt(2, 12),
-    score: scoreText(randomScoreDiff(moment.scoreBias)),
+    score: scoreText(randInt(-17, 17)),
     quarter: quarterText(randInt(1, 4)),
     opponent: slot.opponent,
   };
