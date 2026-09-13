@@ -857,8 +857,23 @@ function applyEndOfSeasonGrowth(state, result) {
   const repDelta = Math.round((result.winPct - expectedWinPct(prestigeGoingIn)) * 24);
   state.reputation = clamp(state.reputation + repDelta, 0, 100);
 
-  let secDelta = (result.winPct - 0.5) * 24;
+  // Job security moves the same expectations-relative way reputation does,
+  // and harder — a program that badly misses what it "should" be doing
+  // should genuinely put a coach's job at risk, not just dent a number
+  // that's nearly impossible to ever run out.
+  const expected = expectedWinPct(prestigeGoingIn);
+  const secDelta = Math.round((result.winPct - expected) * 40);
   state.jobSecurity = clamp(state.jobSecurity + secDelta, 0, 100);
+
+  // A truly disastrous season relative to expectations can get a coach
+  // fired outright, on the spot, instead of only through years of
+  // gradually-drained job security — the bigger the program and the worse
+  // the miss, the higher the chance.
+  const shortfall = expected - result.winPct;
+  if (shortfall > 0.35) {
+    const instantFireChance = clamp((shortfall - 0.35) * 1.5, 0, 0.8);
+    if (Math.random() < instantFireChance) state.jobSecurity = 0;
+  }
 
   if (result.winPct > 0.5) grantAchievement(state, "winning_season");
 
@@ -953,8 +968,17 @@ function generateJobOffers(state, fired) {
     });
   }
 
+  // Cumulative reputation raises how many programs are generally
+  // circling; a season that just blew past what your program's status
+  // should produce adds a burst of fresh interest on top of that, so a
+  // breakout year pays off immediately instead of only through reputation
+  // slowly climbing over future offseasons.
   const repFactor = state.reputation / 100;
-  const numExternal = fired ? randInt(0, 2) : randInt(1, 2 + Math.round(repFactor * 2));
+  const lastResult = state.lastSeasonResult;
+  const performanceEdge = lastResult ? lastResult.winPct - expectedWinPct(myPrestige) : 0;
+  const breakoutBonus = Math.round(clamp(performanceEdge, 0, 1) * 4);
+  const baseMax = 2 + Math.round(repFactor * 4);
+  const numExternal = fired ? randInt(0, 2) : clamp(randInt(1, baseMax) + breakoutBonus, 1, 9);
 
   const usedSchools = new Set([state.school]);
 
